@@ -36,6 +36,18 @@ const readOverheadByTitle = async (req,res)=> {
     res.status(200).json(overheads)
 
 }
+
+const readOverheadById = async (req,res)=> {
+    const {_id} = req.params
+    const overhead = await Overhead.findById(_id).lean()
+   // const overheads = await Overhead.find({title:{"$regex":`^${title}`, "$options": "i"}}).populate("company").lean()
+    // const overheads = await Overhead.find({title:{"$regex":title, "$options": "i"}}).lean()
+    if(!overhead)
+        return res.status(400).json({ message: "no such overhead conditioner" })
+    res.status(200).json(overhead)
+
+}
+
 const updateOverhead = async (req, res) => {
     const { _id,title, describe , imagepath , stock, output, size,speeds, swing, timer , sabbath_command , night_mode } = req.body
     if(!_id){
@@ -73,4 +85,4 @@ const deleteOverhead = async (req,res)=> {
     return res.status(200).json(overheads)
 }
 
-module.exports = {createOverhead , readOverhead, readOverheadByTitle , updateOverhead , deleteOverhead}
+module.exports = {createOverhead , readOverhead, readOverheadById,readOverheadByTitle , updateOverhead , deleteOverhead}

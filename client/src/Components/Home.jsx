@@ -64,8 +64,8 @@ const Home = ()=> {
         <Route path='/branch' element={<Suspense fallback="Loading..."><Branch /></Suspense>}></Route>
         <Route path='/about' element={<Suspense fallback="Loading..."><About /></Suspense>}></Route>
         <Route path='/overheads' element={<Suspense fallback="Loading..."><Overheads /></Suspense>}>        </Route>
-        <Route path='/overheads/overhead' element={<Suspense fallback="Loading..."><Overhead /></Suspense>}></Route>
-
+        <Route path={`/overheads/:product`} element={<Suspense fallback="Loading..."><Overhead /></Suspense>}></Route>
+        {/* <Route exact path={`/overheads/:id`} Component={Overhead}></Route> */}
     </Routes>
         <div className="card">
             <Menubar model={items} start={start} end={end} style={{ position: 'fixed', top: 0}}/>

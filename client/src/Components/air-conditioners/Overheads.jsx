@@ -4,7 +4,7 @@ import { Button } from 'primereact/button';
 import { DataView, DataViewLayoutOptions } from 'primereact/dataview';
 import { Tag } from 'primereact/tag';
 import { classNames } from 'primereact/utils';
-import { Link } from 'react-router-dom';
+import { Link , Outlet, useLocation } from 'react-router-dom';
 import { InputText } from 'primereact/inputtext';
 import { IconField } from 'primereact/iconfield';
 import { InputIcon } from 'primereact/inputicon';
@@ -54,6 +54,7 @@ const Overheads = () => {
             console.error(e)
         }
     }
+   
 
     const getSeverity = (s) => {
         if (s >= 50) {
@@ -93,7 +94,9 @@ const Overheads = () => {
                         <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`${product.imagepath}`} />
                         <div className="flex flex-column sm:flex-row justify-content-between align-items-center xl:align-items-start flex-1 gap-4">
                             <div className="flex flex-column align-items-center sm:align-items-start gap-3">
-                                <Link to={"/overheads/overhead"} ><div className="text-2xl font-bold text-900" style={{}} >{product.title}</div></Link>
+                                {/* <Link to={{pathName:`/overheads/${product.title}` , state: {product:product} }}><div className="text-2xl font-bold text-900" style={{}} >{product.title}</div></Link> */}
+                                <Link to={`/overheads/${product._id}` } params={{ product: product }}><div className="text-2xl font-bold text-900" style={{}} >{product.title}</div></Link>
+
                                 <div className="flex align-items-center gap-3">
                                     <Tag value={getSeverityText(product)} severity={getSeverity(product.stock)}></Tag>
                                 </div>

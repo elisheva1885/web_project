@@ -91,7 +91,9 @@ const Branches = () => {
                                 <span className="font-semibold">{`שעות פתיחה:`}</span>
                                 <span className="font-semibold">{`א-ה: ${branch.closingHour.weekdays} - ${branch.openingHour}`}</span>
                                 <span className="font-semibold">{`שישי וערבי חג:  ${branch.closingHour.fridays} - ${branch.openingHour}`}</span>
+                                <div className="font-semibold">{` ליצירת קשר: ${branch.phoneNumber} `}</div>
                                 </span>
+
                                 <Tag value={isOpen(branch) === "success" ? "open" : "close"} severity={isOpen(branch)}></Tag>
                             </div>
                         </div>
