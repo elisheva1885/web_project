@@ -94,7 +94,7 @@ const Branches = () => {
                                 <div className="font-semibold">{` ליצירת קשר: ${branch.phoneNumber} `}</div>
                                 </span>
 
-                                <Tag value={isOpen(branch) === "success" ? "open" : "close"} severity={isOpen(branch)}></Tag>
+                                <Tag value={isOpen(branch) === "success" ? "פתוח" : "סגור"} severity={isOpen(branch)}></Tag>
                             </div>
                         </div>
                     </div>

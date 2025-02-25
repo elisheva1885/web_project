@@ -39,13 +39,12 @@ const readOverheadByTitle = async (req,res)=> {
 
 const readOverheadById = async (req,res)=> {
     const {_id} = req.params
-    const overhead = await Overhead.findById(_id).lean()
+    const overhead = await Overhead.findById(_id).populate("company").lean()
    // const overheads = await Overhead.find({title:{"$regex":`^${title}`, "$options": "i"}}).populate("company").lean()
     // const overheads = await Overhead.find({title:{"$regex":title, "$options": "i"}}).lean()
     if(!overhead)
         return res.status(400).json({ message: "no such overhead conditioner" })
     res.status(200).json(overhead)
-
 }
 
 const updateOverhead = async (req, res) => {
