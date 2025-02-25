@@ -14,8 +14,8 @@ const adminVerify = (req, res, next)=> {
             }
             req.user = decoded
             const userRole = req.user.roles
-            // console.log(req.user);
-            if(userRole!="admin"){
+            console.log(req.user);
+            if(userRole!="admin" && userRole!="official" ){
                 return res.status(403).json({message: 'Access denied'})
             }
             next()
@@ -23,4 +23,3 @@ const adminVerify = (req, res, next)=> {
     )
 }
 module.exports = adminVerify
-

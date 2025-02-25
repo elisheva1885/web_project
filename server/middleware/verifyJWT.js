@@ -12,7 +12,7 @@ const verifyJWT = (req, res, next)=> {
             if(err){
                 return res.status(400).json({message: 'Forbidden'})
             }
-            req.user = decoded
+            req.user = decoded            
             next()
         }
     )
