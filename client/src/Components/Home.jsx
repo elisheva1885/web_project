@@ -8,6 +8,7 @@ const About = lazy(() => import('./About'));
 const Branch = lazy(() => import('./Branch'));
 const Overheads = lazy(() => import('./air-conditioners/Overheads'));
 const Overhead = lazy(() => import('./air-conditioners/Overhead'));
+const Login = lazy(() => import('./Login'));
 
 
 const Home = ()=> {
@@ -23,7 +24,8 @@ const Home = ()=> {
 
         {
             label: 'התחברות',
-            icon: 'pi pi-user'
+            icon: 'pi pi-user',
+            url: '/login'
         },
         {
             label: 'צור קשר',
@@ -65,6 +67,8 @@ const Home = ()=> {
         <Route path='/about' element={<Suspense fallback="Loading..."><About /></Suspense>}></Route>
         <Route path='/overheads' element={<Suspense fallback="Loading..."><Overheads /></Suspense>}>        </Route>
         <Route path={`/overheads/overhead/:product`} element={<Suspense fallback="Loading..."><Overhead /></Suspense>}></Route>
+        <Route path='/login' element={<Suspense fallback="Loading..."><Login /></Suspense>}></Route>
+
         {/* <Route exact path={`/overheads/:id`} Component={Overhead}></Route> */}
     </Routes>
         <div className="card">
