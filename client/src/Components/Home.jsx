@@ -9,6 +9,7 @@ const Branch = lazy(() => import('./Branch'));
 const Overheads = lazy(() => import('./air-conditioners/Overheads'));
 const Overhead = lazy(() => import('./air-conditioners/Overhead'));
 const Login = lazy(() => import('./Login'));
+const Register = lazy(() => import('./Register'));
 
 
 const Home = ()=> {
@@ -68,6 +69,7 @@ const Home = ()=> {
         <Route path='/overheads' element={<Suspense fallback="Loading..."><Overheads /></Suspense>}>        </Route>
         <Route path={`/overheads/overhead/:product`} element={<Suspense fallback="Loading..."><Overhead /></Suspense>}></Route>
         <Route path='/login' element={<Suspense fallback="Loading..."><Login /></Suspense>}></Route>
+        <Route path='/register' element={<Suspense fallback="Loading..."><Register /></Suspense>}></Route>
 
         {/* <Route exact path={`/overheads/:id`} Component={Overhead}></Route> */}
     </Routes>
