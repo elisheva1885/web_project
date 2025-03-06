@@ -34,10 +34,36 @@ const overheadSchema = new mongoose.Schema({
         cool: { type: String },
         heat: { type: String }
     },
-    size: {
-        length: {type: Number},
+    energy_rating:{//דיורג אנרגטי
+        cool: { type: String },
+        heat: { type: String }
+    },
+    working_current: {//זרם עבודה
+        cool: { type: String },
+        heat: { type: String }
+    },
+    recommended_methom:{
+        type:Number
+    },
+    pipe_connection: {
+
+    },
+    in_size: {
         width: {type: Number},
+        depth: {type: Number},    
         height: {type: Number},
+    },
+    out_size: {
+        width: {type: Number},
+        depth: {type: Number},    
+        height: {type: Number},
+    },
+    air_flow:{//xphe, tuuhr
+        type:Number
+    },
+    //icons
+    quiet:{
+        type: Boolean
     },
     speeds: {
         type: Number
