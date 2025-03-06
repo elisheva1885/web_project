@@ -1,7 +1,7 @@
 const Overhead = require("../models/airconditioners/Overhead")
 
 const createOverhead = async (req, res) => {
-    const {SKU , company , title, describe , imagepath , stock , price , output , size , speeds , swing, timer , sabbath_command , night_mode } = req.body
+    const {SKU , company , title, describe , imagepath , stock , price , output , energy_rating , working_current , recommended_methom, pipe_connection , in_size , out_size, air_flow, quiet, wifi,speeds, air4d,night_mode,timer, sabbath_command,onof_auto} = req.body
     if(!SKU || !company || !title ||!describe || !price ||!imagepath ){
         return res.status(400).json({ message: "all details are required" })
     }
@@ -9,7 +9,7 @@ const createOverhead = async (req, res) => {
     if (duplicate) {
         return res.status(409).json({ message: "SKU already exist" })
     }
-    const overhead = await Overhead.create({SKU , company , title, describe , imagepath , stock ,price, output, size,speeds, swing, timer , sabbath_command , night_mode})
+    const overhead = await Overhead.create({SKU , company , title, describe , imagepath , stock ,price, output, energy_rating , working_current , recommended_methom, pipe_connection , in_size , out_size, air_flow, quiet, wifi,speeds, air4d,night_mode,timer, sabbath_command,onof_auto})
     if(overhead){
         const overheads = await Overhead.find().populate("company").lean()
         res.status(200).json(overheads)
@@ -48,7 +48,7 @@ const readOverheadById = async (req,res)=> {
 }
 
 const updateOverhead = async (req, res) => {
-    const { _id,title, describe , imagepath , stock, output, size,speeds, swing, timer , sabbath_command , night_mode } = req.body
+    const { _id,title, describe , imagepath , stock, output, energy_rating , working_current , recommended_methom, pipe_connection , in_size , out_size, air_flow, quiet, wifi,speeds, air4d,night_mode,timer, sabbath_command,onof_auto} = req.body
     if(!_id){
         return res.status(400).json({message: "all details are required"})
     }
@@ -59,12 +59,21 @@ const updateOverhead = async (req, res) => {
     overhead.stock= stock?stock:overhead.stock
     overhead.price= overhead.price
     overhead.output= output?output:overhead.output
-    overhead.size= size?size:overhead.size
+    overhead.energy_rating= energy_rating?energy_rating:overhead.energy_rating
+    overhead.working_current= working_current?working_current:overhead.working_current
+    overhead.recommended_methom= recommended_methom?recommended_methom:overhead.recommended_methom
+    overhead.pipe_connection= pipe_connection?pipe_connection:overhead.pipe_connection
+    overhead.in_size= in_size?in_size:overhead.in_size
+    overhead.out_size= out_size?out_size:overhead.out_size
+    overhead.air_flow= air_flow?air_flow:overhead.air_flow
+    overhead.quiet= quiet?quiet:overhead.quiet
+    overhead.wifi= wifi?wifi:overhead.wifi
     overhead.speeds= speeds?speeds:overhead.speeds
-    overhead.swing= swing?swing:overhead.swing
+    overhead.air4d= air4d?air4d:overhead.air4d
+    overhead.night_mode= night_mode?night_mode:overhead.night_mode
     overhead.timer= timer?timer:overhead.timer
     overhead.sabbath_command= sabbath_command?sabbath_command:overhead.sabbath_command
-    overhead.night_mode= night_mode?night_mode:overhead.night_mode
+    overhead.onof_auto= onof_auto?onof_auto:overhead.onof_auto
     const updated = await overhead.save()
     const overheads = await Overhead.find().populate("company").lean()
     res.status(200).json(overheads)
