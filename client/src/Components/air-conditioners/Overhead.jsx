@@ -26,18 +26,17 @@ const Overhead = () => {
     }, [])
     return (
         <>
+        <br/><br/><br/><br/>
+                            {/* <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`${overhead.company.imagePath}`} /> */}
                              <h1>{overhead.title}</h1>
-                            { console.log(overhead.imagepath)}
-                            <img src={`${overhead.imagepath}`} />
+                            {/* { console.log(overhead.imagepath)} */}
+                            {/* <img src={`${overhead.imagepath}`} /> */}
+                            <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`${product.imagepath}`} />
                             <h3>{overhead.describe}</h3>
-                            {/* { console.log(overhead.company.name)} */}
+                            {/* { console.log(overhead.company.imagePath)} */}
                             { console.log(overhead.company)}
                             {/* <img src={`${overhead.company.imagePath}`} /> */}
-
-
-
-
-
+                            <p>  ש"ח {overhead.price}</p>
         </>
     )
 }

@@ -1,9 +1,5 @@
 const mongoose = require('mongoose')
 const overheadSchema = new mongoose.Schema({
-    SKU: {
-        type: String,
-        required: true
-    },
     company: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Company',
@@ -46,7 +42,10 @@ const overheadSchema = new mongoose.Schema({
         type:Number
     },
     pipe_connection: {
-
+        a1:{ type:Number},
+        a2:{ type:Number},
+        b1:{ type:Number},
+        b2: { type:Number}
     },
     in_size: {
         width: {type: Number},
