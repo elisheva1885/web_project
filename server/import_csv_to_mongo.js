@@ -50,8 +50,7 @@ fs.readFile('C:\\Users\\משפחת ספראי\\Documents\\final project\\data\\o
                 let value = row[index];
 
                 if (header === 'stock' || header === 'price' || header === 'recommended_methom' || header === 'air_flow' ||
-                    header === 'pipe_connection_a1' || header === 'pipe_connection_a2' || header === 'pipe_connection_b1' || 
-                    header === 'pipe_connection_b2' || header === 'in_size_width' || header === 'in_size_depth' || 
+                    header === 'pipe_connection_a' || header === 'pipe_connection_b'  || header === 'in_size_width' || header === 'in_size_depth' || 
                     header === 'in_size_height' || header === 'out_size_width' || header === 'out_size_depth' || 
                     header === 'out_size_height' || header === 'speeds') {
                     value = convertToNumber(value);

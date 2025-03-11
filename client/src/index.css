@@ -15,7 +15,9 @@ body {
 
 .card {
   background: var(--surface-card);
-  padding: 2rem;
+  padding: 4rem;
   border-radius: 10px;
   margin-bottom: 1rem;
+  width: 25vw; /* 25% מרוחב המסך */
+  height: 25vh; /* 25% מגובה המסך */
 }

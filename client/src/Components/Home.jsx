@@ -4,6 +4,8 @@ import { Badge } from 'primereact/badge';
 import { Avatar } from 'primereact/avatar'; 
 import { Suspense, lazy } from 'react'
 import {  Route, Routes, Link, Router} from 'react-router-dom';
+import { Card } from 'primereact/card';
+import { useNavigate } from 'react-router-dom';
 const About = lazy(() => import('./About'));
 const Branch = lazy(() => import('./Branch'));
 const Overheads = lazy(() => import('./air-conditioners/Overheads'));
@@ -13,6 +15,8 @@ const Register = lazy(() => import('./Register'));
 
 
 const Home = ()=> {
+    const navigate = useNavigate();
+
     // const itemRenderer = (item) => (
     //     <a className="flex align-items-center p-menuitem-link">
     //         <span className={item.icon} />
@@ -21,6 +25,11 @@ const Home = ()=> {
     //         {item.shortcut && <span className="ml-auto border-1 surface-border border-round surface-100 text-xs p-1">{item.shortcut}</span>}
     //     </a>
     // );
+    const goToOverhead = () => {
+        navigate('/overheads');
+      };
+
+      
     const items = [
 
         {
@@ -64,6 +73,7 @@ const Home = ()=> {
     return (
         <>
         <Routes>
+        {/* <Route path="/" element={<Home />} /> */}
         <Route path='/branch' element={<Suspense fallback="Loading..."><Branch /></Suspense>}></Route>
         <Route path='/about' element={<Suspense fallback="Loading..."><About /></Suspense>}></Route>
         <Route path='/overheads' element={<Suspense fallback="Loading..."><Overheads /></Suspense>}>        </Route>
@@ -76,6 +86,30 @@ const Home = ()=> {
         <div className="card">
             <Menubar model={items} start={start} end={end} style={{ position: 'fixed', top: 0}}/>
         </div>
+        {/* <div className="card"  style={{ backgroundImage: "url('/overheads/back.jpg')" }}>
+            <Card title="מזגנים עיליים">
+                <p className="m-0">
+
+                </p>
+            </Card>
+        </div> */}
+       <div className="flex justify-center p-4">
+      <div
+        className="w-190 h-190 rounded-lg shadow-lg bg-cover bg-center flex items-end"
+        style={{ backgroundImage: "url('/overheads/back.jpg')" }}>
+            {/* <Link to="/overheads" className="w-full h-full"> */}
+        {/* מסגרת הכרטיס ללא רקע */}
+        <Card className="bg-transparent border-none shadow-none" style={{ width: '30vw', height: '30vh' }} onClick={goToOverhead}>
+          <div className="w-full text-center text-white text-2xl font-bold bg-black/50 p-4 rounded-b-lg">
+            מזגנים עיליים
+            {/* <button onClick={goToOverhead}>Go to Overhead</button> */}
+
+          </div>
+        </Card>
+        {/* </Link> */}
+      </div>
+    </div>
+ 
         </>
     )
 }

@@ -26,7 +26,7 @@ const overheadSchema = new mongoose.Schema({
         type:Number,
         required:true
     },
-    output: {
+    BTU_output: {
         cool: { type: String },
         heat: { type: String }
     },
@@ -39,13 +39,11 @@ const overheadSchema = new mongoose.Schema({
         heat: { type: String }
     },
     recommended_methom:{
-        type:Number
+        type:String
     },
     pipe_connection: {
-        a1:{ type:Number},
-        a2:{ type:Number},
-        b1:{ type:Number},
-        b2: { type:Number}
+        a:{ type:String},
+        b:{ type:String},
     },
     in_size: {
         width: {type: Number},

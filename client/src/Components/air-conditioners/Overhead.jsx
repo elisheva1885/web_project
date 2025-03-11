@@ -2,6 +2,7 @@ import { useLocation, useParams } from 'react-router-dom';
 import { useState, useEffect} from 'react'
 import axios from 'axios'
 
+
 const Overhead = () => {
     const {product} =  useParams();
 
@@ -32,6 +33,7 @@ const Overhead = () => {
                             {/* { console.log(overhead.imagepath)} */}
                             {/* <img src={`${overhead.imagepath}`} /> */}
                             <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`${product.imagepath}`} />
+                            
                             <h3>{overhead.describe}</h3>
                             {/* { console.log(overhead.company.imagePath)} */}
                             { console.log(overhead.company)}
