@@ -83,30 +83,21 @@ const Home = ()=> {
 
         {/* <Route exact path={`/overheads/:id`} Component={Overhead}></Route> */}
     </Routes>
-        <div className="card">
+        <div className="flex align-items-center gap-2">
             <Menubar model={items} start={start} end={end} style={{ position: 'fixed', top: 0}}/>
         </div>
-        {/* <div className="card"  style={{ backgroundImage: "url('/overheads/back.jpg')" }}>
-            <Card title="מזגנים עיליים">
-                <p className="m-0">
 
-                </p>
-            </Card>
-        </div> */}
-       <div className="flex justify-center p-4">
+       <div className="flex justify-center items-center p-4">
       <div
-        className="w-190 h-190 rounded-lg shadow-lg bg-cover bg-center flex items-end"
+        className="w-[300px] h-[300px] h-190 rounded-lg shadow-lg bg-cover bg-center flex items-end"
         style={{ backgroundImage: "url('/overheads/back.jpg')" }}>
-            {/* <Link to="/overheads" className="w-full h-full"> */}
         {/* מסגרת הכרטיס ללא רקע */}
         <Card className="bg-transparent border-none shadow-none" style={{ width: '30vw', height: '30vh' }} onClick={goToOverhead}>
           <div className="w-full text-center text-white text-2xl font-bold bg-black/50 p-4 rounded-b-lg">
             מזגנים עיליים
-            {/* <button onClick={goToOverhead}>Go to Overhead</button> */}
-
           </div>
         </Card>
-        {/* </Link> */}
+
       </div>
     </div>
  
@@ -115,3 +106,5 @@ const Home = ()=> {
 }
 
 export default Home
+
+

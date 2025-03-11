@@ -30,10 +30,9 @@ function App() {
         <Route path='/register' element={<Suspense fallback="Loading..."><Register /></Suspense>}></Route>
 
   </Routes>
-    {/* // <Provider store={myStore}> */}
+   
         {/* <Home /> */}
       </div>
-    // </Provider>
 
   );
 }

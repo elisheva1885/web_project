@@ -117,7 +117,7 @@ const Overheads = () => {
             <div className="col-12 sm:col-6 lg:col-12 xl:col-4 p-2" key={product._id}>
                 <div className="p-4 border-1 surface-border surface-card border-round">
                     <div className="flex flex-wrap align-items-center justify-content-between gap-2">
-                        <img className="w-9 shadow-2 border-round" src={`${product.company.imagePath}`} />
+                        {/* <img className="w-9 shadow-2 border-round" src={`${product.company.imagePath}`} /> */}
                         <div className="flex align-items-center gap-2">
                             <Link to={"/overheads/overhead"}><div className="text-2xl font-bold text-900" style={{}}>{product.title}</div></Link>
                         </div>
