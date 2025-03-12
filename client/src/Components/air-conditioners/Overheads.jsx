@@ -4,25 +4,40 @@ import { Button } from 'primereact/button';
 import { DataView, DataViewLayoutOptions } from 'primereact/dataview';
 import { Tag } from 'primereact/tag';
 import { classNames } from 'primereact/utils';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { InputText } from 'primereact/inputtext';
 import { IconField } from 'primereact/iconfield';
 import { InputIcon } from 'primereact/inputicon';
 import { getToken } from '../../store/tokenSlice';
 import { useSelector } from 'react-redux';
+import Add_AirConditioner from './Add_AirConditioner';
 
 const Overhead = lazy(() => import('./Overhead'));
 
 
 const Overheads = () => {
-    const token = useSelector(state => state.token.token)
+
+    const {token} = useSelector((state) => state.token)
     const [overheads, setOverheads] = useState([])
     const [overheads2, setOverheads2] = useState([])
     const [value, setValue] = useState('')
+    const userDetalis = JSON.parse(localStorage.getItem('user'));
 
     const [layout, setLayout] = useState('list');
+    const navigate = useNavigate();
 
-      
+
+    // const goToAddOverhead = (type) => {
+    //     navigate(`/overheads/add`, {type: type});
+    //   };
+    const goToAddOverhead = (type) => {
+        const navigationData = {
+            type: type,
+            // You can add any other data you may want to send
+        };
+        navigate('/overheads/add', { state: navigationData });
+    };
+
     const sortData = (data) => {
         data.sort((a, b) => {
             if (a.title < b.title) return -1;  // a comes before b
@@ -33,11 +48,9 @@ const Overheads = () => {
 
     const getOverheads = async () => {
         try {
-            console.log(token);
             const headers = {
                 'Authorization': `Bearer ${token}`
             }
-            debugger
             const res = await axios.get('http://localhost:8000/api/air-conditioner/overhead',{headers})
             if (res.status === 200) {
                 sortData(res.data)
@@ -62,6 +75,9 @@ const Overheads = () => {
         }
     }
    
+    // const createOverhead= () => {
+
+    // }
 
     const getSeverity = (s) => {
         if (s >= 50) {
@@ -97,8 +113,8 @@ const Overheads = () => {
             <>
                 <div className="col-12" key={product._id}>
                     <div className={classNames('flex flex-column xl:flex-row xl:align-items-start p-4 gap-4', { 'border-top-1 surface-border': index !== 0 })}>
-                        {/* <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`${product.company.imagePath}`} /> */}
-                        <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`overheads/${product.imagepath}`} />
+                        <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`/${product.company.imagePath}`} />
+                        <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`${product.imagepath}`} />
                         <div className="flex flex-column sm:flex-row justify-content-between align-items-center xl:align-items-start flex-1 gap-4">
                             <div className="flex flex-column align-items-center sm:align-items-start gap-3">
                                 {/* <Link to={{pathName:`/overheads/${product.title}` , state: {product:product} }}><div className="text-2xl font-bold text-900" style={{}} >{product.title}</div></Link> */}
@@ -175,6 +191,9 @@ const Overheads = () => {
             <Routes>
                 <Route path='/overheads/overhead' element={<Suspense fallback="Loading..."><Overhead /></Suspense>}></Route>
             </Routes> */}
+            {userDetalis.role === 'user'?<Button onClick={ ()=>goToAddOverhead("Overhead")}>add overhead</Button>: <></> }
+            
+
             <div className="card">
                 <div className="flex justify-content-end">
                     <IconField iconPosition="left">
@@ -184,7 +203,6 @@ const Overheads = () => {
                 </div>
                 <DataView value={overheads} listTemplate={listTemplate} layout={layout} header={header()} />
             </div>
-
         </>
     )
 }

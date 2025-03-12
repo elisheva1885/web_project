@@ -64,25 +64,31 @@ const overheadSchema = new mongoose.Schema({
     },
    
     wifi:{
-        type: Boolean
+        type: Boolean,
+        default:false
     },
     speeds: {
         type: Number
     },
     air4d:{
-        type: Boolean
+        type: Boolean,
+        default:false
     },
     night_mode: {
-        type: Boolean
+        type: Boolean,
+        default:false
     },
     timer: {
-        type: Boolean
+        type: Boolean,
+        default:false
     },
     sabbath_command: {
-        type: Boolean
+        type: Boolean,
+        default:false
     },
     onof_auto:{
-        type: Boolean
+        type: Boolean,
+        default:false
     }
 
 

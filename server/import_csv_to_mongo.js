@@ -18,14 +18,16 @@ dbconnect()
 const overheads = [];
 
 // בדיקה אם הקובץ קיים לפני קריאתו
-if (!fs.existsSync('C:\\Users\\משפחת ספראי\\Documents\\final project\\data\\overhead_data.csv')) {
+// if (!fs.existsSync('C:\\Users\\משפחת ספראי\\Documents\\final project\\data\\overhead_data.csv')) {
+    if (!fs.existsSync('./overhead_data_a.csv')) {
     console.error('Error: File "overhead_data.csv" not found.');
     process.exit(1);
 }
 
 
 // קריאת הקובץ וטעינת הנתונים
-fs.readFile('C:\\Users\\משפחת ספראי\\Documents\\final project\\data\\overhead_data.csv', 'utf8', (err, data) => {
+// fs.readFile('C:\\Users\\משפחת ספראי\\Documents\\final project\\data\\overhead_data.csv', 'utf8', (err, data) => {
+    fs.readFile('./overhead_data_a.csv', 'utf8', (err, data) => {
     if (err) {
         console.error('Error reading file:', err);
         process.exit(1);

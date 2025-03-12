@@ -12,7 +12,7 @@ import { clearToken, setToken } from '../store/tokenSlice';
 import myStore from '../store/store';
 
 const Login  =() => {
-
+    const t = useSelector((state) => state.token.token)
     const [showMessage, setShowMessage] = useState(false);
     const [formData, setFormData] = useState({});
     const dispatch = useDispatch();
@@ -33,7 +33,9 @@ const Login  =() => {
             const res = await axios.post(`http://localhost:8000/api/auth/login`,user)
             if(res.status===200){
                 dispatch(setToken(res.data.token));
-                
+                console.log(t);
+                console.log(res.data);
+                localStorage.setItem('user', JSON.stringify(res.data));
                 setShowMessage(true);
             }
         } catch (error) {

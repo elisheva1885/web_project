@@ -12,7 +12,7 @@ const createOverhead = async (req, res) => {
     const overhead = await Overhead.create({ company , title, describe , imagepath , stock ,price, output, energy_rating , working_current , recommended_methom, pipe_connection , in_size , out_size, air_flow, quiet, wifi,speeds, air4d,night_mode,timer, sabbath_command,onof_auto})
     if(overhead){
         const overheads = await Overhead.find().populate("company").lean()
-        res.status(200).json(overheads)
+        res.status(201).json(overheads)
     }
     else{
         return  res.status(400).json({ message: "invalid overhead" })
@@ -22,7 +22,7 @@ const createOverhead = async (req, res) => {
 const readOverhead = async (req,res)=> {
     const overheads = await Overhead.find().populate("company").lean()
     if(!overheads?.length){
-        return res.status(400).json({ message: "no overheads found" })
+        return res.status(404).json({ message: "no overheads found" })
     }
     return res.status(200).json(overheads)
 }
@@ -32,7 +32,7 @@ const readOverheadByTitle = async (req,res)=> {
     const overheads = await Overhead.find({title:{"$regex":`^${title}`, "$options": "i"}}).populate("company").lean()
     // const overheads = await Overhead.find({title:{"$regex":title, "$options": "i"}}).lean()
     if(!overheads)
-        return res.status(400).json({ message: "no such overhead conditioner" })
+        return res.status(404).json({ message: "no such overhead conditioner" })
     res.status(200).json(overheads)
 
 }
@@ -43,7 +43,7 @@ const readOverheadById = async (req,res)=> {
    // const overheads = await Overhead.find({title:{"$regex":`^${title}`, "$options": "i"}}).populate("company").lean()
     // const overheads = await Overhead.find({title:{"$regex":title, "$options": "i"}}).lean()
     if(!overhead)
-        return res.status(400).json({ message: "no such overhead conditioner" })
+        return res.status(404).json({ message: "no such overhead conditioner" })
     res.status(200).json(overhead)
 }
 

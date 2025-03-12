@@ -8,7 +8,7 @@ const createBranch = async (req, res) => {
     const branch = await Branch.create({ address, phoneNumber, openingHour, closingHour})
     if (branch) {
         const branches = await Branch.find().lean()
-        res.status(200).json(branches)
+        res.status(201).json(branches)
     }
     else {   
         return res.status(400).json({ message: "invalid branch" })
@@ -18,7 +18,7 @@ const createBranch = async (req, res) => {
 const readBranch = async (req, res) => {
     const branches = await Branch.find().lean()
     if (!branches?.length)
-        return res.status(400).json({ message: "no branches found" })
+        return res.status(404).json({ message: "no branches found" })
     return res.status(200).json(branches)
 }
 
@@ -27,7 +27,7 @@ const readBranchByCity = async (req,res) => {
     const branches = await Branch.find({"address.city":{"$regex":`^${city}`, "$options": "i"}}).lean()
 
     if(!branches)
-        return res.status(400).json({ message: "no branch in this city" })
+        return res.status(404).json({ message: "no branch in this city" })
     res.status(200).json(branches)
 }
 
@@ -61,12 +61,12 @@ const deleteBranch = async (req,res)=> {
     const {_id} = req.body
     const branch = await Branch.findById(_id).exec()
     if(!branch){
-        return res.status(400).json({ message: "branch not found" })
+        return res.status(404).json({ message: "branch not found" })
     }
     const result = await branch.deleteOne()
     const branches = await Branch.find().lean()
     if (!branches?.length)
-        return res.status(400).json({ message: "no branches found" })
+        return res.status(404).json({ message: "no branches found" })
     return res.status(200).json(branches)
 
 }

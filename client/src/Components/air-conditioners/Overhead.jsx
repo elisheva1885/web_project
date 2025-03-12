@@ -32,7 +32,8 @@ const Overhead = () => {
                              <h1>{overhead.title}</h1>
                             {/* { console.log(overhead.imagepath)} */}
                             {/* <img src={`${overhead.imagepath}`} /> */}
-                            <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`${product.imagepath}`} />
+                            <p>{overhead.imagepath}</p>
+                            <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`${overhead.imagepath}`} />
                             
                             <h3>{overhead.describe}</h3>
                             {/* { console.log(overhead.company.imagePath)} */}

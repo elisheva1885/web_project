@@ -7,9 +7,10 @@ import { Panel } from 'primereact/panel';
 import { InputText } from 'primereact/inputtext';
 import { IconField } from 'primereact/iconfield';
 import { InputIcon } from 'primereact/inputicon';
+import { useSelector } from "react-redux";
 
 const Branches = () => {
-
+    const token = useSelector(state => state.token.token)
     const [branches, setBranches] = useState([])
     const [branches2, setBranches2] = useState([])
     const [value , setValue] = useState('')
@@ -25,6 +26,7 @@ const Branches = () => {
 
     const getBranches = async () => {
         try {
+            console.log(token);
             const res = await axios.get('http://localhost:8000/api/branches')
             if (res.status === 200) {
                 sortData(res.data)

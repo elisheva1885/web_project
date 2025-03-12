@@ -15,7 +15,7 @@ const createCompany = async (req, res) => {
 
     if(company){
         const companies = await Company.find().lean()
-        res.status(200).json(companies)
+        res.status(201).json(companies)
     }
     else{
         return  res.status(400).json({ message: "invalid company" })
@@ -27,7 +27,7 @@ const createCompany = async (req, res) => {
 const readCompany = async (req,res)=> {
     const companies = await Company.find().lean()
     if(!companies?.length){
-        return res.status(400).json({ message: "no companies found" })
+        return res.status(404).json({ message: "no companies found" })
     }
     return res.status(200).json(companies)
 }
@@ -38,7 +38,7 @@ const readCompanyByName = async (req,res)=> {
     const company = await Company.findOne({name: name}).lean()
     console.log(company);
     if(!company)
-        return res.status(400).json({ message: "no such company" })
+        return res.status(404).json({ message: "no such company" })
     res.status(200).json(company)
 }
 
@@ -53,7 +53,7 @@ const deleteCompany = async (req,res)=> {
     const result = await company.deleteOne()
     const companies = await Company.find().lean()
     if(!companies?.length){
-        return res.status(400).json({ message: "no companies found" })
+        return res.status(404).json({ message: "no companies found" })
     }
     return res.status(200).json(companies)
 }

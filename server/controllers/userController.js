@@ -9,7 +9,7 @@ const updateUser = async (req, res) => {
     }
     const user = await User.findById(_id).exec()
     if (!user) {
-        return res.status(400).json({ message: "no such user" })
+        return res.status(404).json({ message: "no such user" })
     }
     if (email) {
         user.email = email

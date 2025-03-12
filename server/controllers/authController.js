@@ -15,7 +15,7 @@ const register = async (req, res) => {
     const userObject = { name, username, password: hashedPassword, email, phone }
     const user = await User.create(userObject)
     if (user) {
-        return res.status(200).json({ message: `New User ${user.username} created` })
+        return res.status(201).json({ message: `New User ${user.username} created` })
     }
     else {
         return res.status(400).json({ message: "invalid user recived" })
@@ -29,11 +29,11 @@ const login = async (req, res) => {
     }
     const foundUser = await User.findOne({ username }).lean()
     if (!foundUser) {
-        return res.status(400).json({ message: "Unauthorized" })
+        return res.status(401).json({ message: "Unauthorized" })
     }
     const match = await bcrypt.compare(password, foundUser.password)
     if (!match) {
-        return res.status(400).json({ message: "Unauthorized" })
+        return res.status(401).json({ message: "Unauthorized" })
     }
     const userInfo = {
         _id: foundUser._id, name: foundUser.name,
@@ -41,7 +41,7 @@ const login = async (req, res) => {
         email: foundUser.email, pone: foundUser.phone, roles: foundUser.roles
     }
     const accessToken = jwt.sign(userInfo, process.env.ACCESS_TOKEN_SECRET)
-    res.status(200).json({token: accessToken})
+    res.status(200).json({token: accessToken, username: userInfo.username,role: userInfo.roles })
 }
 
 module.exports = { login, register }
