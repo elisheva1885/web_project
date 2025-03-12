@@ -4,22 +4,25 @@ import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import { classNames } from 'primereact/utils';
-import './Login.css';
+import '../Login.css';
 import axios from 'axios'
 import { Link } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { clearToken, setToken } from '../store/tokenSlice';
+import myStore from '../store/store';
 
 const Login  =() => {
 
     const [showMessage, setShowMessage] = useState(false);
     const [formData, setFormData] = useState({});
+    const dispatch = useDispatch();
     const defaultValues = {
         username: '',
         password: '',
         accept: false
     }
-   
+
     const onSubmit = async (data) => {
-        // console.log(data);
         setFormData(data);
         const user = {
             username: data.username,
@@ -29,7 +32,8 @@ const Login  =() => {
         try {
             const res = await axios.post(`http://localhost:8000/api/auth/login`,user)
             if(res.status===200){
-                console.log(res.data);
+                dispatch(setToken(res.data.token));
+                
                 setShowMessage(true);
             }
         } catch (error) {
@@ -39,8 +43,6 @@ const Login  =() => {
     };
 
     const { control, formState: { errors }, handleSubmit, reset } = useForm({ defaultValues });
-
-
 
     const getFormErrorMessage = (name) => {
         return errors[name] && <small className="p-error">{errors[name].message}</small>
@@ -63,6 +65,7 @@ const Login  =() => {
                 <div className="card">
                     <h5 className="text-center">התחבר</h5>
                     <form onSubmit={handleSubmit(onSubmit)} className="p-fluid">
+                        
                     <p>?לא רשומים באתר</p>
                     <Link to={`/register` }>לחצו כאן</Link>
                     <br/><br/><br/>

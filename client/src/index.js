@@ -12,19 +12,18 @@ import './flags.css';
 import App from './App';
 import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
+import myStore from './store/store';
 
-// const myStore = configureStore({
-//   reducer : persistReducer
-// });
+
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  //  <Provider store={myStore}> 
+   <Provider store={myStore}> 
   <BrowserRouter>
     <PrimeReactProvider>
         <App />
     </PrimeReactProvider>
   </BrowserRouter>
-      // </Provider>
+ </Provider>
 
 );

@@ -1,19 +1,21 @@
 import axios from 'axios'
-import { Suspense, useEffect, useState, lazy } from 'react'
+import { useEffect, useState, lazy } from 'react'
 import { Button } from 'primereact/button';
 import { DataView, DataViewLayoutOptions } from 'primereact/dataview';
 import { Tag } from 'primereact/tag';
 import { classNames } from 'primereact/utils';
-import { Link , Outlet, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { InputText } from 'primereact/inputtext';
 import { IconField } from 'primereact/iconfield';
 import { InputIcon } from 'primereact/inputicon';
+import { getToken } from '../../store/tokenSlice';
+import { useSelector } from 'react-redux';
 
 const Overhead = lazy(() => import('./Overhead'));
 
 
 const Overheads = () => {
-
+    const token = useSelector(state => state.token.token)
     const [overheads, setOverheads] = useState([])
     const [overheads2, setOverheads2] = useState([])
     const [value, setValue] = useState('')
@@ -31,7 +33,12 @@ const Overheads = () => {
 
     const getOverheads = async () => {
         try {
-            const res = await axios.get('http://localhost:8000/api/air-conditioner/overhead')
+            console.log(token);
+            const headers = {
+                'Authorization': `Bearer ${token}`
+            }
+            debugger
+            const res = await axios.get('http://localhost:8000/api/air-conditioner/overhead',{headers})
             if (res.status === 200) {
                 sortData(res.data)
                 setOverheads(res.data)
