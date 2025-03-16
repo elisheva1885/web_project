@@ -22,6 +22,10 @@ const Login  =() => {
         accept: false
     }
 
+    const signOut = ()=> {
+        clearToken()
+        // localStorage.removeItem("user")
+    }
     const onSubmit = async (data) => {
         setFormData(data);
         const user = {
@@ -31,14 +35,24 @@ const Login  =() => {
         }
         try {
             const res = await axios.post(`http://localhost:8000/api/auth/login`,user)
+            console.log(res.status);
             if(res.status===200){
                 dispatch(setToken(res.data.token));
                 console.log(t);
                 console.log(res.data);
                 localStorage.setItem('user', JSON.stringify(res.data));
                 setShowMessage(true);
+                <Link to={"/"}></Link>
+
             }
-        } catch (error) {
+            // else{
+            // if(res.status===401){
+            //     alert("Unauthorized")
+            // }
+        }
+            
+        //} 
+        catch (error) {
             console.error(error)
         }
         reset();
@@ -93,7 +107,10 @@ const Login  =() => {
                     </form>
                 </div>
             </div>
+            <Button type="submit" label="ליציאה מהפרופיל" className="mt-2" onClick={signOut}/>
+
         </div>
+
 
     );
 }

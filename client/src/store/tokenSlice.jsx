@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit"
 
 const initVal = {
-    token:"tokenisnull"
+    token:"null"
 }
 
 const tokenSlice = createSlice({

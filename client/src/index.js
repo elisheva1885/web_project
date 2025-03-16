@@ -12,7 +12,8 @@ import './flags.css';
 import App from './App';
 import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
-import myStore from './store/store';
+import myStore, { persistor } from './store/store';
+import { PersistGate } from 'redux-persist/integration/react';
 
 
 
@@ -20,11 +21,13 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
    <Provider store={myStore}> 
+   <PersistGate loading={null} persistor={persistor}>
   <BrowserRouter>
     <PrimeReactProvider>
         <App />
     </PrimeReactProvider>
   </BrowserRouter>
+  </PersistGate>
  </Provider>
  </React.StrictMode>
 

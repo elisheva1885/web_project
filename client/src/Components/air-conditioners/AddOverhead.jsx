@@ -164,7 +164,14 @@ const AddOverheadForm = () => {
                                 </div>
                             </div>
                         </div>
-
+                        <div className="field">
+                            <span className="p-float-label">
+                                <Controller name="recommended_methom" control={control}  render={({ field }) => (
+                                    <InputText id="recommended_methom" {...field}  />
+                                )} />
+                                <label htmlFor="recommended_methom" >recommended_methom</label>
+                            </span>
+                        </div>
                         {/* Pipe Connections */}
                         <div className="field">
                             <div className="flex">
@@ -332,3 +339,5 @@ const AddOverheadForm = () => {
 };
 
 export default AddOverheadForm;
+
+

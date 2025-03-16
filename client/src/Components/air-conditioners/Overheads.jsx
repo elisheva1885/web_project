@@ -38,6 +38,12 @@ const Overheads = () => {
         navigate('/overheads/add', { state: navigationData });
     };
 
+    const shopping = (product) => {
+        //function to create prucace object
+        //by the token and the object
+        alert("shoping")
+    }
+
     const sortData = (data) => {
         data.sort((a, b) => {
             if (a.title < b.title) return -1;  // a comes before b
@@ -51,6 +57,7 @@ const Overheads = () => {
             const headers = {
                 'Authorization': `Bearer ${token}`
             }
+            console.log(headers);
             const res = await axios.get('http://localhost:8000/api/air-conditioner/overhead',{headers})
             if (res.status === 200) {
                 sortData(res.data)
@@ -113,7 +120,7 @@ const Overheads = () => {
             <>
                 <div className="col-12" key={product._id}>
                     <div className={classNames('flex flex-column xl:flex-row xl:align-items-start p-4 gap-4', { 'border-top-1 surface-border': index !== 0 })}>
-                        <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`/${product.company.imagePath}`} />
+                        {/* <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`/${product.company.imagePath}`} /> */}
                         <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`${product.imagepath}`} />
                         <div className="flex flex-column sm:flex-row justify-content-between align-items-center xl:align-items-start flex-1 gap-4">
                             <div className="flex flex-column align-items-center sm:align-items-start gap-3">
@@ -126,7 +133,7 @@ const Overheads = () => {
                             </div>
                             <div className="flex sm:flex-column align-items-center sm:align-items-end gap-3 sm:gap-2">
                                 <span className="text-2xl font-semibold">₪{product.price}</span>
-                                <Button icon="pi pi-shopping-cart" className="p-button-rounded" disabled={getSeverity(product.stock) === "danger"}></Button>
+                                <Button icon="pi pi-shopping-cart" className="p-button-rounded" disabled={getSeverity(product.stock) === "danger"} onClick={()=>shopping(product)}></Button>
                             </div>
                         </div>
                     </div>
@@ -191,8 +198,9 @@ const Overheads = () => {
             <Routes>
                 <Route path='/overheads/overhead' element={<Suspense fallback="Loading..."><Overhead /></Suspense>}></Route>
             </Routes> */}
-            {userDetalis.role === 'user'?<Button onClick={ ()=>goToAddOverhead("Overhead")}>add overhead</Button>: <></> }
-            
+            {/* {userDetalis!=null ?userDetalis.role === 'user'?<Button onClick={ ()=>goToAddOverhead("Overhead")}>add overhead</Button>: <></> : <></>} */}
+            {<Button onClick={ ()=>goToAddOverhead("Overhead")}>add overhead</Button>}
+
 
             <div className="card">
                 <div className="flex justify-content-end">

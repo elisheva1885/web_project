@@ -38,7 +38,7 @@ const overheadSchema = new mongoose.Schema({
         cool: { type: String },
         heat: { type: String }
     },
-    recommended_methom:{
+    recommended_method:{
         type:String
     },
     pipe_connection: {
