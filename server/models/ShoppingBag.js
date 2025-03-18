@@ -1,7 +1,8 @@
 const mongoose = require('mongoose')
 const shoppingBagSchema = new mongoose.Schema({
     user_id: {
-        type: mongoose.Schema.Types.string,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
         required: true,
         immutable: true
     },
@@ -9,6 +10,11 @@ const shoppingBagSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.string,
         required: true,
         immutable: true
+     },
+     type:{
+        type: String,
+        enum: ["overhead", "miniCenteral","miniVrf", "multi"],
+        required:true
      }
 }, {
     timestamps: true

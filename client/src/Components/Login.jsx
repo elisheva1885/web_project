@@ -6,13 +6,14 @@ import { Dialog } from 'primereact/dialog';
 import { classNames } from 'primereact/utils';
 import '../Login.css';
 import axios from 'axios'
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { clearToken, setToken } from '../store/tokenSlice';
 import myStore from '../store/store';
 
 const Login  =() => {
-    const t = useSelector((state) => state.token.token)
+    const token = useSelector((state) => state.token.token)
+    const navigate = useNavigate();
     const [showMessage, setShowMessage] = useState(false);
     const [formData, setFormData] = useState({});
     const dispatch = useDispatch();
@@ -21,6 +22,10 @@ const Login  =() => {
         password: '',
         accept: false
     }
+
+    const goToHome = () => {
+        navigate('/');
+    };
 
     const signOut = ()=> {
         clearToken()
@@ -38,12 +43,11 @@ const Login  =() => {
             console.log(res.status);
             if(res.status===200){
                 dispatch(setToken(res.data.token));
-                console.log(t);
+                console.log(token);
                 console.log(res.data);
                 localStorage.setItem('user', JSON.stringify(res.data));
                 setShowMessage(true);
-                <Link to={"/"}></Link>
-
+                goToHome()
             }
             // else{
             // if(res.status===401){

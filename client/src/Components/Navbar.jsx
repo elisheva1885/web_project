@@ -15,15 +15,15 @@ const Basket = lazy(() => import('./Basket'));
 const Navbar = ()=>{
   
     const {token} = useSelector((state) => state.token)
-    const userDetalis = JSON.parse(localStorage.getItem('user'));
-    {console.log(userDetalis.username)}
+    // const userDetalis = JSON.parse(localStorage.getItem('user'));
+    // {console.log(userDetalis.username)}
 
     const items = [
 
         {
                         // {/* {userDetalis!=null ?userDetalis.role === 'user'?<Button onClick={ ()=>goToAddOverhead("Overhead")}>add overhead</Button>: <></> : <></>} */}
-           label: token != null ? userDetalis.username : 'התחברות',
-            // label: 'התחברות',
+        //    label: token != null ? userDetalis.username : 'התחברות',
+            label: 'התחברות',
             icon: 'pi pi-user',
             url: '/login'
         },
