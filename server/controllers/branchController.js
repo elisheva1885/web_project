@@ -8,7 +8,7 @@ const createBranch = async (req, res) => {
     const branch = await Branch.create({ address, phoneNumber, openingHour, closingHour})
     if (branch) {
         const branches = await Branch.find().lean()
-        res.status(201).json(branches)
+        return res.status(201).json(branches)
     }
     else {   
         return res.status(400).json({ message: "invalid branch" })
@@ -28,7 +28,7 @@ const readBranchByCity = async (req,res) => {
 
     if(!branches)
         return res.status(404).json({ message: "no branch in this city" })
-    res.status(200).json(branches)
+    return res.status(200).json(branches)
 }
 
 const updateBranch = async (req, res) => {
@@ -54,7 +54,7 @@ const updateBranch = async (req, res) => {
     }
     const updatedBranch = await branch.save()
     const branches = await Branch.find().lean()
-    res.status(200).json(branches)  
+    return res.status(200).json(branches)  
 }
 
 const deleteBranch = async (req,res)=> {

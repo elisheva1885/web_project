@@ -39,6 +39,9 @@ const readOverheadByTitle = async (req,res)=> {
 
 const readOverheadById = async (req,res)=> {
     const {_id} = req.params
+    if(!_id){
+        return res.status(400).json({message: "reqired"})
+    }
     const overhead = await Overhead.findById(_id).populate("company").lean()
    // const overheads = await Overhead.find({title:{"$regex":`^${title}`, "$options": "i"}}).populate("company").lean()
     // const overheads = await Overhead.find({title:{"$regex":title, "$options": "i"}}).lean()
