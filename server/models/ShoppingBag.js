@@ -7,7 +7,7 @@ const shoppingBagSchema = new mongoose.Schema({
         immutable: true
     },
     product_id: {
-        type: mongoose.Schema.Types.string,
+        type: String,
         required: true,
         immutable: true
      },

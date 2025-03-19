@@ -4,7 +4,8 @@ const Overhead = require("../models/airconditioners/Overhead")
 
 //לבדוק בפוסטמן
 const createShoppingBag= async (req,res)=>{
-    const {user_id, product_id,type, amount} = req.body
+    const user_id = req.user._id
+    const { product_id,type, amount} = req.body
     if(!user_id || !product_id || !type){
         return res.status(400).json({ message: "all details are required" })
     }
@@ -16,7 +17,7 @@ const createShoppingBag= async (req,res)=>{
 }
 
 const readShoppingBagByUserId = async (req,res)=> {
-    const {user_id} = req.params
+    const user_id = req.user._id
     if(!user_id){
         return res.status(400).json({message: "reqired"})
     }
@@ -67,3 +68,5 @@ const deleteShoppingBag = async (req,res)=>{
     const result = await shoppingBag.deleteOne()
     return res.status(200).json({message:"deleted success"})
 }
+
+module.exports = {createShoppingBag, readShoppingBagByUserId,updateShoppingBagAmount , deleteShoppingBag}
