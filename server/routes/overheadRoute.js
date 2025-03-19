@@ -9,6 +9,6 @@ router.get("/",veriftyJWT,overheadController.readOverhead)
 router.get("/overhead/:_id", overheadController.readOverheadById)
 router.get("/:title", overheadController.readOverheadByTitle)
 router.put("/", overheadController.updateOverhead)
-router.delete("/",officialVerify, overheadController.deleteOverhead)
+router.delete("/", overheadController.deleteOverhead)
 
 module.exports = router

@@ -22,16 +22,17 @@ const readShoppingBagByUserId = async (req,res)=> {
         return res.status(400).json({message: "reqired"})
     }
     //returns the user products
-    const shoppingBags =  await ShoppingBag.findById(user_id).lean()
+    const shoppingBags =  await ShoppingBag.find({user_id:user_id}).lean()
     if(!shoppingBags){
         return res.status(400).json({ message: "shopping bag is empty" })
     }
-    const userShoppingBags = [];
+    const userShoppingBags = new Array();
     shoppingBags.forEach(async (shoppingBag) => {
         switch (shoppingBag.type) {
             case "overhead":
-                const overhead = await Overhead.findById(shoppingBag.product_id).populate("company").lean()
+                const overhead = await Overhead.find({_id: shoppingBag.product_id}).populate("company").lean()
                 userShoppingBags.push(overhead)
+                console.log(userShoppingBags) 
                 break;
         
             default:
@@ -60,11 +61,17 @@ const updateShoppingBagAmount = async (req,res)=> {
  
 }
 const deleteShoppingBag = async (req,res)=>{
-    const {_id} = req.body
+    const {product_id} = req.body
+    const shoppingBagByProduct = await ShoppingBag.find({product_id: product_id}).exec()
+
+    const {_id} = shoppingBagByProduct._id
     const shoppingBag = await ShoppingBag.findById(_id).exec()
+
     if(!shoppingBag){
         return res.status(404).json({message:"not fount in shopping bag"})
     }
+    console.log(shoppingBag)
+
     const result = await shoppingBag.deleteOne()
     return res.status(200).json({message:"deleted success"})
 }
