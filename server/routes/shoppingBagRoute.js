@@ -7,7 +7,7 @@ const veriftyJWT = require("../middleware/verifyJWT")
 
 router.post("/",veriftyJWT, shoppingBagController.createShoppingBag)
 router.get("/", veriftyJWT ,shoppingBagController.readShoppingBagByUserId)
-router.put("/",shoppingBagController.updateShoppingBagAmount)
-router.delete("/",   shoppingBagController.deleteShoppingBag)
+router.put("/",veriftyJWT ,shoppingBagController.updateShoppingBagAmount)
+router.delete("/", veriftyJWT,  shoppingBagController.deleteShoppingBag)
 
 module.exports = router

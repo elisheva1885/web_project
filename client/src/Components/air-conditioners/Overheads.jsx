@@ -22,6 +22,7 @@ const Overheads = () => {
     const [overheads2, setOverheads2] = useState([])
     const [value, setValue] = useState('')
     const userDetalis = JSON.parse(localStorage.getItem('user'));
+    const [shoppingBags, setShoppingBags] = useState([])
 
     const [layout, setLayout] = useState('list');
     const navigate = useNavigate();
@@ -38,10 +39,33 @@ const Overheads = () => {
         navigate('/overheads/add', { state: navigationData });
     };
 
-    const shopping = (product) => {
+    const shopping = async(product) => {
         //function to create prucace object
         //by the token and the object
         alert("shoping")
+        const shoppingBagDetails = {
+            product_id  : product._id,
+            type : "overhead"
+        }
+        try {
+            const headers = {
+                'Authorization': `Bearer ${token}`
+            }
+            const res = await axios.post('http://localhost:8000/api/user/shoppingBag', shoppingBagDetails, {headers},)
+            if (res.status === 200) {
+                // sortData(res.data)
+                setShoppingBags(shoppingBags.push(res.data))
+                console.log("res.data",res.data);
+                console.log("useState",shoppingBags);
+            }
+            if(res.status === 409){
+                // updateAmount(product)
+            }
+        }
+        catch (e) {
+            console.error(e)
+        }
+
     }
 
     const sortData = (data) => {
@@ -82,9 +106,6 @@ const Overheads = () => {
         }
     }
    
-    // const createOverhead= () => {
-
-    // }
 
     const getSeverity = (s) => {
         if (s >= 50) {
