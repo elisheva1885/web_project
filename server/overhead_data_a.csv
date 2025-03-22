@@ -1,5 +1,9 @@
 company,title,describe,imagepath,stock,price, BTU_output_cool, BTU_output_heat,energy_rating_cool,energy_rating_heat,working_current_cool,working_current_heat,recommended_method,pipe_connection_a,pipe_connection_b,in_size_width,in_size_depth,in_size_height,out_size_width,out_size_depth,out_size_height,air_flow,quiet,wifi,speeds,air4d,night_mode,timer,sabbath_command,onof_auto
-6783a4dc389eaaa28c1d9aa1,AI INVERTER 150,מזגן חכם עם בינה מלאכותית,electra_overhead/ELECTRA AI INVERTER.png,10,2500,"9,215 BTU/h","10,236",A++,A+++,3.5,4,1X10,1X4,3X8,812,199,299,720,270,495,306,TRUE,TRUE,100,TRUE,TRUE,TRUE,TRUE,TRUE
+6783a4dc389eaaa28c1d9aa1,AI INVERTER 150,מזגן חכם עם בינה מלאכותית,electra_overhead/ELECTRA AI INVERTER.png,10,2500,"9,215","10,236",A++,A+++,3.5,4,1X10,1X4,3X8,812,199,299,720,270,495,306,TRUE,TRUE,100,TRUE,TRUE,TRUE,TRUE,TRUE
 6783a4dc389eaaa28c1d9aa1,AI INVERTER 180,מזגן מתקדם עם טכנולוגיית אינוורטר,electra_overhead/ELECTRA AI INVERTER.png,8,2800,"11,940","10,600",A++,A+++,4.5,4.5,1X10,1X4,3X8,812,199,299,720,270,495,341,TRUE,TRUE,100,TRUE,TRUE,TRUE,TRUE,TRUE
 6783a4dc389eaaa28c1d9aa1,AI INVERTER 250,מזגן חכם עם בינה מלאכותית,electra_overhead/ELECTRA AI INVERTER.png,25,2000,"18,420","17,600",A++,A++,6,7,1X16,1X4,1X2,968,225,320,805,330,554,491,TRUE,TRUE,100,TRUE,TRUE,TRUE,TRUE,TRUE
 6783a4dc389eaaa28c1d9aa1,AI INVERTER 350,מזגן מתקדם עם טכנולוגיית אינוורטר,electra_overhead/ELECTRA AI INVERTER.png,40,1700,"23,800","19,448",A++,A+++,10,11,1X16,3X8,5X8,1030,238,338,890,342,673,720,TRUE,TRUE,100,TRUE,TRUE,TRUE,TRUE,TRUE
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+6789c33b32f9067cbff7b6c2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,

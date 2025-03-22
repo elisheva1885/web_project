@@ -147,7 +147,7 @@ const Overheads = () => {
                             <div className="flex flex-column align-items-center sm:align-items-start gap-3">
                                 {/* <Link to={{pathName:`/overheads/${product.title}` , state: {product:product} }}><div className="text-2xl font-bold text-900" style={{}} >{product.title}</div></Link> */}
                                 <Link to={`/overheads/overhead/${product._id}` } params={{ product: product }}><div className="text-2xl font-bold text-900" style={{}} >{product.title}</div></Link>
-
+                                <p>{product.imagepath}</p>
                                 <div className="flex align-items-center gap-3">
                                     <Tag value={getSeverityText(product)} severity={getSeverity(product.stock)}></Tag>
                                 </div>
