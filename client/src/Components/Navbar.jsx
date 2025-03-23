@@ -22,8 +22,8 @@ const Navbar = ()=>{
 
         {
                         // {/* {userDetalis!=null ?userDetalis.role === 'user'?<Button onClick={ ()=>goToAddOverhead("Overhead")}>add overhead</Button>: <></> : <></>} */}
-            label: token != null ?'התנתקות' : 'התחברות',
-            // label: 'התחברות',
+            // label: token != null ?'התנתקות' : 'התחברות',
+            label: 'התחברות',
             icon: 'pi pi-user',
             url: '/login'
         },

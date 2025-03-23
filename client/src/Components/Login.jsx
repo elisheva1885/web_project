@@ -10,6 +10,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { clearToken, setToken } from '../store/tokenSlice';
 import myStore from '../store/store';
+import { setBasket } from '../store/basketSlice';
+import Basket from './Basket';
 
 const Login  =() => {
     const token = useSelector((state) => state.token.token)
@@ -31,6 +33,27 @@ const Login  =() => {
         clearToken()
         // localStorage.removeItem("user")
     }
+
+    const getShoppingBags = async () => {
+        try {
+            const headers = {
+                'Authorization': `Bearer ${token}`
+            }
+
+            const res = await axios.get('http://localhost:8000/api/user/shoppingBag',{headers})
+            if (res.status === 200) {
+                // sortData(res.data)
+                // setShoppingBags(res.data)
+                dispatch(setBasket(res.data))
+                console.log("res.data",res.data);
+                // console.log("useState",shoppingBags);
+            }
+        }
+        catch (e) {
+            console.error(e)
+        }
+    }
+
     const onSubmit = async (data) => {
         setFormData(data);
         const user = {

@@ -31,15 +31,15 @@ const Overhead = () => {
 
     const details = {
         // "sku": "309666",
-        // "מותג": overhead.company.name,
+        "מותג":overhead?.company?.name,
         "כולל מצב שבת": overhead.sabbath_command? "✔": "X",
         "תפוקת קירור (BTU)": overhead?.BTU_output?.cool,
-        "תפוקת חימום (BTU)": "16241",
-        "מדחס אינוורטר": "כולל",
+        "תפוקת חימום (BTU)": overhead?.BTU_output?.heat,
+        // "מדחס אינוורטר": "כולל",
         "דירוג אנרגטי קירור":  overhead?.energy_rating?.cool,
         "דירוג אנרגטי חימום":  overhead?.energy_rating?.cool,
-        "הספק יעילות בקירור (COP)": "6.41",
-        "הספק יעילות בחימום (COP)": "4.8",
+        "הספק יעילות בקירור (COP)": overhead?.working_current?.cool,
+        "הספק יעילות בחימום (COP)": overhead?.working_current?.heat,
         "דגם": overhead.title,
         // "תקופת אחריות": "שלוש שנות אחריות",
         "טכנולוגיות Wi-Fi": overhead.wifi? "✔": "X"
@@ -60,7 +60,7 @@ const Overhead = () => {
     return (
         <>
         <br/><br/><br/><br/>
-         {/* <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`/${overhead.company.imagePath}`} /> */}
+         <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`/${overhead?.company?.imagePath}`} />
          <h1>{overhead.title}</h1>
          {console.log(overhead)}
                 <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`/overheads/${overhead.imagepath}`} />
@@ -82,7 +82,6 @@ const Overhead = () => {
                         {/* <div className="border-2 border-dashed surface-border border-round surface-ground flex-auto flex justify-content-center align-items-center font-medium"> */}
                         <div className="card">
                             <table  tableStyle={{ minWidth: '50rem' }}>
-                            {/* <p>{overhead.title}</p> */}
                                 {Object.entries(details).map(([key,value])=> (
                                <tr>
                                 <td>

@@ -1,7 +1,7 @@
 const Overhead = require("../models/airconditioners/Overhead")
 
 const createOverhead = async (req, res) => {
-    const {company , title, describe , imagepath , stock , price , output , energy_rating , working_current , recommended_methom, pipe_connection , in_size , out_size, air_flow, quiet, wifi,speeds, air4d,night_mode,timer, sabbath_command,onof_auto} = req.body
+    const {company , title, describe , imagepath , stock , price , BTU_output , energy_rating , working_current , recommended_methom, pipe_connection , in_size , out_size, air_flow, quiet, wifi,speeds, air4d,night_mode,timer, sabbath_command,onof_auto} = req.body
     if(!company || !title ||!describe || !price ||!imagepath ){
         return res.status(400).json({ message: "all details are required" })
     }
@@ -9,7 +9,7 @@ const createOverhead = async (req, res) => {
     if (duplicate) {
         return res.status(409).json({ message: "already exist" })
     }
-    const overhead = await Overhead.create({ company , title, describe , imagepath , stock ,price, output, energy_rating , working_current , recommended_methom, pipe_connection , in_size , out_size, air_flow, quiet, wifi,speeds, air4d,night_mode,timer, sabbath_command,onof_auto})
+    const overhead = await Overhead.create({ company , title, describe , imagepath , stock ,price, BTU_output, energy_rating , working_current , recommended_methom, pipe_connection , in_size , out_size, air_flow, quiet, wifi,speeds, air4d,night_mode,timer, sabbath_command,onof_auto})
     if(overhead){
         const overheads = await Overhead.find().populate("company").lean()
         res.status(201).json(overheads)

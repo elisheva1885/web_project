@@ -15,6 +15,9 @@ const Basket = () =>{
 
 
     const {token} = useSelector((state) => state.token)
+    const {basket} = useSelector((state) => state.basket)
+    console.log(basket);
+
     const [shoppingBags, setShoppingBags] = useState([])
     const [layout, setLayout] = useState('list');
 
@@ -28,23 +31,23 @@ const Basket = () =>{
         })
     }
 
-    const getShoppingBags = async () => {
-        try {
-            const headers = {
-                'Authorization': `Bearer ${token}`
-            }
-            const res = await axios.get('http://localhost:8000/api/user/shoppingBag',{headers})
-            if (res.status === 200) {
-                // sortData(res.data)
-                setShoppingBags(res.data)
-                console.log("res.data",res.data);
-                console.log("useState",shoppingBags);
-            }
-        }
-        catch (e) {
-            console.error(e)
-        }
-    }
+    // const getShoppingBags = async () => {
+    //     try {
+    //         const headers = {
+    //             'Authorization': `Bearer ${token}`
+    //         }
+    //         const res = await axios.get('http://localhost:8000/api/user/shoppingBag',{headers})
+    //         if (res.status === 200) {
+    //             // sortData(res.data)
+    //             setShoppingBags(res.data)
+    //             console.log("res.data",res.data);
+    //             console.log("useState",shoppingBags);
+    //         }
+    //     }
+    //     catch (e) {
+    //         console.error(e)
+    //     }
+    // }
 
     const deleteShoppingBag = async (product)=>{
         alert("hgvh")
@@ -164,7 +167,7 @@ const Basket = () =>{
 
     const listTemplate = (products, layout) => {
         if(shoppingBags!=null){
-            return <div className="grid grid-nogutter">{shoppingBags.map((product, index) => itemTemplate(product, layout, index))}</div>;
+            return <div className="grid grid-nogutter">{basket?.map((product, index) => itemTemplate(product, layout, index))}:<></></div>;
         }
         else{
             <>basketIsEmpty</>
@@ -178,9 +181,9 @@ const Basket = () =>{
             </div>
         );
     };
-    useEffect(() => {
-        getShoppingBags()
-    }, [])
+    // useEffect(() => {
+    //     getShoppingBags()
+    // }, [])
 
     return (
         <>
