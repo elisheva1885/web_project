@@ -9,8 +9,10 @@ import { InputText } from 'primereact/inputtext';
 import { IconField } from 'primereact/iconfield';
 import { InputIcon } from 'primereact/inputicon';
 import { getToken } from '../../store/tokenSlice';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Add_AirConditioner from './Add_AirConditioner';
+import { setCompanies } from '../../store/companySlice'
+
 
 const Overhead = lazy(() => import('./Overhead'));
 
@@ -18,6 +20,8 @@ const Overhead = lazy(() => import('./Overhead'));
 const Overheads = () => {
 
     const {token} = useSelector((state) => state.token)
+    // const {companies} = useSelector((state) => state.companies)
+
     const [overheads, setOverheads] = useState([])
     const [overheads2, setOverheads2] = useState([])
     const [value, setValue] = useState('')
@@ -26,6 +30,7 @@ const Overheads = () => {
 
     const [layout, setLayout] = useState('list');
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
 
     // const goToAddOverhead = (type) => {
@@ -39,7 +44,7 @@ const Overheads = () => {
         navigate('/overheads/add', { state: navigationData });
     };
 
-    const shopping = async(product) => {
+    const addToBasket = async(product) => {
         //function to create prucace object
         //by the token and the object
         alert("shoping")
@@ -60,6 +65,21 @@ const Overheads = () => {
             }
             if(res.status === 409){
                 // updateAmount(product)
+            }
+        }
+        catch (e) {
+            console.error(e)
+        }
+
+    }
+
+    const getCompanies = async()=>{
+        try{
+            const res = await axios.get('http://localhost:8000/api/company')
+            if(res.status === 200){
+                console.log("company:",res.data);
+                dispatch(setCompanies(res.data))
+                // console.log(companies);
             }
         }
         catch (e) {
@@ -154,7 +174,7 @@ const Overheads = () => {
                             </div>
                             <div className="flex sm:flex-column align-items-center sm:align-items-end gap-3 sm:gap-2">
                                 <span className="text-2xl font-semibold">₪{product.price}</span>
-                                <Button icon="pi pi-shopping-cart" className="p-button-rounded" disabled={getSeverity(product.stock) === "danger"} onClick={()=>shopping(product)}></Button>
+                                <Button icon="pi pi-shopping-cart" className="p-button-rounded" disabled={getSeverity(product.stock) === "danger"} onClick={()=>addToBasket(product)}></Button>
                             </div>
                         </div>
                     </div>
@@ -180,7 +200,7 @@ const Overheads = () => {
 
                     <div className="flex align-items-center justify-content-between">
                         <span className="text-2xl font-semibold">₪{product.price}</span>
-                        <Button icon="pi pi-shopping-cart" className="p-button-rounded" disabled={getSeverity(product.stock) === "danger"}></Button>
+                        <Button icon="pi pi-shopping-cart" className="p-button-rounded" disabled={getSeverity(product.stock) === "danger"} onClick={()=>addToBasket(product)}></Button>
                     </div>
                 </div>
             </div>
@@ -211,6 +231,7 @@ const Overheads = () => {
 
     useEffect(() => {
         getOverheads()
+        getCompanies()
     }, [])
 
     return (

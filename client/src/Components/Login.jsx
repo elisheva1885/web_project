@@ -14,7 +14,9 @@ import { setBasket } from '../store/basketSlice';
 import Basket from './Basket';
 
 const Login  =() => {
-    const token = useSelector((state) => state.token.token)
+    const {token} = useSelector((state) => state.token)
+    const {basket} = useSelector((state) => state.basket)
+
     const navigate = useNavigate();
     const [showMessage, setShowMessage] = useState(false);
     const [formData, setFormData] = useState({});
@@ -45,6 +47,7 @@ const Login  =() => {
                 // sortData(res.data)
                 // setShoppingBags(res.data)
                 dispatch(setBasket(res.data))
+                alert("basket:", basket);
                 console.log("res.data",res.data);
                 // console.log("useState",shoppingBags);
             }
@@ -70,6 +73,7 @@ const Login  =() => {
                 console.log(res.data);
                 localStorage.setItem('user', JSON.stringify(res.data));
                 setShowMessage(true);
+                getShoppingBags();
                 goToHome()
             }
             // else{

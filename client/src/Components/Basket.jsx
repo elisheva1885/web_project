@@ -9,16 +9,19 @@ import { InputText } from 'primereact/inputtext';
 import { IconField } from 'primereact/iconfield';
 import { InputIcon } from 'primereact/inputicon';
 import { getToken } from '../store/tokenSlice';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { setBasket } from '../store/basketSlice';
+
 
 const Basket = () =>{
 
 
     const {token} = useSelector((state) => state.token)
-    const {basket} = useSelector((state) => state.basket)
+    const basket = useSelector((state) => state.basket.basket)
     console.log(basket);
+    const dispatch = useDispatch();
 
-    const [shoppingBags, setShoppingBags] = useState([])
+    // const [shoppingBags, setShoppingBags] = useState([])
     const [layout, setLayout] = useState('list');
 
 
@@ -31,23 +34,6 @@ const Basket = () =>{
         })
     }
 
-    // const getShoppingBags = async () => {
-    //     try {
-    //         const headers = {
-    //             'Authorization': `Bearer ${token}`
-    //         }
-    //         const res = await axios.get('http://localhost:8000/api/user/shoppingBag',{headers})
-    //         if (res.status === 200) {
-    //             // sortData(res.data)
-    //             setShoppingBags(res.data)
-    //             console.log("res.data",res.data);
-    //             console.log("useState",shoppingBags);
-    //         }
-    //     }
-    //     catch (e) {
-    //         console.error(e)
-    //     }
-    // }
 
     const deleteShoppingBag = async (product)=>{
         alert("hgvh")
@@ -66,7 +52,7 @@ const Basket = () =>{
                 // sortData(res.data)
                 // setShoppingBags(res.data)
                 console.log("res.data",res.data);
-                console.log("useState",shoppingBags);
+                // console.log("useState",shoppingBags);
             }
             
         }
@@ -166,11 +152,11 @@ const Basket = () =>{
     };
 
     const listTemplate = (products, layout) => {
-        if(shoppingBags!=null){
+        if(basket!=null){
             return <div className="grid grid-nogutter">{basket?.map((product, index) => itemTemplate(product, layout, index))}:<></></div>;
         }
         else{
-            <>basketIsEmpty</>
+            <h1>basketIsEmpty</h1>
         }
         };
 
@@ -181,9 +167,7 @@ const Basket = () =>{
             </div>
         );
     };
-    // useEffect(() => {
-    //     getShoppingBags()
-    // }, [])
+
 
     return (
         <>
@@ -202,7 +186,7 @@ const Basket = () =>{
                         {/* <InputText placeholder="Search by name" onChange={(c) => getOverheadByTitle(c)} value={value} /> */}
                     </IconField>
                 </div>
-                <DataView value={shoppingBags} listTemplate={listTemplate} layout={layout} header={header()} />
+                <DataView value={basket} listTemplate={listTemplate} layout={layout} header={header()} />
             </div>
         </>
     )
