@@ -93,9 +93,9 @@ const deleteShoppingBag = async (req,res)=>{
     console.log(shoppingBag)
 
     const result = await shoppingBag.deleteOne()
-    // const shoppingBags = readShoppingBagByUserId()
+    readShoppingBagByUserId()
     // return res.status(200).json({shoppingBags})
-    return res.status(200).json({message: "deleted succes" })
+    return res.status(200).json(shoppingBags)
 
 }
 

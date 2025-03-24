@@ -17,7 +17,7 @@ const Basket = () =>{
 
 
     const {token} = useSelector((state) => state.token)
-    const basket = useSelector((state) => state.basket.basket)
+    const {basket} = useSelector((state) => state.basket)
     console.log(basket);
     const dispatch = useDispatch();
 
@@ -49,6 +49,7 @@ const Basket = () =>{
             data:product_id
         })
             if (res.status === 200) {
+                dispatch(setBasket(res.data))
                 // sortData(res.data)
                 // setShoppingBags(res.data)
                 console.log("res.data",res.data);
@@ -152,7 +153,7 @@ const Basket = () =>{
     };
 
     const listTemplate = (products, layout) => {
-        if(basket!=null){
+        if(basket!="null"){
             return <div className="grid grid-nogutter">{basket?.map((product, index) => itemTemplate(product, layout, index))}:<></></div>;
         }
         else{

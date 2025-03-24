@@ -12,6 +12,7 @@ import { getToken } from '../../store/tokenSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import Add_AirConditioner from './Add_AirConditioner';
 import { setCompanies } from '../../store/companySlice'
+import { setBasket } from '../../store/basketSlice';
 
 
 const Overhead = lazy(() => import('./Overhead'));
@@ -21,6 +22,7 @@ const Overheads = () => {
 
     const {token} = useSelector((state) => state.token)
     // const {companies} = useSelector((state) => state.companies)
+    const {basket} = useSelector((state) => state.basket)
 
     const [overheads, setOverheads] = useState([])
     const [overheads2, setOverheads2] = useState([])
@@ -58,8 +60,8 @@ const Overheads = () => {
             }
             const res = await axios.post('http://localhost:8000/api/user/shoppingBag', shoppingBagDetails, {headers},)
             if (res.status === 200) {
-                // sortData(res.data)
-                setShoppingBags(shoppingBags.push(res.data))
+                alert("im here")
+                dispatch(setBasket(basket.push(res.data)))
                 console.log("res.data",res.data);
                 console.log("useState",shoppingBags);
             }
