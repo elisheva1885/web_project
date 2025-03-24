@@ -2,8 +2,8 @@ import { createSlice } from "@reduxjs/toolkit"
 
 const initVal = {
     userDetails:{
-        userName:"",
-        password: ""
+        username:"null",
+        role: "null"
     }
 }
 
@@ -14,6 +14,7 @@ const userDetailsSlice = createSlice({
         setUserDetails:(state,action)=>{
             state.userDetails=action.payload
             console.log(state.userDetails);
+            alert("setUserDetails")
         },
         clearUserDetails(state) {
             state.userDetails = null;

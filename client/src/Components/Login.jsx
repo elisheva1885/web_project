@@ -11,11 +11,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import { clearToken, setToken } from '../store/tokenSlice';
 import myStore from '../store/store';
 import { setBasket } from '../store/basketSlice';
+import { setUserDetails } from '../store/userDetailsSlice';
+
 import Basket from './Basket';
 
 const Login  =() => {
     const {token} = useSelector((state) => state.token)
     const {basket} = useSelector((state) => state.basket)
+    // const {username} = useSelector((state) => state.userDetails.username)
+    // const {role} = useSelector((state) => state.userDetails.role)
 
     const navigate = useNavigate();
     const [showMessage, setShowMessage] = useState(false);
@@ -69,11 +73,14 @@ const Login  =() => {
             console.log(res.status);
             if(res.status===200){
                 dispatch(setToken(res.data.token));
+                dispatch(setUserDetails(res.data.username,res.data.role))
                 console.log(token);
                 console.log(res.data);
                 localStorage.setItem('user', JSON.stringify(res.data));
                 setShowMessage(true);
+                alert("before",basket)
                 getShoppingBags();
+                alert("after",basket.name)
                 goToHome()
             }
             // else{

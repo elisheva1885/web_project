@@ -93,6 +93,7 @@ const Basket = () =>{
     };
 
     const listItem = (product, index) => {
+        alert(product.describe)
         return (
             <>
                 <div className="col-12" key={product._id}>
@@ -120,6 +121,7 @@ const Basket = () =>{
     };
 
     const gridItem = (product) => {
+        alert(product.describe)
         return (
             <div className="col-12 sm:col-6 lg:col-12 xl:col-4 p-2" key={product._id}>
                 <div className="p-4 border-1 surface-border surface-card border-round">
@@ -153,12 +155,12 @@ const Basket = () =>{
     };
 
     const listTemplate = (layout) => {
-        if(basket!="null"){
-            return <div className="grid grid-nogutter">{basket?.map((product, index) => itemTemplate(product, layout, index))}:<></></div>;
-        }
-        else{
-            <h1>basketIsEmpty</h1>
-        }
+        
+            return <div className="grid grid-nogutter">{basket?.map((product, index) => itemTemplate(product, layout, index))}</div>;
+        
+        // else{
+        //     <h1>basketIsEmpty</h1>
+        // }
         };
 
     const header = () => {
@@ -187,6 +189,7 @@ const Basket = () =>{
                         {/* <InputText placeholder="Search by name" onChange={(c) => getOverheadByTitle(c)} value={value} /> */}
                     </IconField>
                 </div>
+                {console.log("in return",basket)}
                 <DataView value={basket} listTemplate={listTemplate} layout={layout} header={header()} />
             </div>
         </>

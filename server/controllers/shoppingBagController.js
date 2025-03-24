@@ -18,7 +18,7 @@ const createShoppingBag= async (req,res)=>{
     }).lean()
     console.log("duplicate", duplicate)
     if (duplicate) {
-        return res.status(409).json({ message: "already exist" })
+        return res.status(409).json({ message: "already exist in the basket" })
     }
 
     const shoppingBag = await ShoppingBag.create({user_id, product_id,type, amount})
