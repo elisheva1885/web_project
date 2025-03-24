@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Menubar } from 'primereact/menubar';
 import { Suspense, lazy } from 'react'
 import { Route, Routes, Link, Router } from 'react-router-dom';
 import Add_AirConditioner from './air-conditioners/Add_AirConditioner';
 import { useSelector } from 'react-redux';
+import { MegaMenu } from 'primereact/megamenu';
+
 const About = lazy(() => import('./About'));
 const Branch = lazy(() => import('./Branch'));
 const Overheads = lazy(() => import('./air-conditioners/Overheads'));
@@ -12,16 +14,47 @@ const Login = lazy(() => import('./Login'));
 const Register = lazy(() => import('./Register'));
 const Basket = lazy(() => import('./Basket'));
 
-const Navbar = ()=>{
-  
-    const {token} = useSelector((state) => state.token)
+const Navbar = () => {
+
+    const { token } = useSelector((state) => state.token)
     // const userDetalis = JSON.parse(localStorage.getItem('user'));
     // {console.log(userDetalis.username)}
+
+    const acItems = [
+        {
+            label: 'מזגן עילי',
+            items: [{ label: 'Details for Overhead AC' }], // You can customize this
+        },
+        {
+            label: 'מזגן נייד',
+            items: [{ label: 'Details for Mobile AC' }],
+        },
+        {
+            label: 'מזגן חלון',
+            items: [{ label: 'Details for Window AC' }],
+        },
+        {
+            label: 'מזגן מרכזי',
+            items: [{ label: 'Details for Central AC' }],
+        },
+    ];
+
+    const menuItems = [
+        {
+            label: 'AC Types',
+            icon: 'pi pi-desktop',
+            items: [
+                [
+                    ...acItems,
+                ],
+            ],
+        },
+    ];
 
     const items = [
 
         {
-                        // {/* {userDetalis!=null ?userDetalis.role === 'user'?<Button onClick={ ()=>goToAddOverhead("Overhead")}>add overhead</Button>: <></> : <></>} */}
+            // {/* {userDetalis!=null ?userDetalis.role === 'user'?<Button onClick={ ()=>goToAddOverhead("Overhead")}>add overhead</Button>: <></> : <></>} */}
             // label: token != null ?'התנתקות' : 'התחברות',
             label: 'התחברות',
             icon: 'pi pi-user',
@@ -49,16 +82,23 @@ const Navbar = ()=>{
 
 
     ];
+    const [hoverMenuVisible, setHoverMenuVisible] = useState(false);
 
-    const start = <Link to={"/"}><img alt="logo" src="/air-conditioner.png" height="40" className="mr-2"></img></Link>;
+    const start = (
+        <Link to={"/"}
+            onMouseEnter={() => setHoverMenuVisible(true)}
+            onMouseLeave={() => setHoverMenuVisible(false)}>
+            <img alt="logo" src="/air-conditioner.png" height="40" className="mr-2" />
+        </Link>
+    )
     const end = (
         <div className="flex align-items-center gap-2">
         </div>
     );
 
-    return(
+    return (
         <>
-        <Routes>
+            <Routes>
                 <Route path='/branch' element={<Suspense fallback="Loading..."><Branch /></Suspense>}></Route>
                 <Route path='/about' element={<Suspense fallback="Loading..."><About /></Suspense>}></Route>
                 <Route path='/overheads' element={<Suspense fallback="Loading..."><Overheads /></Suspense>}>        </Route>
@@ -66,14 +106,19 @@ const Navbar = ()=>{
                 <Route path='/login' element={<Suspense fallback="Loading..."><Login /></Suspense>}></Route>
                 <Route path='/register' element={<Suspense fallback="Loading..."><Register /></Suspense>}></Route>
                 <Route path='/overheads/add' element={<Suspense fallback="Loading..."><Add_AirConditioner /></Suspense>}></Route>
-                <Route path='/basket' element={<Suspense fallback="Loading..."><Basket/></Suspense>}></Route>
+                <Route path='/basket' element={<Suspense fallback="Loading..."><Basket /></Suspense>}></Route>
 
             </Routes>
             <div className="flex align-items-center gap-2">
                 <Menubar model={items} start={start} end={end} style={{ position: 'fixed', top: 0 }} />
+                {hoverMenuVisible && (
+                    <div  onMouseEnter={() => setHoverMenuVisible(true)} onMouseLeave={() => setHoverMenuVisible(false)}>
+                        <MegaMenu model={acItems} orientation="vertical" breakpoint="960px" />
+                    </div>
+                )}
             </div>
         </>
-        
+
     )
 }
 export default Navbar

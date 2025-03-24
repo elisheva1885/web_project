@@ -152,7 +152,7 @@ const Basket = () =>{
         else if (layout === 'grid') return gridItem(product);
     };
 
-    const listTemplate = (products, layout) => {
+    const listTemplate = (layout) => {
         if(basket!="null"){
             return <div className="grid grid-nogutter">{basket?.map((product, index) => itemTemplate(product, layout, index))}:<></></div>;
         }
