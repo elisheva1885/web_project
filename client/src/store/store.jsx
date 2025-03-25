@@ -6,6 +6,7 @@ import storage from "redux-persist/lib/storage/session";
 import overHeadsSlice from "./air-conditioner/overHeadsSlice"
 import basketSlice from "./basketSlice"
 import companySlice from "./companySlice";
+import userDetailsSlice from "./userDetailsSlice";
 const persistConfig = {
     key: "root",
     storage
@@ -16,6 +17,7 @@ const persistedTokenReducer = persistReducer(persistConfig, tokenSlice)
 const persistedOverHeadsReducer = persistReducer(persistConfig, overHeadsSlice)
 const persistedBasketReducer = persistReducer(persistConfig, basketSlice)
 const persistedCompaniesReducer = persistReducer(persistConfig, companySlice)
+const persistedUserDetailsReducer = persistReducer(persistConfig, userDetailsSlice)
 
 
 const myStore = configureStore({
@@ -24,6 +26,7 @@ const myStore = configureStore({
         overheads: persistedOverHeadsReducer,
         basket:  persistedBasketReducer,
         company : persistedCompaniesReducer,
+        userDetails: persistedUserDetailsReducer,
     }
 })
 

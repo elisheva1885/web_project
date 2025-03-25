@@ -18,7 +18,9 @@ import Basket from './Basket';
 const Login  =() => {
     const {token} = useSelector((state) => state.token)
     const {basket} = useSelector((state) => state.basket)
-    // const {username} = useSelector((state) => state.userDetails.username)
+    const {userDetails} = useSelector((state) => state.userDetails);
+
+
     // const {role} = useSelector((state) => state.userDetails.role)
 
     const navigate = useNavigate();
@@ -66,7 +68,6 @@ const Login  =() => {
         const user = {
             username: data.username,
             password: data.password
-
         }
         try {
             const res = await axios.post(`http://localhost:8000/api/auth/login`,user)
@@ -75,7 +76,6 @@ const Login  =() => {
                 dispatch(setToken(res.data.token));
                 dispatch(setUserDetails(res.data.username,res.data.role))
                 console.log(token);
-                console.log(res.data);
                 localStorage.setItem('user', JSON.stringify(res.data));
                 setShowMessage(true);
                 alert("before",basket)

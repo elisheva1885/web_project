@@ -2,6 +2,7 @@ import React from 'react';
 import { Card } from 'primereact/card';
 import { useNavigate } from 'react-router-dom';
 import styles from '../home.module.css'
+import { useDispatch, useSelector } from 'react-redux';
 
 
 const Home = () => {
@@ -25,6 +26,7 @@ const Home = () => {
             console.log(`Navigating to details of AC type ${id}`);
         };
         return (
+            <>
             <div className={styles.grid}>
                 {acTypes.map(ac => (
                     <div key={ac.id} className="flex justify-center items-center p-4">
@@ -41,6 +43,7 @@ const Home = () => {
                     </div>
                 ))}
             </div>
+            </>
         );
     };
 

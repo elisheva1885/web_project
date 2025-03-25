@@ -242,8 +242,8 @@ const Overheads = () => {
             <Routes>
                 <Route path='/overheads/overhead' element={<Suspense fallback="Loading..."><Overhead /></Suspense>}></Route>
             </Routes> */}
-            {/* {userDetalis!=null ?userDetalis.role === 'user'?<Button onClick={ ()=>goToAddOverhead("Overhead")}>add overhead</Button>: <></> : <></>} */}
-            {<Button onClick={ ()=>goToAddOverhead("Overhead")}>add overhead</Button>}
+            {userDetalis.role=="admin" ?userDetalis.role === 'user'?<Button onClick={ ()=>goToAddOverhead("Overhead")}>add overhead</Button>: <></> : <></>}
+            {/* {<Button onClick={ ()=>goToAddOverhead("Overhead")}>add overhead</Button>} */}
 
 
             <div className="card">

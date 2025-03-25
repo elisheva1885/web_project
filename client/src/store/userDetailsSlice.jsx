@@ -1,10 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit"
 
 const initVal = {
-    userDetails:{
-        username:"null",
-        role: "null"
-    }
+    userDetails:null
 }
 
 const userDetailsSlice = createSlice({
