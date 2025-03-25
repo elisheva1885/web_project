@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit"
 
 const initVal = {
-    basket:"null"
+    basket:null
 }
 
 const basketSlice = createSlice({
@@ -10,8 +10,9 @@ const basketSlice = createSlice({
     reducers:{
         setBasket:(state,action)=>{
             state.basket=action.payload
-            alert("in set")
-            alert("basket:",state.basket);
+            // alert("in set")
+            alert("Type of basket:", typeof basket);
+            // alert("basket:",state.basket);
         },
         clearBasket(state) {
             state.basket = null;

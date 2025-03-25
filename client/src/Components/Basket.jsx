@@ -20,8 +20,8 @@ const Basket = () =>{
     const {basket} = useSelector((state) => state.basket)
     console.log(basket);
     const dispatch = useDispatch();
+    const [shoppingBags, setShoppingBags] = useState([basket])
 
-    // const [shoppingBags, setShoppingBags] = useState([])
     const [layout, setLayout] = useState('list');
 
 
@@ -155,8 +155,7 @@ const Basket = () =>{
     };
 
     const listTemplate = (layout) => {
-        
-            return <div className="grid grid-nogutter">{basket?.map((product, index) => itemTemplate(product, layout, index))}</div>;
+            return <div className="grid grid-nogutter">{basket.map((product, index) => itemTemplate(product, layout, index))}</div>;
         
         // else{
         //     <h1>basketIsEmpty</h1>
@@ -170,7 +169,9 @@ const Basket = () =>{
             </div>
         );
     };
-
+// useEffect(() => {
+//     setShoppingBags(basket)
+// }, [basket])
 
     return (
         <>
