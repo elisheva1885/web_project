@@ -5,6 +5,8 @@ const Overhead = require("../models/airconditioners/Overhead")
 //לבדוק בפוסטמן
 const createShoppingBag= async (req,res)=>{
     const user_id = req.user._id
+
+    console.log("user",user_id);
     const { product_id,type, amount} = req.body
     // console.log(product_id,type, amount)
     if(!user_id || !product_id || !type){
@@ -37,8 +39,7 @@ const readShoppingBagByUserId = async (req,res)=> {
     if(!shoppingBags){
         return res.status(400).json({ message: "shopping bag is empty" })
     }
-    // let userShoppingBags = new Array();
-    let i = 1;
+
     const promises = shoppingBags.map(async (shoppingBag) => {
         switch (shoppingBag.type) {
             case "overhead":
@@ -51,9 +52,9 @@ const readShoppingBagByUserId = async (req,res)=> {
 
     });
     const results = await Promise.all(promises)
-    // console.log(userShoppingBags) 
-    const userShoppingBags = results.filter(result => result !== null).flat(); //filter null values and flatten the array.
 
+    const userShoppingBags = results.filter(result => result !== null).flat(); //filter null values and flatten the array.
+    console.log(userShoppingBags);
     return res.status(200).json(userShoppingBags)
 }
 const updateShoppingBagAmount = async (req,res)=> {
@@ -78,6 +79,9 @@ const updateShoppingBagAmount = async (req,res)=> {
 const deleteShoppingBag = async (req,res)=>{
 
     const {product_id} = req.body
+
+    const user_id = req.user._id
+    console.log(user_id);
     const shoppingBagByProduct = await ShoppingBag.findOne({product_id: product_id}).exec()
     if(!shoppingBagByProduct){
         return res.status(404).json({message:"no such product"})
@@ -93,9 +97,10 @@ const deleteShoppingBag = async (req,res)=>{
     console.log(shoppingBag)
 
     const result = await shoppingBag.deleteOne()
-    readShoppingBagByUserId()
+
+    // readShoppingBagByUserId()
     // return res.status(200).json({shoppingBags})
-    return res.status(200).json(shoppingBags)
+    return res.status(200).json({message:"deled successfully"})
 
 }
 

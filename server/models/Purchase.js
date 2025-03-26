@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
-const ShoppingBag = require('./ShoppingBag')
+
 const purchaseSchema = new mongoose.Schema({
-    user_id: {
+    user: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
         ref: "User",
@@ -11,6 +11,7 @@ const purchaseSchema = new mongoose.Schema({
         type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'ShoppingBag' }],
         required: true,
      }
+
 }, {
     timestamps: true
 })
