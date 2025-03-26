@@ -34,7 +34,26 @@ const Basket = () =>{
         })
     }
 
+    const getShoppingBags = async () => {
+        try {
+            const headers = {
+                'Authorization': `Bearer ${token}`
+            }
 
+            const res = await axios.get('http://localhost:8000/api/user/shoppingBag',{headers})
+            if (res.status === 200) {
+                // sortData(res.data)
+                // setShoppingBags(res.data)
+                dispatch(setBasket(res.data))
+                alert("basket:", basket);
+                console.log("res.data",res.data);
+                // console.log("useState",shoppingBags);
+            }
+        }
+        catch (e) {
+            console.error(e)
+        }
+    }
     const deleteShoppingBag = async (product)=>{
         alert("hgvh")
         try {
@@ -54,6 +73,7 @@ const Basket = () =>{
                 // setShoppingBags(res.data)
                 console.log("res.data",res.data);
                 // console.log("useState",shoppingBags);
+                getShoppingBags()
             }
             
         }
@@ -93,7 +113,7 @@ const Basket = () =>{
     };
 
     const listItem = (product, index) => {
-        alert(product.describe)
+        // alert(product.describe)
         return (
             <>
                 <div className="col-12" key={product._id}>
@@ -154,7 +174,7 @@ const Basket = () =>{
         else if (layout === 'grid') return gridItem(product);
     };
 
-    const listTemplate = (layout) => {
+    const listTemplate = (products,layout) => {
             return <div className="grid grid-nogutter">{basket.map((product, index) => itemTemplate(product, layout, index))}</div>;
         
         // else{

@@ -1,7 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit"
 
 const initVal = {
-    userDetails:null
+    userDetails:{
+        username:null,
+        role:null
+    }
 }
 
 const userDetailsSlice = createSlice({
@@ -9,7 +12,9 @@ const userDetailsSlice = createSlice({
     initialState:initVal,
     reducers:{
         setUserDetails:(state,action)=>{
-            state.userDetails=action.payload
+            state.userDetails.username=action.payload.username
+            state.userDetails.role=action.payload.role
+
             console.log(state.userDetails);
             alert("setUserDetails")
         },

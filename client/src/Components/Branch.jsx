@@ -8,12 +8,17 @@ import { InputText } from 'primereact/inputtext';
 import { IconField } from 'primereact/iconfield';
 import { InputIcon } from 'primereact/inputicon';
 import { useSelector } from "react-redux";
+import { Button } from 'primereact/button';
+import { Link, useNavigate } from 'react-router-dom';
+import { setUserDetails } from '../store/userDetailsSlice';
 
 const Branches = () => {
-    const token = useSelector(state => state.token.token)
+    const {token} = useSelector(state => state.token)
+    const {userDetails} = useSelector((state) => state.userDetails);
     const [branches, setBranches] = useState([])
     const [branches2, setBranches2] = useState([])
     const [value , setValue] = useState('')
+    const navigate = useNavigate();
 
 
     const sortData = (data) => {
@@ -23,7 +28,10 @@ const Branches = () => {
             return 0;                           // a and b are equal
         })
     }
+    const goToAddBranch = ()=> {
+        navigate('/branch/add');
 
+    } 
     const getBranches = async () => {
         try {
             console.log(token);
@@ -60,7 +68,7 @@ const Branches = () => {
     const isOpen = (b) => {
         const date = new Date();
         const hour = date.getHours()
-        console.log(hour);
+        // console.log(hour);
         console.log("the" + b.closingHour.weekdays);
         const day = date.getDay()
         if (day === 6) {
@@ -149,6 +157,9 @@ const Branches = () => {
     }, [])
     return (
         <>
+        <br/><br/><br/>
+            {userDetails.role==="user"?<Button onClick={ ()=>goToAddBranch()}>add branch</Button>: <></> }
+
         {renderHeader()}
         <Panel header="סניפים" style={{direction:"rtl"}}>
             <div className="card">

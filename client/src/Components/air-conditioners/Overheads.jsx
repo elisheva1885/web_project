@@ -23,11 +23,11 @@ const Overheads = () => {
     const {token} = useSelector((state) => state.token)
     // const {companies} = useSelector((state) => state.companies)
     const {basket} = useSelector((state) => state.basket)
+    const {userDetails} = useSelector((state) => state.userDetails);
 
     const [overheads, setOverheads] = useState([])
     const [overheads2, setOverheads2] = useState([])
     const [value, setValue] = useState('')
-    const userDetalis = JSON.parse(localStorage.getItem('user'));
     const [shoppingBags, setShoppingBags] = useState([])
 
     const [layout, setLayout] = useState('list');
@@ -242,7 +242,8 @@ const Overheads = () => {
             <Routes>
                 <Route path='/overheads/overhead' element={<Suspense fallback="Loading..."><Overhead /></Suspense>}></Route>
             </Routes> */}
-            {userDetalis.role=="admin" ?userDetalis.role === 'user'?<Button onClick={ ()=>goToAddOverhead("Overhead")}>add overhead</Button>: <></> : <></>}
+            <br/><br/><br/><br/>
+            {userDetails.role === 'user'?<Button onClick={ ()=>goToAddOverhead("Overhead")}>add overhead</Button>: <></> }
             {/* {<Button onClick={ ()=>goToAddOverhead("Overhead")}>add overhead</Button>} */}
 
 

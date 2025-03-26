@@ -74,13 +74,11 @@ const Login  =() => {
             console.log(res.status);
             if(res.status===200){
                 dispatch(setToken(res.data.token));
-                dispatch(setUserDetails(res.data.username,res.data.role))
+                dispatch(setUserDetails({username:res.data.username,role:res.data.role}))
                 console.log(token);
-                localStorage.setItem('user', JSON.stringify(res.data));
+                // localStorage.setItem('user', JSON.stringify(res.data));
                 setShowMessage(true);
-                alert("before",basket)
                 getShoppingBags();
-                alert("after",basket.name)
                 goToHome()
             }
             // else{
@@ -106,15 +104,15 @@ const Login  =() => {
     
     return (
         <div className="form-demo">
-            <Dialog visible={showMessage} onHide={() => setShowMessage(false)} position="top" footer={dialogFooter} showHeader={false} breakpoints={{ '960px': '80vw' }} style={{ width: '30vw' }}>
-                <div className="flex justify-content-center flex-column pt-6 px-3">
-                    <i className="pi pi-check-circle" style={{ fontSize: '5rem', color: 'var(--green-500)' }}></i>
-                    <h5>Login Successful!</h5>
-                    <p style={{ lineHeight: 1.5, textIndent: '1rem' }}>
-                        Your account is registered under name <b>{formData.name}</b> ; it'll be valid next 30 days without activation. Please check <b>{formData.email}</b> for activation instructions.
-                    </p>
-                </div>
-            </Dialog>
+        {/* //     <Dialog visible={showMessage} onHide={() => setShowMessage(false)} position="top" footer={dialogFooter} showHeader={false} breakpoints={{ '960px': '80vw' }} style={{ width: '30vw' }}>
+        //         <div className="flex justify-content-center flex-column pt-6 px-3">
+        //             <i className="pi pi-check-circle" style={{ fontSize: '5rem', color: 'var(--green-500)' }}></i>
+        //             <h5>Login Successful!</h5>
+        //             <p style={{ lineHeight: 1.5, textIndent: '1rem' }}>
+        //             !!התחברת בהצלחה {userDetails} שלום  <b></b>  
+        //             </p>
+        //         </div>
+        //     </Dialog> */}
             <div className="flex justify-content-center">
                 <div className="card">
                     <h5 className="text-center">התחבר</h5>
