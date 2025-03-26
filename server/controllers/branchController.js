@@ -1,6 +1,7 @@
 const Branch = require("../models/Branch")
 
 const createBranch = async (req, res) => {
+    console.log("inside")
     const { address, phoneNumber, openingHour, closingHour} = req.body
     if (!address || !phoneNumber || !openingHour || !closingHour) {
         return res.status(400).json({ message: "all details are required" })

@@ -13,12 +13,17 @@ const AddBranch = () => {
     const [showMessage, setShowMessage] = useState(false);
     const [formData, setFormData] = useState({});
     // const {companies} = useSelector((state) => state.companies)
+    console.log("hello");
 
     const onSubmit = async (data) => {
         try {
-            const response = await axios.post('http://localhost:8000/api/air-conditioner/overhead', data);
+            const response = await axios.post('http://localhost:8000/api/branches', data);
+            if(response.status===201)
+            {
             setFormData(data);
             setShowMessage(true);
+            }
+            
         } catch (error) {
             console.error(error);
         }
@@ -45,70 +50,70 @@ const AddBranch = () => {
                     <form onSubmit={handleSubmit(onSubmit)} className="p-fluid">
                         <div className="field">
                             <span className="p-float-label">
-                                <Controller name="company" control={control} rules={{ required: 'Company is required.' }} render={({ field, fieldState }) => (
+                                <Controller name="address.city" control={control} rules={{ required: 'city is required.' }} render={({ field, fieldState }) => (
                                     <InputText id={field.name} {...field} className={classNames({ 'p-invalid': fieldState.invalid })} />
                                 )} />
-                                <label htmlFor="address.city" className={classNames({ 'p-error': errors.company })}>*city</label>
+                                <label htmlFor="address.city" className={classNames({ 'p-error': errors.address?.city })}>*city</label>
                             </span>
-                            {getFormErrorMessage('company')}
+                            {getFormErrorMessage('address.city')}
                         </div>
 
                         <div className="field">
                             <span className="p-float-label">
-                                <Controller name="title" control={control} rules={{ required: 'Title is required.' }} render={({ field, fieldState }) => (
+                                <Controller name="address.street" control={control} rules={{ required: 'street is required.' }} render={({ field, fieldState }) => (
                                     <InputText id={field.name} {...field} className={classNames({ 'p-invalid': fieldState.invalid })} />
                                 )} />
-                                <label htmlFor="address.street" className={classNames({ 'p-error': errors.title })}>*street</label>
+                                <label htmlFor="address.street" className={classNames({ 'p-error': errors.address?.street })}>*street</label>
                             </span>
-                            {getFormErrorMessage('title')}
+                            {getFormErrorMessage('address.street')}
                         </div>
 
 
 
                         <div className="field">
                             <span className="p-float-label">
-                                <Controller name="imagepath" control={control} rules={{ required: 'Image path is required.' }} render={({ field, fieldState }) => (
+                                <Controller name="address.streetNum" control={control} rules={{ required: 'streetNum is required.' }} render={({ field, fieldState }) => (
                                     <InputText id={field.name} {...field} className={classNames({ 'p-invalid': fieldState.invalid })} />
                                 )} />
-                                <label htmlFor="address.street.streetNum" className={classNames({ 'p-error': errors.imagepath })}>*streetNum</label>
+                                <label htmlFor="address.streetNum" className={classNames({ 'p-error': errors.address?.streetNum })}>*streetNum</label>
                             </span>
-                            {getFormErrorMessage('imagepath')}
+                            {getFormErrorMessage('address.streetNum')}
                         </div>
 
                         <div className="field">
                             <span className="p-float-label">
-                                <Controller name="stock" control={control} render={({ field }  ) => (
+                                <Controller name="phoneNumber" control={control}rules={{ required: 'phoneNumber is required.' }} render={({ field }  ) => (
                                     <InputText id={field.name} type="number" {...field} />
                                 )} />
                                 <label htmlFor="phoneNumber">phoneNumber</label>
                             </span>
+                            {getFormErrorMessage('phoneNumber')}
                         </div>
 
                         <div className="field">
                             <span className="p-float-label">
-                                <Controller name="price" control={control}  render={({ field }) => (
+                                <Controller name="openingHour" control={control}  render={({ field }) => (
                                     <InputText id={field.name} type="number" {...field} />
                                 )} />
-                                <label htmlFor="openingHour" className={classNames({ 'p-error': errors.price })}>*openingHour</label>
+                                <label htmlFor="openingHour" className={classNames({ 'p-error': errors.openingHour })}>*openingHour</label>
                             </span>
-                            {getFormErrorMessage('price')}
+                            {getFormErrorMessage('openingHour')}
                         </div>
 
-                        {/* BTUs */}
                         <div className="field">
                             <div className="flex">
                                 <div style={{ flex: '1', marginRight: '10px' }}>
                                     <span className="p-float-label">
-                                        <Controller name="BTU_output.cool" control={control} render={({ field }) => (
-                                            <InputText id="BTU_output.cool" {...field} />
+                                        <Controller name="closingHour.weekdays" control={control} render={({ field }) => (
+                                            <InputText id="closingHour.weekdays" {...field} />
                                         )} />
                                         <label htmlFor="closingHour.weekdays">closingHour</label>
                                     </span>
                                 </div>
                                 <div style={{ flex: '1', marginLeft: '10px' }}>
                                     <span className="p-float-label">
-                                        <Controller name="BTU_output.heat" control={control} render={({ field }) => (
-                                            <InputText id="BTU_output.heat" {...field} />
+                                        <Controller name="closingHour.fridays" control={control} render={({ field }) => (
+                                            <InputText id="closingHour.fridays" {...field} />
                                         )} />
                                         <label htmlFor="closingHour.fridays">Friday_closingHour</label>
                                     </span>

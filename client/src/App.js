@@ -3,6 +3,8 @@ import { Route, Routes, Link, Router } from 'react-router-dom';
 import Home from './Components/Home';
 import { Suspense, lazy } from 'react'
 import Navbar from './Components/Navbar';
+import BasketPayment from './Components/Payment';
+import SideBasket from './Components/Payment';
 const About = lazy(() => import('./Components/About'));
 const Branch = lazy(() => import('./Components/Branch'));
 const Overheads = lazy(() => import('./Components/air-conditioners/Overheads'));
