@@ -1,0 +1,9 @@
+.hoverMenu {
+    position: absolute; /* Position it absolutely */
+    top: 40px; /* Adjust based on your layout */
+    left: 0; /* Align with the start of the Menubar */
+    background-color: white; /* Background color of the menu */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); /* Shadow for better visibility */
+    z-index: 1000; /* Ensure it appears on top of other elements */
+    padding: 8px; /* Padding around the menu */
+}
