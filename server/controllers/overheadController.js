@@ -19,7 +19,7 @@ const createOverhead = async (req, res) => {
     }
 
 }
-const readOverhead = async (req,res)=> {
+const readOverheads = async (req,res)=> {
     const overheads = await Overhead.find().populate("company").lean()
     if(!overheads?.length){
         return res.status(404).json({ message: "no overheads found" })
@@ -96,4 +96,4 @@ const deleteOverhead = async (req,res)=> {
     return res.status(200).json(overheads)
 }
 
-module.exports = {createOverhead , readOverhead, readOverheadById,readOverheadByTitle , updateOverhead , deleteOverhead}
+module.exports = {createOverhead , readOverheads, readOverheadById,readOverheadByTitle , updateOverhead , deleteOverhead}
