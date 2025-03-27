@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { useEffect, useState} from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from 'primereact/button';
 import { DataView, DataViewLayoutOptions } from 'primereact/dataview';
 import { Tag } from 'primereact/tag';
@@ -13,11 +13,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setBasket } from '../store/basketSlice';
 
 
-const Basket = () =>{
+const Basket = () => {
 
 
-    const {token} = useSelector((state) => state.token)
-    const {basket} = useSelector((state) => state.basket)
+    const { token } = useSelector((state) => state.token)
+    const { basket } = useSelector((state) => state.basket)
     const dispatch = useDispatch();
     const [shoppingBags, setShoppingBags] = useState([basket])
 
@@ -33,25 +33,32 @@ const Basket = () =>{
 
     const getShoppingBags = async () => {
         try {
+            console.log(`token: ${token}`); // token is null here!!!!!!!!!
             const headers = {
                 'Authorization': `Bearer ${token}`
             }
-
-            const res = await axios.get('http://localhost:8000/api/user/shoppingBag',{headers})
+            const res = await axios.get('http://localhost:8000/api/user/shoppingBag', { headers })
             if (res.status === 200) {
                 // sortData(res.data)
-                setShoppingBags(res.data)
+                console.log(res.data);
                 dispatch(setBasket(res.data))
-                alert("basket:", basket);
-                console.log("res.data",res.data);
+                setShoppingBags(basket)
+                // alert("basket:", basket);
+                console.log("res.data", res.data);
                 // console.log("useState",shoppingBags);
             }
         }
         catch (e) {
+            if (e.status === 401){
+                alert("unauthorized")
+            }
+            else if (e.status === 403){
+                alert("forbiddened")
+            }
             console.error(e)
         }
     }
-    const deleteShoppingBag = async (product)=>{
+    const deleteShoppingBag = async (product) => {
         alert("hgvh")
         try {
             const headers = {
@@ -60,19 +67,19 @@ const Basket = () =>{
             const product_id = {
                 product_id: product._id
             }
-            const res = await axios.delete('http://localhost:8000/api/user/shoppingBag',{
+            const res = await axios.delete('http://localhost:8000/api/user/shoppingBag', {
                 headers: headers,
-            data:product_id
-        })
+                data: product_id
+            })
             if (res.status === 200) {
                 dispatch(setBasket(res.data))
                 // sortData(res.data)
                 // setShoppingBags(res.data)
-                console.log("res.data",res.data);
+                console.log("res.data", res.data);
                 // console.log("useState",shoppingBags);
                 getShoppingBags()
             }
-            
+
         }
         catch (e) {
             console.error(e)
@@ -120,7 +127,7 @@ const Basket = () =>{
                         <div className="flex flex-column sm:flex-row justify-content-between align-items-center xl:align-items-start flex-1 gap-4">
                             <div className="flex flex-column align-items-center sm:align-items-start gap-3">
                                 {/* <Link to={{pathName:`/overheads/${product.title}` , state: {product:product} }}><div className="text-2xl font-bold text-900" style={{}} >{product.title}</div></Link> */}
-                                <Link to={`/overheads/overhead/${product._id}` } params={{ product: product }}><div className="text-2xl font-bold text-900" style={{}} >{product.title}</div></Link>
+                                <Link to={`/overheads/overhead/${product._id}`} params={{ product: product }}><div className="text-2xl font-bold text-900" style={{}} >{product.title}</div></Link>
 
                                 <div className="flex align-items-center gap-3">
                                     <Tag value={getSeverityText(product)} severity={getSeverity(product.stock)}></Tag>
@@ -128,7 +135,7 @@ const Basket = () =>{
                             </div>
                             <div className="flex sm:flex-column align-items-center sm:align-items-end gap-3 sm:gap-2">
                                 <span className="text-2xl font-semibold">₪{product.price}</span>
-                                <Button icon="pi pi-shopping-cart" className="p-button-rounded" disabled={getSeverity(product.stock) === "danger"} onClick={()=>deleteShoppingBag(product)}>   להסרה מהעגלה  </Button>
+                                <Button icon="pi pi-shopping-cart" className="p-button-rounded" disabled={getSeverity(product.stock) === "danger"} onClick={() => deleteShoppingBag(product)}>   להסרה מהעגלה  </Button>
                             </div>
                         </div>
                     </div>
@@ -166,20 +173,23 @@ const Basket = () =>{
         if (!product) {
             return;
         }
-        
+
         if (layout === 'list') return listItem(product, index);
         else if (layout === 'grid') return gridItem(product);
     };
 
-    const listTemplate = (products,layout) => {
+    const listTemplate = (products, layout) => {
+        if (!token) {
+            return <h1>please login to see your shopping bag</h1>; // Or any other fallback UI
+        }
         if (!shoppingBags) {
             return <h1>Your basket is empty</h1>; // Or any other fallback UI
         }
-            return <div className="grid grid-nogutter">{shoppingBags.map((product, index) => itemTemplate(product, layout, index))}</div>;
+        return <div className="grid grid-nogutter">{shoppingBags.map((product, index) => itemTemplate(product, layout, index))}</div>;
         // else{
         //     <h1>basketIsEmpty</h1>
         // }
-        };
+    };
 
     const header = () => {
         return (
@@ -188,13 +198,13 @@ const Basket = () =>{
             </div>
         );
     };
-useEffect(() => {
-    getShoppingBags()
-}, [])
+    useEffect(() => {
+        getShoppingBags()
+    }, [])
 
     return (
         <>
-{/* 
+            {/* 
             <Routes>
                 <Route path='/overheads/overhead' element={<Suspense fallback="Loading..."><Overhead /></Suspense>}></Route>
             </Routes> */}
@@ -215,6 +225,6 @@ useEffect(() => {
         </>
     )
     //showing all the shopping bag objects which belongs to the userId
-// alert("basket")
+    // alert("basket")
 }
 export default Basket

@@ -74,7 +74,6 @@ const Home = () => {
                 // sortData(res.data)
                 // setOverheads(res.data)
                 dispatch(setOverheads(res.data));
-                console.log(overheads);
             }
         }
         catch (e) {
