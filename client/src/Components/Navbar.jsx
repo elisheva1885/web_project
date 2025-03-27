@@ -5,6 +5,7 @@ import { Route, Routes, Link, Router } from 'react-router-dom';
 import Add_AirConditioner from './air-conditioners/Add_AirConditioner';
 import { useSelector } from 'react-redux';
 import { MegaMenu } from 'primereact/megamenu';
+import userDetailsSlice from '../store/userDetailsSlice';
 
 
 const About = lazy(() => import('./About'));
@@ -20,8 +21,8 @@ const AddBranch = lazy(() => import('./AddBranch'));
 const Navbar = () => {
 
     const { token } = useSelector((state) => state.token)
-    // const userDetalis = JSON.parse(localStorage.getItem('user'));
-    // {console.log(userDetalis.username)}
+
+    const {userDetails} = useSelector((state) => state.userDetails);
 
     const acItems = [
         {
@@ -82,6 +83,11 @@ const Navbar = () => {
             icon: 'pi pi-question',
             url: '/about'
         },
+        {
+           label:userDetails.role==='user'? 'לאתר הניהול':'',
+           icon: <img src="admin.png" style={{ width: '24px', height: '24px' }} /> ,
+           url: '/admin' 
+        }
 
 
     ];
