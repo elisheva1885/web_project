@@ -9,8 +9,9 @@ import { IconField } from 'primereact/iconfield';
 import { InputIcon } from 'primereact/inputicon';
 import { useSelector } from "react-redux";
 import { Button } from 'primereact/button';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { setUserDetails } from '../store/userDetailsSlice';
+import 'primeicons/primeicons.css';
 
 const Branches = () => {
     const {token} = useSelector(state => state.token)
@@ -19,6 +20,8 @@ const Branches = () => {
     const [branches2, setBranches2] = useState([])
     const [value , setValue] = useState('')
     const navigate = useNavigate();
+    const location = useLocation();
+    const { data } = location.state || {}; 
 
 
     const sortData = (data) => {
@@ -46,13 +49,14 @@ const Branches = () => {
         }
     }
 
-    const updateBranch = async (b, setBranches) => {
-        const branch = {
-            _id: b._id,
-            phoneNumber: b.phoneNumber,
-            openingHour: b.openingHour,
-            closingHour: b.closingHour
-        }
+    const updateBranch = async (b) => {
+        const navigationData = {
+            type: b,
+            // You can add any other data you may want to send
+        };
+        console.log(b);
+        navigate('/branch/update' , { state: navigationData })
+        setBranches(data)
     }
 
     const printBranches = () => {
@@ -103,14 +107,15 @@ const Branches = () => {
                                 <span className="font-semibold">{`שישי וערבי חג:  ${branch.closingHour.fridays} - ${branch.openingHour}`}</span>
                                 <div className="font-semibold">{` ליצירת קשר: ${branch.phoneNumber} `}</div>
                                 </span>
-
                                 <Tag value={isOpen(branch) === "success" ? "פתוח" : "סגור"} severity={isOpen(branch)}></Tag>
+                                <Button onClick={()=>updateBranch(branch)}><i className="pi pi-pencil" style={{ fontSize: '1rem' }}></i></Button>
                             </div>
                         </div>
                     </div>
                 </div>
                 </div>
                 </>
+                
         );
     }
 

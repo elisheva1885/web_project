@@ -33,29 +33,59 @@ const readBranchByCity = async (req,res) => {
 }
 
 const updateBranch = async (req, res) => {
-    const { _id, phoneNumber, openingHour, closingHour } = req.body
+    // console.log("req.body",req.body);
+    const { _id,address, phoneNumber, openingHour, closingHour } = req.body
     if(!_id){
         return res.status(400).json({message: "error on updating"})
     }
-    if (!phoneNumber && !openingHour && !closingHour) {
+    if (!address && !phoneNumber && !openingHour && !closingHour) {
         return res.status(400).json({ message: "nothing changed" })
     }
     const branch = await Branch.findById(_id).exec()
     if (!branch) {
         return res.status(400).json({ message: "no such branch" })
     }
-    if (phoneNumber) {
-        branch.phoneNumber = phoneNumber
-    }
-    if (openingHour) {
-        branch.openingHour = openingHour
-    }
-    if (closingHour) {
-        branch.closingHour = closingHour
-    }
+
+    // if (address.city) {
+    //     branch.city = address.city
+    //     console.log(branch.city ,address.city)
+    // }
+    // if (address.street) {
+    //     branch.street = address.street
+    // }
+    // if (address.city) {
+    //     branch.streetNum = address.streetNum
+    // }
+    // if (phoneNumber) {
+    //     branch.phoneNumber = phoneNumber
+    // }
+    // if (openingHour) {
+    //     branch.openingHour = openingHour
+    // }
+    // if (closingHour.weekdays) {
+    //     branch.closingHour = closingHour.weekdays
+    //     console.log(branch.closingHour);
+    // }
+    // if (closingHour.fridays) {
+    //     branch.fridays = closingHour.fridays
+    // }
+    // console.log("branch", branch);
+
+
+    branch.address.city = address.city?address.city:branch.address.city
+    branch.address.street = address.street?address.street:branch.address.street
+    branch.address.streetNum = address.streetNum?address.streetNum:branch.address.streetNum
+    branch.phoneNumber = phoneNumber?phoneNumber:branch.phoneNumber
+    branch.openingHour = openingHour?openingHour:branch.openingHour
+    branch.closingHour.weekdays = closingHour.weekdays?closingHour.weekdays:branch.closingHour.weekdays
+    branch.closingHour.fridays = closingHour.fridays?closingHour.fridays:branch.closingHour.fridays
+
+    console.log(branch)
     const updatedBranch = await branch.save()
     const branches = await Branch.find().lean()
-    return res.status(200).json(branches)  
+    return res.status(201).json(branches)  
+    // return res.status(201).json({message: "updated"})  
+
 }
 
 const deleteBranch = async (req,res)=> {
