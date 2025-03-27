@@ -13,19 +13,21 @@ const AddBranch = () => {
     const [showMessage, setShowMessage] = useState(false);
     const [formData, setFormData] = useState({});
     // const {companies} = useSelector((state) => state.companies)
-    console.log("hello");
-
     const onSubmit = async (data) => {
         try {
-            const response = await axios.post('http://localhost:8000/api/branches', data);
-            if(response.status===201)
+            const res = await axios.post('http://localhost:8000/api/branches', data);
+            console.log(res);
+            if(res.status===201)
             {
             setFormData(data);
             setShowMessage(true);
             }
             
-        } catch (error) {
-            console.error(error);
+        } 
+        catch (error) {
+            if(error.status === 409){
+                alert("הסניף כבר קיים באתר")
+            }
         }
     };
 
@@ -92,7 +94,7 @@ const AddBranch = () => {
 
                         <div className="field">
                             <span className="p-float-label">
-                                <Controller name="openingHour" control={control}  render={({ field }) => (
+                                <Controller name="openingHour" control={control}  rules={{ required: 'openingHour is required.' }}  render={({ field }) => (
                                     <InputText id={field.name} type="number" {...field} />
                                 )} />
                                 <label htmlFor="openingHour" className={classNames({ 'p-error': errors.openingHour })}>*openingHour</label>
@@ -104,7 +106,7 @@ const AddBranch = () => {
                             <div className="flex">
                                 <div style={{ flex: '1', marginRight: '10px' }}>
                                     <span className="p-float-label">
-                                        <Controller name="closingHour.weekdays" control={control} render={({ field }) => (
+                                        <Controller name="closingHour.weekdays" control={control} rules={{ required: 'closingHour is required.' }}  render={({ field }) => (
                                             <InputText id="closingHour.weekdays" {...field} />
                                         )} />
                                         <label htmlFor="closingHour.weekdays">closingHour</label>
@@ -112,7 +114,7 @@ const AddBranch = () => {
                                 </div>
                                 <div style={{ flex: '1', marginLeft: '10px' }}>
                                     <span className="p-float-label">
-                                        <Controller name="closingHour.fridays" control={control} render={({ field }) => (
+                                        <Controller name="closingHour.fridays" control={control} rules={{ required: 'closingHour is required.' }}  render={({ field }) => (
                                             <InputText id="closingHour.fridays" {...field} />
                                         )} />
                                         <label htmlFor="closingHour.fridays">Friday_closingHour</label>

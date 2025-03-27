@@ -64,7 +64,7 @@ const updateOverhead = async (req, res) => {
     overhead.output= output?output:overhead.output
     overhead.energy_rating= energy_rating?energy_rating:overhead.energy_rating
     overhead.working_current= working_current?working_current:overhead.working_current
-    overhead.recommended_methom= recommended_methom?recommended_methom:overhead.recommended_methom
+    overhead.recommended_method= recommended_method?recommended_method:overhead.recommended_method
     overhead.pipe_connection= pipe_connection?pipe_connection:overhead.pipe_connection
     overhead.in_size= in_size?in_size:overhead.in_size
     overhead.out_size= out_size?out_size:overhead.out_size

@@ -6,7 +6,6 @@ import Add_AirConditioner from './air-conditioners/Add_AirConditioner';
 import { useSelector } from 'react-redux';
 import { MegaMenu } from 'primereact/megamenu';
 
-
 const About = lazy(() => import('./About'));
 const Branch = lazy(() => import('./Branch'));
 const Overheads = lazy(() => import('./air-conditioners/Overheads'));
@@ -16,12 +15,14 @@ const Register = lazy(() => import('./Register'));
 const Basket = lazy(() => import('./Basket'));
 const UpdateBranch = lazy(() => import('./UpdateBranch'));
 const AddBranch = lazy(() => import('./AddBranch'));
+const Admin = lazy(() => import('./Admin'));
+const UserAccont = lazy(() => import('./UserAccont'));
 
 const Navbar = () => {
 
     const { token } = useSelector((state) => state.token)
-    // const userDetalis = JSON.parse(localStorage.getItem('user'));
-    // {console.log(userDetalis.username)}
+
+    const {userDetails} = useSelector((state) => state.userDetails);
 
     const acItems = [
         {
@@ -59,9 +60,9 @@ const Navbar = () => {
         {
             // {/* {userDetalis!=null ?userDetalis.role === 'user'?<Button onClick={ ()=>goToAddOverhead("Overhead")}>add overhead</Button>: <></> : <></>} */}
             // label: token != null ?'התנתקות' : 'התחברות',
-            label: 'התחברות',
+            label:userDetails.username? userDetails.username:'התחברות',
             icon: 'pi pi-user',
-            url: '/login'
+            url: userDetails.username? '/userAccount': '/login'
         },
         {
             label: 'צור קשר',
@@ -82,6 +83,11 @@ const Navbar = () => {
             icon: 'pi pi-question',
             url: '/about'
         },
+        {
+           label:userDetails.role==='user'? 'לאתר הניהול':'',
+           icon: userDetails.role==='user'?<img src="admin.png" style={{ width: '24px', height: '24px' }} />:'' ,
+           url: userDetails.role==='user'?'/admin' :'/'
+        }
 
 
     ];
@@ -112,6 +118,9 @@ const Navbar = () => {
                 <Route path='/register' element={<Suspense fallback="Loading..."><Register /></Suspense>}></Route>
                 <Route path='/overheads/add' element={<Suspense fallback="Loading..."><Add_AirConditioner /></Suspense>}></Route>
                 <Route path='/basket' element={<Suspense fallback="Loading..."><Basket /></Suspense>}></Route>
+                <Route path='/admin' element={<Suspense fallback="Loading..."><Admin/></Suspense>}></Route>
+                <Route path='/userAccount' element={<Suspense fallback="Loading..."><UserAccont/></Suspense>}></Route>
+
 
             </Routes>
             <div className="flex align-items-center gap-2">

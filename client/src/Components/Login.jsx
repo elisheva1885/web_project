@@ -10,8 +10,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { clearToken, setToken } from '../store/tokenSlice';
 import myStore from '../store/store';
-import { setBasket, clearBasket } from '../store/basketSlice';
-import { setUserDetails } from '../store/userDetailsSlice';
+import { setBasket ,clearBasket  } from '../store/basketSlice';
+import { clearUserDetails, setUserDetails } from '../store/userDetailsSlice';
+
 
 import Basket from './Basket';
 
@@ -144,7 +145,6 @@ const Login  =() => {
                     </form>
                 </div>
             </div>
-            <Button type="submit" label="ליציאה מהפרופיל" className="mt-2" onClick={signOut}/>
 
         </div>
 

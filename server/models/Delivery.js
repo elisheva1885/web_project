@@ -7,7 +7,8 @@ const deliverySchema = new mongoose.Schema({
         immutable: true
     },
     address: {
-        type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Address' }],
+        type:  mongoose.Schema.Types.ObjectId,
+         ref: 'Address' ,
         required: true
     },
     purchase: {
