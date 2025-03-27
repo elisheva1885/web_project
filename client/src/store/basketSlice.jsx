@@ -10,9 +10,6 @@ const basketSlice = createSlice({
     reducers:{
         setBasket:(state,action)=>{
             state.basket=action.payload
-            // alert("in set")
-            alert("Type of basket:", typeof basket);
-            // alert("basket:",state.basket);
         },
         clearBasket(state) {
             state.basket = null;

@@ -30,6 +30,7 @@ const createShoppingBag= async (req,res)=>{
 }
 
 const readShoppingBagByUserId = async (req,res)=> {
+    console.log("readShoppingBagByUserId");
     const user_id = req.user._id
     if(!user_id){
         return res.status(400).json({message: "reqired"})
