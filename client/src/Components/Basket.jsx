@@ -18,21 +18,18 @@ const Basket = () =>{
 
     const {token} = useSelector((state) => state.token)
     const {basket} = useSelector((state) => state.basket)
-    console.log(basket);
     const dispatch = useDispatch();
     const [shoppingBags, setShoppingBags] = useState([basket])
 
     const [layout, setLayout] = useState('list');
 
-
-
-    const sortData = (data) => {
-        data.sort((a, b) => {
-            if (a.title < b.title) return -1;  // a comes before b
-            if (a.title > b.title) return 1;   // a comes after b
-            return 0;                           // a and b are equal
-        })
-    }
+    // const sortData = (data) => {
+    //     data.sort((a, b) => {
+    //         if (a.title < b.title) return -1;  // a comes before b
+    //         if (a.title > b.title) return 1;   // a comes after b
+    //         return 0;                           // a and b are equal
+    //     })
+    // }
 
     const getShoppingBags = async () => {
         try {
@@ -43,7 +40,7 @@ const Basket = () =>{
             const res = await axios.get('http://localhost:8000/api/user/shoppingBag',{headers})
             if (res.status === 200) {
                 // sortData(res.data)
-                // setShoppingBags(res.data)
+                setShoppingBags(res.data)
                 dispatch(setBasket(res.data))
                 alert("basket:", basket);
                 console.log("res.data",res.data);
@@ -175,8 +172,10 @@ const Basket = () =>{
     };
 
     const listTemplate = (products,layout) => {
-            return <div className="grid grid-nogutter">{basket.map((product, index) => itemTemplate(product, layout, index))}</div>;
-        
+        if (!shoppingBags) {
+            return <h1>Your basket is empty</h1>; // Or any other fallback UI
+        }
+            return <div className="grid grid-nogutter">{shoppingBags.map((product, index) => itemTemplate(product, layout, index))}</div>;
         // else{
         //     <h1>basketIsEmpty</h1>
         // }
@@ -189,9 +188,9 @@ const Basket = () =>{
             </div>
         );
     };
-// useEffect(() => {
-//     setShoppingBags(basket)
-// }, [basket])
+useEffect(() => {
+    getShoppingBags()
+}, [])
 
     return (
         <>
@@ -210,8 +209,8 @@ const Basket = () =>{
                         {/* <InputText placeholder="Search by name" onChange={(c) => getOverheadByTitle(c)} value={value} /> */}
                     </IconField>
                 </div>
-                {console.log("in return",basket)}
-                <DataView value={basket} listTemplate={listTemplate} layout={layout} header={header()} />
+                {/* {console.log("in return",basket)} */}
+                <DataView value={shoppingBags} listTemplate={listTemplate} layout={layout} header={header()} />
             </div>
         </>
     )

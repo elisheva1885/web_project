@@ -10,7 +10,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { clearToken, setToken } from '../store/tokenSlice';
 import myStore from '../store/store';
-import { setBasket } from '../store/basketSlice';
+import { setBasket, clearBasket } from '../store/basketSlice';
 import { setUserDetails } from '../store/userDetailsSlice';
 
 import Basket from './Basket';
@@ -26,6 +26,8 @@ const Login  =() => {
     const navigate = useNavigate();
     const [showMessage, setShowMessage] = useState(false);
     const [formData, setFormData] = useState({});
+    
+
     const dispatch = useDispatch();
     const defaultValues = {
         username: '',
@@ -39,15 +41,15 @@ const Login  =() => {
 
     const signOut = ()=> {
         clearToken()
+        clearBasket()
         // localStorage.removeItem("user")
     }
 
-    const getShoppingBags = async () => {
+    const getShoppingBag = async () => {
         try {
             const headers = {
                 'Authorization': `Bearer ${token}`
             }
-
             const res = await axios.get('http://localhost:8000/api/user/shoppingBag',{headers})
             if (res.status === 200) {
                 // sortData(res.data)
@@ -78,7 +80,7 @@ const Login  =() => {
                 console.log(token);
                 // localStorage.setItem('user', JSON.stringify(res.data));
                 setShowMessage(true);
-                getShoppingBags();
+                getShoppingBag();
                 goToHome()
             }
             // else{
@@ -86,8 +88,7 @@ const Login  =() => {
             //     alert("Unauthorized")
             // }
         }
-            
-        //} 
+
         catch (error) {
             console.error(error)
         }

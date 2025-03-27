@@ -73,7 +73,7 @@ const Branches = () => {
         const date = new Date();
         const hour = date.getHours()
         // console.log(hour);
-        console.log("the" + b.closingHour.weekdays);
+        //console.log("the" + b.closingHour.weekdays);
         const day = date.getDay()
         if (day === 6) {
             return 'danger';
