@@ -11,7 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { clearToken, setToken } from '../store/tokenSlice';
 import myStore from '../store/store';
 import { setBasket } from '../store/basketSlice';
-import { setUserDetails } from '../store/userDetailsSlice';
+import { clearUserDetails, setUserDetails } from '../store/userDetailsSlice';
 
 import Basket from './Basket';
 
@@ -37,10 +37,7 @@ const Login  =() => {
         navigate('/');
     };
 
-    const signOut = ()=> {
-        clearToken()
-        // localStorage.removeItem("user")
-    }
+   
 
     const getShoppingBags = async () => {
         try {
@@ -143,7 +140,6 @@ const Login  =() => {
                     </form>
                 </div>
             </div>
-            <Button type="submit" label="ליציאה מהפרופיל" className="mt-2" onClick={signOut}/>
 
         </div>
 

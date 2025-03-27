@@ -6,6 +6,16 @@ const createBranch = async (req, res) => {
     if (!address || !phoneNumber || !openingHour || !closingHour) {
         return res.status(400).json({ message: "all details are required" })
     }
+    console.log(address)
+    const city = address.city
+    const street = address.street
+    const streetNum = address.streetNum
+
+    const duplicate = await Branch.findOne({'address.city': city, 'address.street': street, 'address.streetNum': streetNum }).lean()
+    console.log("s", duplicate);
+    if (duplicate) {
+        return res.status(409).json({ message: "branch is already taken" })
+    }
     const branch = await Branch.create({ address, phoneNumber, openingHour, closingHour})
     if (branch) {
         const branches = await Branch.find().lean()
@@ -55,11 +65,11 @@ const updateBranch = async (req, res) => {
     const branches = await Branch.find().lean()
     return res.status(201).json(branches)  
     // return res.status(201).json({message: "updated"})  
-
 }
 
 const deleteBranch = async (req,res)=> {
     const {_id} = req.body
+    console.log(_id);
     const branch = await Branch.findById(_id).exec()
     if(!branch){
         return res.status(404).json({ message: "branch not found" })

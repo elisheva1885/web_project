@@ -48,7 +48,27 @@ const Branches = () => {
             console.error(e)
         }
     }
-
+    const deleteBranch =async (b)=>{
+        try {
+            const headers = {
+                'Authorization': `Bearer ${token}`
+            }
+            const _id = {
+                _id: b._id
+            }
+            const res = await axios.delete('http://localhost:8000/api/branches',{
+                headers: headers,
+            data:_id
+        })
+        if(res.status === 200){
+            setBranches(res.data)
+        }
+    }
+    catch (e) {
+        console.error(e)
+    }
+            
+    }
     const updateBranch = async (b) => {
         const navigationData = {
             type: b,
@@ -72,8 +92,6 @@ const Branches = () => {
     const isOpen = (b) => {
         const date = new Date();
         const hour = date.getHours()
-        // console.log(hour);
-        console.log("the" + b.closingHour.weekdays);
         const day = date.getDay()
         if (day === 6) {
             return 'danger';
@@ -109,6 +127,8 @@ const Branches = () => {
                                 </span>
                                 <Tag value={isOpen(branch) === "success" ? "פתוח" : "סגור"} severity={isOpen(branch)}></Tag>
                                 <Button onClick={()=>updateBranch(branch)}><i className="pi pi-pencil" style={{ fontSize: '1rem' }}></i></Button>
+                                <Button onClick={()=>deleteBranch(branch)}><i className="pi pi-trash" style={{ fontSize: '1rem' }}></i></Button>
+
                             </div>
                         </div>
                     </div>

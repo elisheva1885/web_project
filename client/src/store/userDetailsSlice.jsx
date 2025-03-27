@@ -14,12 +14,10 @@ const userDetailsSlice = createSlice({
         setUserDetails:(state,action)=>{
             state.userDetails.username=action.payload.username
             state.userDetails.role=action.payload.role
-
-            console.log(state.userDetails);
-            alert("setUserDetails")
         },
         clearUserDetails(state) {
-            state.userDetails = null;
+            state.userDetails.username=null
+            state.userDetails.role=null
         }
     }
 })
