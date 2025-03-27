@@ -13,6 +13,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import Add_AirConditioner from './Add_AirConditioner';
 import { setCompanies } from '../../store/companySlice'
 import { setBasket } from '../../store/basketSlice';
+import { setOverheads } from '../../store/air-conditioner/overHeadsSlice';
 
 
 const Overhead = lazy(() => import('./Overhead'));
@@ -25,7 +26,7 @@ const Overheads = () => {
     const {basket} = useSelector((state) => state.basket)
     const {userDetails} = useSelector((state) => state.userDetails);
 
-    const [overheads, setOverheads] = useState([])
+    const {overheads}= useSelector((state) => state.overheads);
     const [overheads2, setOverheads2] = useState([])
     const [value, setValue] = useState('')
     const [shoppingBags, setShoppingBags] = useState([])
@@ -75,20 +76,19 @@ const Overheads = () => {
 
     }
 
-    const getCompanies = async()=>{
-        try{
-            const res = await axios.get('http://localhost:8000/api/company')
-            if(res.status === 200){
-                console.log("company:",res.data);
-                dispatch(setCompanies(res.data))
-                // console.log(companies);
-            }
-        }
-        catch (e) {
-            console.error(e)
-        }
-
-    }
+    // const getCompanies = async()=>{
+    //     try{
+    //         const res = await axios.get('http://localhost:8000/api/company')
+    //         if(res.status === 200){
+    //             console.log("company:",res.data);
+    //             dispatch(setCompanies(res.data))
+    //             // console.log(companies);
+    //         }
+    //     }
+    //     catch (e) {
+    //         console.error(e)
+    //     }
+    // }
 
     const sortData = (data) => {
         data.sort((a, b) => {
@@ -98,22 +98,22 @@ const Overheads = () => {
         })
     }
 
-    const getOverheads = async () => {
-        try {
-            const headers = {
-                'Authorization': `Bearer ${token}`
-            }
-            console.log(headers);
-            const res = await axios.get('http://localhost:8000/api/air-conditioner/overhead',{headers})
-            if (res.status === 200) {
-                sortData(res.data)
-                setOverheads(res.data)
-            }
-        }
-        catch (e) {
-            console.error(e)
-        }
-    }
+    // const getOverheads = async () => {
+    //     try {
+    //         const headers = {
+    //             'Authorization': `Bearer ${token}`
+    //         }
+    //         console.log(headers);
+    //         const res = await axios.get('http://localhost:8000/api/air-conditioner/overhead',{headers})
+    //         if (res.status === 200) {
+    //             sortData(res.data)
+    //             setOverheads(res.data)
+    //         }
+    //     }
+    //     catch (e) {
+    //         console.error(e)
+    //     }
+    // }
     const getOverheadByTitle = async (c) => {
         try {
             setValue(c.target.value)
@@ -219,6 +219,9 @@ const Overheads = () => {
     };
 
     const listTemplate = (products, layout) => {
+        if (!Array.isArray(overheads) || overheads.length === 0) {
+            return <h1>No overheads available</h1>; // Fallback UI          
+            }
         return <div className="grid grid-nogutter">{overheads.map((product, index) => itemTemplate(product, layout, index))}</div>;
     };
 
@@ -232,8 +235,8 @@ const Overheads = () => {
 
 
     useEffect(() => {
-        getOverheads()
-        getCompanies()
+        // getOverheads()
+        // getCompanies()
     }, [])
 
     return (

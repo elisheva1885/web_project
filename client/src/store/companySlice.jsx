@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit"
 
 const initVal = {
-    companies:"null"
+    companies:[]
 }
 
 const companySlice = createSlice({
