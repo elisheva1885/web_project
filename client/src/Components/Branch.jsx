@@ -126,8 +126,8 @@ const Branches = () => {
                                 <div className="font-semibold">{` ליצירת קשר: ${branch.phoneNumber} `}</div>
                                 </span>
                                 <Tag value={isOpen(branch) === "success" ? "פתוח" : "סגור"} severity={isOpen(branch)}></Tag>
-                                <Button onClick={()=>updateBranch(branch)}><i className="pi pi-pencil" style={{ fontSize: '1rem' }}></i></Button>
-                                <Button onClick={()=>deleteBranch(branch)}><i className="pi pi-trash" style={{ fontSize: '1rem' }}></i></Button>
+                                {userDetails?.role==='official'|| userDetails?.role==='admin' ?<Button onClick={()=>updateBranch(branch)}><i className="pi pi-pencil" style={{ fontSize: '1rem' }}></i></Button>: <></>}
+                                {userDetails?.role==='admin'?<Button onClick={()=>deleteBranch(branch)}><i className="pi pi-trash" style={{ fontSize: '1rem' }}></i></Button>:<></>}
 
                             </div>
                         </div>
@@ -183,7 +183,7 @@ const Branches = () => {
     return (
         <>
         <br/><br/><br/>
-            {userDetails.role==="user"?<Button onClick={ ()=>goToAddBranch()}>add branch</Button>: <></> }
+            {userDetails.role==="admin"?<Button onClick={ ()=>goToAddBranch()}>add branch</Button>: <></> }
 
         {renderHeader()}
         <Panel header="סניפים" style={{direction:"rtl"}}>

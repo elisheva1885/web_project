@@ -22,7 +22,12 @@ const UpdateBranch = () => {
 
     // console.log(type);
     const onSubmit = async (data) => {
-        console.log(data);
+        if(data.openingHour<7 || data.openingHour>9){
+            alert("openingHour is not fitting")
+        }
+        if(data.closingHour.weekdays<16 || data.closingHour.fridays>13){
+            alert("closingHour is not fitting")
+        }
         const branch = {
             _id: type._id,
             address: data.address,
@@ -30,7 +35,6 @@ const UpdateBranch = () => {
             openingHour: data.openingHour,
             closingHour : data.closingHour
         }
-        console.log(branch);
         try {
             const response = await axios.put('http://localhost:8000/api/branches', branch);
             if(response.status===201)

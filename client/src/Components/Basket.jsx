@@ -36,15 +36,12 @@ const Basket = () =>{
             const headers = {
                 'Authorization': `Bearer ${token}`
             }
-
             const res = await axios.get('http://localhost:8000/api/user/shoppingBag',{headers})
             if (res.status === 200) {
-                // sortData(res.data)
                 setShoppingBags(res.data)
                 dispatch(setBasket(res.data))
                 alert("basket:", basket);
                 console.log("res.data",res.data);
-                // console.log("useState",shoppingBags);
             }
         }
         catch (e) {

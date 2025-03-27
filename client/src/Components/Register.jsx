@@ -10,10 +10,12 @@ import { Divider } from 'primereact/divider';
 import { classNames } from 'primereact/utils';
 import axios from 'axios'
 import '../Login.css';
+import { useSelector } from 'react-redux';
 
 const Register = () => {
     const [showMessage, setShowMessage] = useState(false);
     const [formData, setFormData] = useState({});
+    const {userDetails} = useSelector((state) => state.userDetails);
     const defaultValues = {
         name: '',
         username: '',
@@ -25,6 +27,7 @@ const Register = () => {
 
     const { control, formState: { errors }, handleSubmit, reset } = useForm({ defaultValues });
 
+  
     const onSubmit = async (data) => {
         setFormData(data);
         const user = {
@@ -133,7 +136,9 @@ const Register = () => {
                             )} />
                             <label htmlFor="accept" className={classNames({ 'p-error': errors.accept })}>I agree to the terms and conditions*</label>
                         </div>
-                        <Button type="submit" label="Submit" className="mt-2" />
+                        <Button type="submit" label="הירשם" className="mt-2" />
+                        {/* {userDetails?.role==="user"?<Button type="button"label="הוספת מזכירה" className="mt-2" onClick={registerOfficial()} />: <></> } */}
+
                     </form>
                 </div>
             </div>

@@ -22,6 +22,26 @@ const register = async (req, res) => {
     }
 }
 
+const registerAdmin = async (req, res) => {
+    const { name, username, password, email, phone , roles} = req.body
+    if (!name || !username || !password) {
+        return res.status(400).json({ message: "all field are reqired" })
+    }
+    const duplicate = await User.findOne({ username: username }).lean()
+    if (duplicate) {
+        return res.status(409).json({ message: "username is already taken" })
+    }
+    const hashedPassword = await bcrypt.hash(password, 10)
+    const userObject = { name, username, password: hashedPassword, email, phone , roles}
+    const user = await User.create(userObject)
+    if (user) {
+        return res.status(201).json({ message: `New User ${user.username} created` })
+    }
+    else {
+        return res.status(400).json({ message: "invalid user recived" })
+    }
+}
+
 const login = async (req, res) => {
     const { username, password } = req.body
     if (!username || !password) {
@@ -44,4 +64,4 @@ const login = async (req, res) => {
     res.status(200).json({token: accessToken, username: userInfo.username,role: userInfo.roles })
 }
 
-module.exports = { login, register }
+module.exports = { login, register, registerAdmin }

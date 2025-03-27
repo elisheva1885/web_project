@@ -6,33 +6,47 @@ import { Button } from 'primereact/button';
 import axios from 'axios';
 import classNames from 'classnames';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 
 const AddBranch = () => {
     const { control, handleSubmit, formState: { errors } } = useForm();
     const [showMessage, setShowMessage] = useState(false);
     const [formData, setFormData] = useState({});
+    const navigate = useNavigate()
     // const {companies} = useSelector((state) => state.companies)
     const onSubmit = async (data) => {
         try {
+            if(data.openingHour<7 || data.openingHour>9){
+                alert("openingHour is not fitting")
+            }
+            if(data.closingHour.weekdays<16 || data.closingHour.fridays>13){
+                alert("closingHour is not fitting")
+            }
             const res = await axios.post('http://localhost:8000/api/branches', data);
             console.log(res);
             if(res.status===201)
             {
             setFormData(data);
             setShowMessage(true);
+            navigate('/branch')
             }
-            
         } 
         catch (error) {
             if(error.status === 409){
                 alert("הסניף כבר קיים באתר")
             }
+            navigate('/branch')
         }
     };
 
+    // const getFormErrorMessage = (name) => {
+    //     return errors[name] ? <small className="p-error">{errors[name].message}</small> : null;
+    // };
+
     const getFormErrorMessage = (name) => {
-        return errors[name] ? <small className="p-error">{errors[name].message}</small> : null;
+        const error = name.split('.').reduce((acc, part) => acc && acc[part], errors);
+        return error ? <small className="p-error">{error.message}</small> : null;
     };
 
     return (
@@ -75,7 +89,7 @@ const AddBranch = () => {
                         <div className="field">
                             <span className="p-float-label">
                                 <Controller name="address.streetNum" control={control} rules={{ required: 'streetNum is required.' }} render={({ field, fieldState }) => (
-                                    <InputText id={field.name} {...field} className={classNames({ 'p-invalid': fieldState.invalid })} />
+                                    <InputText id={field.name} type="number" {...field}/>
                                 )} />
                                 <label htmlFor="address.streetNum" className={classNames({ 'p-error': errors.address?.streetNum })}>*streetNum</label>
                             </span>
@@ -84,7 +98,7 @@ const AddBranch = () => {
 
                         <div className="field">
                             <span className="p-float-label">
-                                <Controller name="phoneNumber" control={control}rules={{ required: 'phoneNumber is required.' }} render={({ field }  ) => (
+                                <Controller name="phoneNumber" control={control}rules={{ required: 'phoneNumber is required.' ,validate: {validHour: value => value.length == 9  || 'מספר הטלפון חייב להיות באורך 9 ספרות ' }}} render={({ field }  ) => (
                                     <InputText id={field.name} type="number" {...field} />
                                 )} />
                                 <label htmlFor="phoneNumber">phoneNumber</label>
@@ -94,7 +108,7 @@ const AddBranch = () => {
 
                         <div className="field">
                             <span className="p-float-label">
-                                <Controller name="openingHour" control={control}  rules={{ required: 'openingHour is required.' }}  render={({ field }) => (
+                                <Controller name="openingHour" control={control}  rules={{ required: 'openingHour is required.' ,validate: {validHour: value => value > 6 && value <10 || 'שעות הפתיחה חייבות להיות ב7 ל9 בבוקר'  }} } render={({ field }) => (
                                     <InputText id={field.name} type="number" {...field} />
                                 )} />
                                 <label htmlFor="openingHour" className={classNames({ 'p-error': errors.openingHour })}>*openingHour</label>
@@ -106,26 +120,29 @@ const AddBranch = () => {
                             <div className="flex">
                                 <div style={{ flex: '1', marginRight: '10px' }}>
                                     <span className="p-float-label">
-                                        <Controller name="closingHour.weekdays" control={control} rules={{ required: 'closingHour is required.' }}  render={({ field }) => (
-                                            <InputText id="closingHour.weekdays" {...field} />
+                                        <Controller name="closingHour.weekdays" control={control} rules={{ required: 'closingHour is required.' ,validate: {validHour: value => value >= 16 && value <= 17 || 'שעות הסגירה חייבות להיות בין 16 ל17' }} }  render={({ field }) => (
+                                            <InputText id={field.name} type="number"  {...field} />
                                         )} />
-                                        <label htmlFor="closingHour.weekdays">closingHour</label>
+                                        <label htmlFor="closingHour.weekdays" className={classNames({ 'p-error': errors.closingHour?.weekdays })}>closingHour</label>
                                     </span>
+                                    {getFormErrorMessage('closingHour.weekdays')}
+
                                 </div>
                                 <div style={{ flex: '1', marginLeft: '10px' }}>
                                     <span className="p-float-label">
-                                        <Controller name="closingHour.fridays" control={control} rules={{ required: 'closingHour is required.' }}  render={({ field }) => (
-                                            <InputText id="closingHour.fridays" {...field} />
+                                        <Controller name="closingHour.fridays" control={control} rules={{ required: 'closingHour is required.',validate: {validHour: value => value >= 11 && value <= 13 || 'שעות הסגירה בימי שישי וערבי חגים חייבות להיות בין 11 ל13 ' }} }  render={({ field }) => (
+                                            <InputText  id={field.name} type="number"  {...field} />
                                         )} />
-                                        <label htmlFor="closingHour.fridays">Friday_closingHour</label>
+                                        <label htmlFor="closingHour.fridays"  className={classNames({ 'p-error': errors.closingHour?.fridays })}>Friday_closingHour</label>
                                     </span>
+                                    {getFormErrorMessage('closingHour.fridays')}
                                 </div>
                             </div>
                         </div>
 
                         
 
-                        <Button type="submit" label="Add Air Conditioner" className="mt-2" />
+                        <Button type="submit" label="Add Branch" className="mt-2" />
                     </form>
                 </div>
             </div>

@@ -5,6 +5,7 @@ import { Route, Routes, Link, Router } from 'react-router-dom';
 import Add_AirConditioner from './air-conditioners/Add_AirConditioner';
 import { useSelector } from 'react-redux';
 import { MegaMenu } from 'primereact/megamenu';
+import AdminRegister from './AdminRegister';
 
 const About = lazy(() => import('./About'));
 const Branch = lazy(() => import('./Branch'));
@@ -84,9 +85,9 @@ const Navbar = () => {
             url: '/about'
         },
         {
-           label:userDetails.role==='user'? 'לאתר הניהול':'',
-           icon: userDetails.role==='user'?<img src="admin.png" style={{ width: '24px', height: '24px' }} />:'' ,
-           url: userDetails.role==='user'?'/admin' :'/'
+           label:userDetails.role==='admin'? 'לאתר הניהול':'',
+           icon: userDetails.role==='admin'?<img src="admin.png" style={{ width: '24px', height: '24px' }} />:'' ,
+           url: userDetails.role==='admin'?'/admin' :'/'
         }
 
 
@@ -120,6 +121,7 @@ const Navbar = () => {
                 <Route path='/basket' element={<Suspense fallback="Loading..."><Basket /></Suspense>}></Route>
                 <Route path='/admin' element={<Suspense fallback="Loading..."><Admin/></Suspense>}></Route>
                 <Route path='/userAccount' element={<Suspense fallback="Loading..."><UserAccont/></Suspense>}></Route>
+                <Route path='/admin/register' element={<Suspense fallback="Loading..."><AdminRegister/></Suspense>}></Route>
 
 
             </Routes>
