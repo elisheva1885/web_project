@@ -12,8 +12,10 @@ const Home = () => {
     const navigate = useNavigate();
     const {overheads} = useSelector((state) => state.overheads)
     const {companies} = useSelector((state) => state.company)
-    const dispatch = useDispatch();
+    const {userDetails} = useSelector((state) => state.userDetails);
 
+    const dispatch = useDispatch();
+    // console.log("userDetails",userDetails.username)
     const AirConditionerTypes = () => {
         const acTypes = [
             { id: 1, name: 'מזגן עילי', imageUrl: '/overheads/back.jpg' },
@@ -71,8 +73,6 @@ const Home = () => {
             // const res = await axios.get('http://localhost:8000/api/air-conditioner/overhead',{headers})
             const res = await axios.get('http://localhost:8000/api/air-conditioner/overhead')
             if (res.status === 200) {
-                // sortData(res.data)
-                // setOverheads(res.data)
                 dispatch(setOverheads(res.data));
             }
         }
@@ -85,9 +85,7 @@ const Home = () => {
         try{
             const res = await axios.get('http://localhost:8000/api/company')
             if(res.status === 200){
-                // console.log("company:",res.data);
                 dispatch(setCompanies(res.data))
-                // console.log(companies);
             }
         }
         catch (e) {

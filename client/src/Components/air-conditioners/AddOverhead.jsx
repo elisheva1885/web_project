@@ -6,6 +6,7 @@ import { Button } from 'primereact/button';
 import axios from 'axios';
 import classNames from 'classnames';
 import { useDispatch, useSelector } from 'react-redux';
+import { Dropdown } from 'primereact/dropdown';
 
 
 const AddOverheadForm = () => {
@@ -13,6 +14,7 @@ const AddOverheadForm = () => {
     const [showMessage, setShowMessage] = useState(false);
     const [formData, setFormData] = useState({});
     // const {companies} = useSelector((state) => state.companies)
+    const {companies} = useSelector((state) => state.company)
 
     const onSubmit = async (data) => {
         try {
@@ -29,6 +31,7 @@ const AddOverheadForm = () => {
     };
 
     return (
+        
         <div className="form-demo">
             <Dialog visible={showMessage} onHide={() => setShowMessage(false)} position="top" footer={<Button label="Close" onClick={() => setShowMessage(false)} />} showHeader={false} breakpoints={{ '960px': '80vw' }} style={{ width: '40vw' }}>
                 <div className="flex justify-content-center flex-column pt-6 px-3">
@@ -45,10 +48,10 @@ const AddOverheadForm = () => {
                     <form onSubmit={handleSubmit(onSubmit)} className="p-fluid">
                         <div className="field">
                             <span className="p-float-label">
-                                <Controller name="company" control={control} rules={{ required: 'Company is required.' }} render={({ field, fieldState }) => (
-                                    <InputText id={field.name} {...field} className={classNames({ 'p-invalid': fieldState.invalid })} />
+                                <Controller name="company" control={control} render={({ field }) => (
+                                    <Dropdown id={field.id} value={field.value} onChange={(e) => field.onChange(e.value)} options={companies} optionLabel="name" />
                                 )} />
-                                <label htmlFor="company" className={classNames({ 'p-error': errors.company })}>*Company ID</label>
+                                <label htmlFor="company">Company</label>
                             </span>
                             {getFormErrorMessage('company')}
                         </div>

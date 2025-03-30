@@ -10,10 +10,11 @@ const UserAccont =()=> {
     const {userDetails} = useSelector((state) => state.userDetails);
     const dispatch = useDispatch();
     const navigate = useNavigate()
+    console.log("userDetails",userDetails.username)
     const signOut = ()=> {
         dispatch( clearToken())
         dispatch(clearUserDetails())
-        navigate("/")
+        navigate("/")       
     }
     return(
         <>

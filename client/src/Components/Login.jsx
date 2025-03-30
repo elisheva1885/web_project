@@ -12,23 +12,17 @@ import { clearToken, setToken } from '../store/tokenSlice';
 import myStore from '../store/store';
 import { setBasket ,clearBasket  } from '../store/basketSlice';
 import { clearUserDetails, setUserDetails } from '../store/userDetailsSlice';
-
-
 import Basket from './Basket';
 
 const Login  =() => {
     const {token} = useSelector((state) => state.token)
-    const {basket} = useSelector((state) => state.basket)
+    // const {basket} = useSelector((state) => state.basket)
     const {userDetails} = useSelector((state) => state.userDetails);
-
-
     // const {role} = useSelector((state) => state.userDetails.role)
 
     const navigate = useNavigate();
     const [showMessage, setShowMessage] = useState(false);
     const [formData, setFormData] = useState({});
-    
-
     const dispatch = useDispatch();
     const defaultValues = {
         username: '',
@@ -43,7 +37,6 @@ const Login  =() => {
     const signOut = ()=> {
         clearToken()
         clearBasket()
-        // localStorage.removeItem("user")
     }
 
     const getShoppingBag = async () => {
@@ -53,12 +46,8 @@ const Login  =() => {
             }
             const res = await axios.get('http://localhost:8000/api/user/shoppingBag',{headers})
             if (res.status === 200) {
-                // sortData(res.data)
-                // setShoppingBags(res.data)
                 dispatch(setBasket(res.data))
-                alert("basket:", basket);
                 console.log("res.data",res.data);
-                // console.log("useState",shoppingBags);
             }
         }
         catch (e) {
@@ -74,24 +63,23 @@ const Login  =() => {
         }
         try {
             const res = await axios.post(`http://localhost:8000/api/auth/login`,user)
-            console.log(res.status);
             if(res.status===200){
-                dispatch(setToken(res.data.token));
+                console.log(res.data.token);
+                dispatch(setToken(res.data))
+                // dispatch(setToken(res.data.token));
                 dispatch(setUserDetails({username:res.data.username,role:res.data.role}))
                 console.log(token);
-                // localStorage.setItem('user', JSON.stringify(res.data));
                 setShowMessage(true);
                 getShoppingBag();
                 goToHome()
             }
-            // else{
-            // if(res.status===401){
-            //     alert("Unauthorized")
-            // }
         }
 
         catch (error) {
             console.error(error)
+            if(error.status===401){
+                    alert("Unauthorized")
+                }
         }
         reset();
     };

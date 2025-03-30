@@ -24,7 +24,8 @@ const Navbar = () => {
     const { token } = useSelector((state) => state.token)
 
     const {userDetails} = useSelector((state) => state.userDetails);
-
+    console.log("userDetails Navbar",userDetails)
+    
     const acItems = [
         {
             label: 'מזגן עילי',
@@ -61,10 +62,11 @@ const Navbar = () => {
         {
             // {/* {userDetalis!=null ?userDetalis.role === 'user'?<Button onClick={ ()=>goToAddOverhead("Overhead")}>add overhead</Button>: <></> : <></>} */}
             // label: token != null ?'התנתקות' : 'התחברות',
-            label:userDetails.username? userDetails.username:'התחברות',
+            label:userDetails?.username? userDetails?.username:'התחברות',
             icon: 'pi pi-user',
-            url: userDetails.username? '/userAccount': '/login'
-        },
+            url: userDetails?.username? '/userAccount': '/login'
+        }
+        ,
         {
             label: 'צור קשר',
             icon: 'pi pi-phone'
@@ -83,11 +85,12 @@ const Navbar = () => {
             label: 'אודות',
             icon: 'pi pi-question',
             url: '/about'
-        },
+        }
+        ,
         {
-           label:userDetails.role==='admin'? 'לאתר הניהול':'',
-           icon: userDetails.role==='admin'?<img src="admin.png" style={{ width: '24px', height: '24px' }} />:'' ,
-           url: userDetails.role==='admin'?'/admin' :'/'
+           label:userDetails?.role==='admin'? 'לאתר הניהול':'',
+           icon: userDetails?.role==='admin'?<img src="admin.png" style={{ width: '24px', height: '24px' }} />:'' ,
+           url: userDetails?.role==='admin'?'/admin' :'/'
         }
 
 

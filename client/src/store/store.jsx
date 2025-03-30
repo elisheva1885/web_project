@@ -7,9 +7,20 @@ import overHeadsSlice from "./air-conditioner/overHeadsSlice"
 import basketSlice from "./basketSlice"
 import companySlice from "./companySlice";
 import userDetailsSlice from "./userDetailsSlice";
+import { combineReducers } from '@reduxjs/toolkit'
+
+const rootReducer = combineReducers({
+    token: tokenSlice,
+    overheads: overHeadsSlice,
+    basket: basketSlice,
+    company: companySlice,
+    userDetails: userDetailsSlice,
+  });
+
 const persistConfig = {
     key: "root",
-    storage
+    storage,
+    // whitelist: ["token", "basket", "userDetails", "company", "overheads"],
 }
 // const persistedReducer = persistReducer(persistConfig, tokenSlice,overHeadsSlice, basketSlice)
 
@@ -29,6 +40,11 @@ const myStore = configureStore({
         userDetails: persistedUserDetailsReducer,
     }
 })
+// const persistedReducer = persistReducer(persistConfig, rootReducer);
+
+// const myStore = configureStore({
+//     reducer: persistedReducer,
+//   });
 
 export const persistor = persistStore(myStore)
 export default myStore
