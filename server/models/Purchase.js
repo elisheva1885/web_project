@@ -10,6 +10,11 @@ const purchaseSchema = new mongoose.Schema({
     products: {
         type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'ShoppingBag' }],
         required: true,
+     },
+     paymentType:{
+        type: String,
+        enum: ["paypal", "google"],
+        required:true
      }
 
 }, {

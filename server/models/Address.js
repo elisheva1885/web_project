@@ -9,7 +9,7 @@ const addressSchema = new mongoose.Schema({
     country: {
         type: String,
         required: true,
-        default: "Israel"
+        default: "ישראל"
     },
     city: {
         type: String,

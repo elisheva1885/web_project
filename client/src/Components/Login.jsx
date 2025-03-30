@@ -70,7 +70,7 @@ const Login  =() => {
                 dispatch(setUserDetails({username:res.data.username,role:res.data.role}))
                 console.log(token);
                 setShowMessage(true);
-                getShoppingBag();
+                // getShoppingBag();
                 goToHome()
             }
         }

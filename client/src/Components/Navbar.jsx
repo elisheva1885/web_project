@@ -6,6 +6,7 @@ import Add_AirConditioner from './air-conditioners/Add_AirConditioner';
 import { useSelector } from 'react-redux';
 import { MegaMenu } from 'primereact/megamenu';
 import AdminRegister from './AdminRegister';
+import Payment from './Payment';
 
 const About = lazy(() => import('./About'));
 const Branch = lazy(() => import('./Branch'));
@@ -125,8 +126,7 @@ const Navbar = () => {
                 <Route path='/admin' element={<Suspense fallback="Loading..."><Admin/></Suspense>}></Route>
                 <Route path='/userAccount' element={<Suspense fallback="Loading..."><UserAccont/></Suspense>}></Route>
                 <Route path='/admin/register' element={<Suspense fallback="Loading..."><AdminRegister/></Suspense>}></Route>
-
-
+                <Route path='/user/Payment' element={<Suspense fallback="Loading..."><Payment/></Suspense>}></Route>
             </Routes>
             <div className="flex align-items-center gap-2">
                 <Menubar model={items} start={start} end={end} style={{ position: 'fixed', top: 0 }} />

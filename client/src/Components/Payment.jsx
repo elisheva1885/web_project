@@ -1,75 +1,114 @@
-// import React, { useState } from 'react';
-// import { Card } from 'primereact/card';
-// import { Button } from 'primereact/button';
-// import { InputText } from 'primereact/inputtext';
+import { useState } from "react";
+import { useSelector } from "react-redux";
+import axios from "axios";
+import { Button } from "primereact/button";
+import { InputText } from "primereact/inputtext";
+import { Divider } from "primereact/divider";
 
-// const SideBasket = () => {
-//   const [basketItems, setBasketItems] = useState([
-//     { id: 1, name: 'Product A', price: 25.99, quantity: 2 },
-//     { id: 2, name: 'Product B', price: 15.50, quantity: 1 },
-//   ]);
+const Payment = () => {
+    const { token } = useSelector((state) => state.token);
+    const [address, setAddress] = useState();
 
-//   const [couponCode, setCouponCode] = useState('');
+    const createAddress = async (address) => {
+        try {
+            const headers = {
+                'Authorization': `Bearer ${token}`
+            };
+            const res = await axios.post("http://localhost:8000/api/user/address", address, { headers });
+            if (res.status === 201) {
+                setAddress(res.data);
+                console.log(res.data);
+            }
+        } catch (error) {
+            console.log(error);
+            if (error.response?.status === 400) {
+                alert("Error");
+            }
+        }
+    };
+    const createPurchase = async(paymentType)=> {
+        
+    }
 
-//   const calculateTotal = () => {
-//     return basketItems.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2);
-//   };
+    const [form, setForm] = useState({
+        country: "ישראל",
+        city: "",
+        street: "",
+        building_num: "",
+        apartment_num: "",
+        floor: "",
+        zip_code: "",
+    });
 
-//   const calculateDiscount = () => {
-//     // Add your discount logic here (e.g., based on couponCode)
-//     // For now, let's just return a fixed discount
-//     return 4.00; 
-//   };
+    const [errors, setErrors] = useState({});
 
-//   const finalTotal = (parseFloat(calculateTotal()) - calculateDiscount()).toFixed(2);
+    const handleChange = (e) => {
+        setForm({ ...form, [e.target.name]: e.target.value });
+    };
 
-//   return (
-//     <div style={{ width: '300px', padding: '20px', backgroundColor: '#f0f0f0' }}> 
-//       <Card title="סיכום">
-//         <div>סיכום ביניים: {calculateTotal()} ₪</div>
-//         <div>
-//           <span style={{ color: 'red' }}>- {calculateDiscount()} ₪</span> נחסכו
-//         </div>
-//         <div>
-//           קוד מבצע:
-//           <InputText value={couponCode} onChange={(e) => setCouponCode(e.target.value)} />
-//         </div>
-//         <div>דמי משלוח: חינם</div>
-//         <div>סך הכל: {finalTotal} ₪</div>
+    const validate = () => {
+        let newErrors = {};
+        for (let key in form) {
+            if (!form[key]) newErrors[key] = "Required";
+        }
+        return newErrors;
+    };
 
-//         <Button label="בצע הזמנה" className="p-button-success" style={{ marginTop: '20px' }} />
-//         <div style={{ fontSize: '0.8em', marginTop: '10px' }}>
-//           לתנאים ולהתניות לחיצה על 'בצע הזמנה' עם אישור שקראתם והסכמתם
-//         </div>
-//       </Card>
-//       <div style={{ marginTop: '20px' }}>
-//         <img src="https://ae01.alicdn.com/kf/H983637e1081f4560b0e3522a46c31041L.png" alt="AliExpress" style={{ maxWidth: '100%' }} />
-//         <div style={{ fontSize: '0.9em', marginTop: '5px' }}>
-//           אתר AliExpress שומר על בטחון התשלומים שלכם
-//         </div>
-//       </div>
-//       <div style={{ marginTop: '20px' }}>
-//         <div style={{ fontWeight: 'bold' }}>אספקה מהירה <span style={{ float: 'right' }}>&gt;</span></div>
-//         <ul style={{ listStyleType: 'none', padding: 0 }}>
-//           <li>- ₪4.00 קוד קופון בבקשה מאוחר יותר</li>
-//           <li>- החזר כספי הפריטים הגיעו פגומים</li>
-//           <li>- אם החזר כספי אם החבילה אבדה</li>
-//           <li>- החזר כספי במקרה שההזמנה לא נמסרה לאחר 45 יום</li>
-//         </ul>
-//       </div>
-//       <div style={{ marginTop: '20px' }}>
-//         <div style={{ fontWeight: 'bold' }}>אבטחה ופרטיות <span style={{ float: 'right' }}>&gt;</span></div>
-//         <div>תשלומים בטוחים - אבטחת פרטים אישיים</div>
-//       </div>
-//       <div style={{ marginTop: '20px' }}>
-//         <div style={{ fontWeight: 'bold' }}>תשלומים בטוחים</div>
-//         <img src="https://ae01.alicdn.com/kf/H983637e1081f4560b0e3522a46c31041L.png" alt="Payment Icons" style={{ maxWidth: '100%' }} />
-//         <div style={{ fontSize: '0.9em', marginTop: '5px' }}>
-//           עם ביטוחי הביטוח הפופולריים שלך , פרטיים אישיים .
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        const newErrors = validate();
+        if (Object.keys(newErrors).length === 0) {
+            createAddress(form);
+        }
+        setErrors(newErrors);
+    };
 
-// export default SideBasket;
+    return (
+        <div style={{ display: "flex", width: "100vw", height: "100vh", padding: "20px" }}>
+            {/* Left: Payment Square */}
+            <div
+                style={{
+                    width: "30%",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    border: "2px solid #ccc",
+                    borderRadius: "10px",
+                    padding: "20px",
+                    height: "300px",
+                    boxShadow: "2px 2px 10px rgba(0,0,0,0.1)",
+                }}
+            >
+                <h3>Choose Payment</h3>
+                <Button label="Pay with PayPal" icon="pi pi-paypal" className="p-button-info p-mb-2" onClick={()=>createPurchase("paypal")} />
+                <Button label="Pay with Google Pay" icon="pi pi-google" className="p-button-warning" onClick={()=>createPurchase("google")}/>
+            </div>
+
+            <Divider layout="vertical" />
+
+            {/* Right: Address Form */}
+            <div style={{ width: "65%", marginLeft: "auto" }}>
+                <form onSubmit={handleSubmit} className="p-fluid">
+                    {["country", "city", "street", "zip_code"].map((field) => (
+                        <div key={field} className="p-field">
+                            <label htmlFor={field}>{field.replace("_", " ")}</label>
+                            <InputText id={field} name={field} value={form[field]} onChange={handleChange} />
+                            {errors[field] && <small className="p-error">{errors[field]}</small>}
+                        </div>
+                    ))}
+                    {["building_num", "apartment_num", "floor"].map((field) => (
+                        <div key={field} className="p-field">
+                            <label htmlFor={field}>{field.replace("_", " ")}</label>
+                            <InputText id={field} name={field} type="number" value={form[field]} onChange={handleChange} />
+                            {errors[field] && <small className="p-error">{errors[field]}</small>}
+                        </div>
+                    ))}
+                    <Button type="submit" label="Submit" className="p-mt-2" />
+                </form>
+            </div>
+        </div>
+    );
+};
+
+export default Payment;

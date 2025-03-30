@@ -35,25 +35,20 @@ const readShoppingBagByUserId = async (req,res)=> {
     if(!user_id){
         return res.status(400).json({message: "reqired"})
     }
-    //returns the user products
     const shoppingBags =  await ShoppingBag.find({user_id:user_id}).lean()
     if(!shoppingBags){
         return res.status(400).json({ message: "shopping bag is empty" })
     }
-
     const promises = shoppingBags.map(async (shoppingBag) => {
         switch (shoppingBag.type) {
             case "overhead":
                 const overhead = await Overhead.find({_id: shoppingBag.product_id}).populate("company").lean()
-                // userShoppingBags.push(overhead)
                 return overhead;        
             default:
                 break;
         }
-
     });
     const results = await Promise.all(promises)
-
     const userShoppingBags = results.filter(result => result !== null).flat(); //filter null values and flatten the array.
     console.log(userShoppingBags);
     return res.status(200).json(userShoppingBags)

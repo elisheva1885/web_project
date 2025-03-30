@@ -12,7 +12,7 @@ const UserAccont =()=> {
     const navigate = useNavigate()
     console.log("userDetails",userDetails.username)
     const signOut = ()=> {
-        dispatch( clearToken())
+        dispatch(clearToken())
         dispatch(clearUserDetails())
         navigate("/")       
     }
