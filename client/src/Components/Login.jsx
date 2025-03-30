@@ -81,7 +81,6 @@ const Login  =() => {
                     alert("Unauthorized")
                 }
         }
-        reset();
     };
 
     const { control, formState: { errors }, handleSubmit, reset } = useForm({ defaultValues });

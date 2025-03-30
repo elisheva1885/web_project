@@ -42,7 +42,7 @@ const Basket = () => {
                 // sortData(res.data)
                 console.log(res.data);
                 dispatch(setBasket(res.data))
-                setShoppingBags(basket)
+                setShoppingBags(res.data)
                 // alert("basket:", basket);
                 console.log("res.data", res.data);
                 // console.log("useState",shoppingBags);

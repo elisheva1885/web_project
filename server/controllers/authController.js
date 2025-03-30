@@ -48,6 +48,7 @@ const login = async (req, res) => {
         return res.status(400).json({ message: "all field are reqired" })
     }
     const foundUser = await User.findOne({ username }).lean()
+
     if (!foundUser) {
         return res.status(401).json({ message: "Unauthorized" })
     }
