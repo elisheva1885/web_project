@@ -1,10 +1,5 @@
 const mongoose = require('mongoose')
 const minicenteralSchema = new mongoose.Schema({
-    SKU: {
-        type: String,
-        required: true,
-        uniqe: true
-    },
     company: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Company',
@@ -16,10 +11,12 @@ const minicenteralSchema = new mongoose.Schema({
         required: true
     },
     describe: {
-        type: String
+        type: String,
+        required: true
     },
     imagepath: {
-        type: String
+        type: String,
+        required: true
     },
     stock:{
         type:Number,
@@ -29,33 +26,72 @@ const minicenteralSchema = new mongoose.Schema({
         type:Number,
         required:true
     },
-    output: {
+    BTU_output: {
         cool: { type: String },
         heat: { type: String }
     },
-    size: {
-        length: {type: Number},
+    energy_rating:{//דיורג אנרגטי
+        cool: { type: String },
+        heat: { type: String }
+    },
+    working_current: {//זרם עבודה
+        cool: { type: String },
+        heat: { type: String }
+    },
+    recommended_model_C:{
+        type:String
+    },
+    pipe_connection: {
+        a:{ type:String},
+        b:{ type:String},
+    },
+    in_size: {
         width: {type: Number},
+        depth: {type: Number},    
         height: {type: Number},
+    },
+    out_size: {
+        width: {type: Number},
+        depth: {type: Number},    
+        height: {type: Number},
+    },
+    air_flow:{//xphe, tuuhr
+        type:Number
+    },
+    //icons
+    quiet:{
+        type: Boolean
+    },
+   
+    wifi:{
+        type: Boolean,
+        default:false
     },
     speeds: {
         type: Number
     },
-    swing: {
-        updown:{type: Boolean},
-        leftright:{type: Boolean}
-    },
-    timer: {
-        type: Boolean
-    },
-    sabbath_command: {
-        type: Boolean
+    air4d:{
+        type: Boolean,
+        default:false
     },
     night_mode: {
-        type: Boolean
+        type: Boolean,
+        default:false
+    },
+    timer: {
+        type: Boolean,
+        default:false
+    },
+    sabbath_command: {
+        type: Boolean,
+        default:false
+    },
+    onof_auto:{
+        type: Boolean,
+        default:false
     }
 
-}
-)
+
+})
 
 module.exports = mongoose.model('MiniCenteral', minicenteralSchema)

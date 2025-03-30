@@ -17,6 +17,7 @@ const AddOverheadForm = () => {
     const {companies} = useSelector((state) => state.company)
 
     const onSubmit = async (data) => {
+        console.log(data);
         try {
             const response = await axios.post('http://localhost:8000/api/air-conditioner/overhead', data);
             setFormData(data);
@@ -172,10 +173,18 @@ const AddOverheadForm = () => {
                         </div>
                         <div className="field">
                             <span className="p-float-label">
-                                <Controller name="recommended_methom" control={control}  render={({ field }) => (
-                                    <InputText id="recommended_methom" {...field}  />
+                                <Controller name="CFM" control={control}  render={({ field }) => (
+                                    <InputText id="CFM" {...field}  />
                                 )} />
-                                <label htmlFor="recommended_methom" >recommended_methom</label>
+                                <label htmlFor="CFM" >CFM</label>
+                            </span>
+                        </div>
+                        <div className="field">
+                            <span className="p-float-label">
+                                <Controller name="recommended_model_C" control={control}  render={({ field }) => (
+                                    <InputText id="recommended_model_C" {...field}  />
+                                )} />
+                                <label htmlFor="recommended_model_C" >recommended_model_C</label>
                             </span>
                         </div>
                         {/* Pipe Connections */}

@@ -79,6 +79,15 @@ const Branches = () => {
         setBranches(data)
     }
 
+    const getInMap = (branch)=> {
+        const lat = 32.0853; // קו רוחב (Latitude)
+        const lng = 34.7818; // קו אורך (Longitude)
+        const address = encodeURIComponent(`${branch.address.city}, ${branch.address.street},${branch.address.streetNum}`); // כתובת בעברית או אנגלית
+        // window.open(`https://www.google.com/maps/search/?api=1&query=${address}`, '_blank');
+        window.open(`https://www.google.com/maps/dir/?api=1&destination=${address}`, '_blank');
+
+    }
+
     const printBranches = () => {
         if (branches2.length !== 0) {
             setBranches(branches2)
@@ -128,6 +137,7 @@ const Branches = () => {
                                 <Tag value={isOpen(branch) === "success" ? "פתוח" : "סגור"} severity={isOpen(branch)}></Tag>
                                 {userDetails?.role==='official'|| userDetails?.role==='admin' ?<Button onClick={()=>updateBranch(branch)}><i className="pi pi-pencil" style={{ fontSize: '1rem' }}></i></Button>: <></>}
                                 {userDetails?.role==='admin'?<Button onClick={()=>deleteBranch(branch)}><i className="pi pi-trash" style={{ fontSize: '1rem' }}></i></Button>:<></>}
+                                <Button  onClick={()=>getInMap(branch)}><i className="pi pi-map-marker"></i></Button>
 
                             </div>
                         </div>
