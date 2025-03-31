@@ -65,7 +65,7 @@ const Login  =() => {
             const res = await axios.post(`http://localhost:8000/api/auth/login`,user)
             if(res.status===200){
                 console.log(res.data.token);
-                dispatch(setToken(res.data))
+                dispatch(setToken(res.data.token))
                 // dispatch(setToken(res.data.token));
                 dispatch(setUserDetails({username:res.data.username,role:res.data.role}))
                 console.log(token);
