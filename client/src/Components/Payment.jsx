@@ -131,9 +131,10 @@ import { Link } from 'react-router-dom';
 import { Tag } from 'primereact/tag';
 import { IconField } from 'primereact/iconfield';
 import { InputIcon } from 'primereact/inputicon';
+import { Checkbox } from 'primereact/checkbox';
 
 
-const AddAddress = () => {
+const Payment = () => {
     const { control, handleSubmit, formState: { errors } } = useForm();
     const [showMessage, setShowMessage] = useState(false);
     const navigate = useNavigate();
@@ -141,6 +142,9 @@ const AddAddress = () => {
     const [address, setAddress] = useState();
     const { basket } = useSelector((state) => state.basket);
     const [layout, setLayout] = useState('list');
+    const [selectedItems, setSelectedItems] = useState([]);
+    const [purchase , setPurcase] = useState([])
+    const [products , setProducts] = useState([])
 
     const createAddress = async (address) => {
         try {
@@ -161,7 +165,28 @@ const AddAddress = () => {
         }
     };
     const createPurchase = async(paymentType)=> {
-        
+        setProducts(selectedItems)
+        console.log(selectedItems);
+        const purchase = {
+            products: selectedItems,
+            paymentType: paymentType
+        }
+        try {
+            const headers = {
+                'Authorization': `Bearer ${token}`
+            };
+            const res = await axios.post("http://localhost:8000/api/user/purchase", purchase, { headers });
+            if (res.status === 201) {
+                setPurcase(res.data);
+                alert("ההזמנה הושלמה")
+                console.log(res.data);
+            }
+        } catch (error) {
+            console.log(error);
+            if (error.response?.status === 400) {
+                alert("Error");
+            }
+        }
      }
     const onSubmit =  (data) => {
         createAddress(data)
@@ -188,9 +213,23 @@ const AddAddress = () => {
     };
 
     const listItem = (product, index) => {
+        // const isSelected = selectedItems?.includes(product?._id);
+        const isSelected = selectedItems.some(item => item._id === product._id);
+
+        const handleSelectionChange = (product) => {
+            const isSelected = selectedItems.some(item => item._id === product._id);   
+            if (isSelected) {
+                setSelectedItems(selectedItems.filter(item => item._id !== product._id));
+            } else {
+                setSelectedItems([...selectedItems, product]);
+            }
+        };
+        if(product){
         return (
+
             <div className="col-12" key={product._id}>
                 <div className={classNames('flex flex-column xl:flex-row xl:align-items-start p-4 gap-4', { 'border-top-1 surface-border': index !== 0 })}>
+                <Checkbox inputId={product._id} checked={isSelected} onChange={() => handleSelectionChange(product)} />
                     <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`${product.imagepath}`} />
                     <div className="flex flex-column sm:flex-row justify-content-between align-items-center xl:align-items-start flex-1 gap-4">
                         <div className="flex flex-column align-items-center sm:align-items-start gap-3">
@@ -206,7 +245,10 @@ const AddAddress = () => {
                     </div>
                 </div>
             </div>
-        );
+        );}
+        else{
+            return (<></>)
+        }
     };
 
     const listTemplate = (products, layout) => {
@@ -258,7 +300,7 @@ const AddAddress = () => {
                 </div>
             </Dialog>
             <div className="flex justify-content-center">
-                <div className="card" style={{ width: '100%', maxWidth: '600px' }}>
+                <div className="card" style={{ width: '60%', maxWidth: '300px' }}>
                     <h5 className="text-center">Add Address</h5>
                     <form onSubmit={handleSubmit(onSubmit)} className="p-fluid">
                         <div className="field">
@@ -339,7 +381,7 @@ const AddAddress = () => {
         </div>
         <div className="flex">
         {/* Left Panel with Payment Button */}
-        <div className="card p-4 mr-4" style={{ width: '200px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}>
+        <div className="card p-4 mr-4" style={{ width: '20%', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}>
             <h3>סך הכל</h3>
             {/* {setTotalAmount(amount)} */}
             {/* <h4>{amount} ש"ח</h4> */}
@@ -355,11 +397,13 @@ const AddAddress = () => {
                     <InputIcon className="pi pi-search" />
                 </IconField>
             </div>
+            <div style={{ width: "65%", marginLeft: "auto" }}>
             <DataView value={basket} listTemplate={listTemplate} layout={layout} header={header()} />
+            </div>
+            </div>
         </div>
-    </div>
         </div>
     );
 };
 
-export default AddAddress;
+export default Payment;

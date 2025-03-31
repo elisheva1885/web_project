@@ -460,7 +460,9 @@ const Basket = () => {
     const navigate = useNavigate()
     console.log("token Basket",token)
     let amount =0;
-    basket.map(b=> amount+=b.price)
+    if(basket){
+        basket.map(b=> amount+=b.price)
+    }
 
     const [totalAmount,setTotalAmount] =useState(0);
     const deleteShoppingBag = async (product) => {

@@ -13,7 +13,6 @@ const createShoppingBag= async (req,res)=>{
         return res.status(400).json({ message: "all details are required" })
     }
     console.log("user, pro",user_id, product_id)
-
     const duplicate = await ShoppingBag.findOne({ 
         user_id: user_id,
         product_id:product_id,

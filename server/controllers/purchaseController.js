@@ -3,13 +3,13 @@ const Purchase = require("../models/Purchase")
 const createPurchase = async (req, res) => {
     const user_id = req.user._id
     const { products , paymentType} = req.body
-    if (!user_id || !products || paymentType) {
+    if (!user_id || !products || !paymentType) {
         return res.status(400).json({ message: "all details are required" })
     }
-    const purchase = await Purchase.create({ user_id, products,paymentType})
+    const purchase = await Purchase.create({user_id, products,paymentType})
     if (purchase) {
-        const purchases = await Purchase.find().lean()
-        return res.status(201).json(purchases)
+        // const purchases = await Purchase.find().lean()
+        return res.status(201).json(purchase)
     }
     else {   
         return res.status(400).json({ message: "invalid purchase" })
