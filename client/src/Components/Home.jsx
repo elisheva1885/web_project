@@ -13,7 +13,8 @@ const Home = () => {
     const {overheads} = useSelector((state) => state.overheads)
     const {companies} = useSelector((state) => state.company)
     const {userDetails} = useSelector((state) => state.userDetails);
-
+    const {basket} = useSelector((state) => state.basket);
+    console.log("HomeBasket",basket);
     const dispatch = useDispatch();
     // console.log("userDetails",userDetails.username)
     const AirConditionerTypes = () => {

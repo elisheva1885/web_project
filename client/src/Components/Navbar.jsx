@@ -26,7 +26,8 @@ const Navbar = () => {
 
     const {userDetails} = useSelector((state) => state.userDetails);
     console.log("userDetails Navbar",userDetails)
-    
+    console.log("token Navbar",token)
+
     const acItems = [
         {
             label: 'מזגן עילי',
@@ -127,7 +128,7 @@ const Navbar = () => {
                 <Route path='/admin' element={<Suspense fallback="Loading..."><Admin/></Suspense>}></Route>
                 <Route path='/userAccount' element={<Suspense fallback="Loading..."><UserAccont/></Suspense>}></Route>
                 <Route path='/admin/register' element={<Suspense fallback="Loading..."><AdminRegister/></Suspense>}></Route>
-                <Route path='/user/Payment' element={<Suspense fallback="Loading..."><Payment/></Suspense>}></Route>
+                <Route path='/basket/Payment' element={<Suspense fallback="Loading..."><Payment/></Suspense>}></Route>
             </Routes>
             <div className="flex align-items-center gap-2">
                 <Menubar model={items} start={start} end={end} style={{ position: 'fixed', top: 0 }} />

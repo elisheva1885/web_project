@@ -8,8 +8,8 @@ const createAddress = async (req, res) => {
     }
     const address = await Address.create({ user_id, country, city, street, building_num, apartment_num, floor, zip_code})
     if (address) {
-        const addresses = await Address.find().lean()
-        return res.status(201).json(addresses)
+        // const addresses = await Address.find().lean()
+        return res.status(201).json(address)
     }
     else {   
         return res.status(400).json({ message: "invalid address" })

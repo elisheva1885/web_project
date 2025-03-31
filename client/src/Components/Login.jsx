@@ -1,4 +1,4 @@
-import React, {useState } from 'react';
+import React, {useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
@@ -42,7 +42,7 @@ const Login  =() => {
     const getShoppingBag = async () => {
         try {
             const headers = {
-                'Authorization': `Bearer ${token}`
+                'Authorization': `Bearer ${token.token}`
             }
             const res = await axios.get('http://localhost:8000/api/user/shoppingBag',{headers})
             if (res.status === 200) {
@@ -66,9 +66,8 @@ const Login  =() => {
             if(res.status===200){
                 console.log(res.data.token);
                 dispatch(setToken(res.data.token))
-                // dispatch(setToken(res.data.token));
-                dispatch(setUserDetails({username:res.data.username,role:res.data.role}))
                 console.log(token);
+                dispatch(setUserDetails({username:res.data.username,role:res.data.role}))
                 setShowMessage(true);
                 // getShoppingBag();
                 goToHome()
@@ -90,7 +89,11 @@ const Login  =() => {
     };
 
     const dialogFooter = <div className="flex justify-content-center"><Button label="OK" className="p-button-text" autoFocus onClick={() => setShowMessage(false)} /></div>;
-    
+    useEffect(() => {
+        // if (token) {
+        //     // קריאה ל-API רק אם יש טוקן
+        // }
+    }, [token]);
     return (
         <div className="form-demo">
         {/* //     <Dialog visible={showMessage} onHide={() => setShowMessage(false)} position="top" footer={dialogFooter} showHeader={false} breakpoints={{ '960px': '80vw' }} style={{ width: '30vw' }}>
