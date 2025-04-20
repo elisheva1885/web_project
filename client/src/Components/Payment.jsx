@@ -27,7 +27,7 @@
 //         }
 //     };
 //     const createPurchase = async(paymentType)=> {
-        
+
 //     }
 
 //     const [form, setForm] = useState({
@@ -117,7 +117,7 @@
 // export default Payment;
 
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
@@ -139,12 +139,15 @@ const Payment = () => {
     const [showMessage, setShowMessage] = useState(false);
     const navigate = useNavigate();
     const { token } = useSelector((state) => state.token);
-    const [address, setAddress] = useState();
+    const [address, setAddress] = useState([]);
+    const [newAddress, setNewAddress] = useState([]);
+    const [showAddress, setShowAddress] = useState([])
     const { basket } = useSelector((state) => state.basket);
     const [layout, setLayout] = useState('list');
     const [selectedItems, setSelectedItems] = useState([]);
-    const [purchase , setPurcase] = useState([])
-    const [products , setProducts] = useState([])
+    const [purchase, setPurcase] = useState([])
+    const [products, setProducts] = useState([])
+    const [visible, setVisible] = useState(false);
 
     const createAddress = async (address) => {
         try {
@@ -153,7 +156,7 @@ const Payment = () => {
             };
             const res = await axios.post("http://localhost:8000/api/user/address", address, { headers });
             if (res.status === 201) {
-                setAddress(res.data);
+                setNewAddress(res.data);
                 alert("כתובת להזמנה נשמרה במערכת")
                 console.log(res.data);
             }
@@ -164,7 +167,8 @@ const Payment = () => {
             }
         }
     };
-    const createPurchase = async(paymentType)=> {
+
+    const createPurchase = async (paymentType) => {
         setProducts(selectedItems)
         console.log(selectedItems);
         const purchase = {
@@ -187,8 +191,8 @@ const Payment = () => {
                 alert("Error");
             }
         }
-     }
-    const onSubmit =  (data) => {
+    }
+    const onSubmit = (data) => {
         createAddress(data)
     };
 
@@ -217,42 +221,43 @@ const Payment = () => {
         const isSelected = selectedItems.some(item => item._id === product._id);
 
         const handleSelectionChange = (product) => {
-            const isSelected = selectedItems.some(item => item._id === product._id);   
+            const isSelected = selectedItems.some(item => item._id === product._id);
             if (isSelected) {
                 setSelectedItems(selectedItems.filter(item => item._id !== product._id));
             } else {
                 setSelectedItems([...selectedItems, product]);
             }
         };
-        if(product){
-        return (
+        if (product) {
+            return (
 
-            <div className="col-12" key={product._id}>
-                <div className={classNames('flex flex-column xl:flex-row xl:align-items-start p-4 gap-4', { 'border-top-1 surface-border': index !== 0 })}>
-                <Checkbox inputId={product._id} checked={isSelected} onChange={() => handleSelectionChange(product)} />
-                    <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`${product.imagepath}`} />
-                    <div className="flex flex-column sm:flex-row justify-content-between align-items-center xl:align-items-start flex-1 gap-4">
-                        <div className="flex flex-column align-items-center sm:align-items-start gap-3">
-                            <Link to={`/overheads/overhead/${product._id}`}><div className="text-2xl font-bold text-900">{product.title}</div></Link>
-                            <div className="flex align-items-center gap-3">
-                                <Tag value={getSeverityText(product)} severity={getSeverity(product.stock)}></Tag>
+                <div className="col-12" key={product._id}>
+                    <div className={classNames('flex flex-column xl:flex-row xl:align-items-start p-4 gap-4', { 'border-top-1 surface-border': index !== 0 })}>
+                        <Checkbox inputId={product._id} checked={isSelected} onChange={() => handleSelectionChange(product)} />
+                        <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`${product.imagepath}`} />
+                        <div className="flex flex-column sm:flex-row justify-content-between align-items-center xl:align-items-start flex-1 gap-4">
+                            <div className="flex flex-column align-items-center sm:align-items-start gap-3">
+                                <Link to={`/overheads/overhead/${product._id}`}><div className="text-2xl font-bold text-900">{product.title}</div></Link>
+                                <div className="flex align-items-center gap-3">
+                                    <Tag value={getSeverityText(product)} severity={getSeverity(product.stock)}></Tag>
+                                </div>
                             </div>
-                        </div>
-                        <div className="flex sm:flex-column align-items-center sm:align-items-end gap-3 sm:gap-2">
-                            <span className="text-2xl font-semibold">₪{product.price}</span>
-                            {/* <Button icon="pi pi-shopping-cart" className="p-button-rounded" disabled={getSeverity(product.stock) === "danger"} onClick={() => deleteShoppingBag(product)}> להסרה מהעגלה </Button> */}
+                            <div className="flex sm:flex-column align-items-center sm:align-items-end gap-3 sm:gap-2">
+                                <span className="text-2xl font-semibold">₪{product.price}</span>
+                                {/* <Button icon="pi pi-shopping-cart" className="p-button-rounded" disabled={getSeverity(product.stock) === "danger"} onClick={() => deleteShoppingBag(product)}> להסרה מהעגלה </Button> */}
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        );}
-        else{
+            );
+        }
+        else {
             return (<></>)
         }
     };
 
     const listTemplate = (products, layout) => {
-        if(!basket){
+        if (!basket) {
             return <h1>basket is empty</h1>
         }
         return <div className="grid grid-nogutter">{basket.map((product, index) => listItem(product, index))}</div>;
@@ -265,12 +270,67 @@ const Payment = () => {
             </div>
         );
     };
+    const existAddress = () => {
+        console.log("in func", address)
+        return (
+            <Dialog
+                header="כתובת שמורה"
+                visible={visible}
+                style={{ width: '50vw' }}
+                onHide={() => setVisible(false)}
+            >
+                <div>
+                    <h6>עיר: {address.city}</h6>
+                    <h6>רחוב: {address.street} {address.building_num}</h6>
+                    <h6>דירה: {address.apartment_num}, קומה: {address.floor}</h6>
+                    <h6>מיקוד: {address.zip_code}</h6>
+                </div>
+                <Button >לשימוש בכתובת</Button>
+                <Button>ליצירת כתובת חדשה</Button>
 
+            </Dialog>
+
+        )
+    }
+    const getUserAddress = async (c) => {
+        try {
+            const headers = {
+                'Authorization': `Bearer ${token}`
+            };
+            const res = await axios.get(`http://localhost:8000/api/user/address/existAddress`, { headers })
+            if (res.status === 200) {
+                setAddress(res.data[0])
+                console.log(address);
+                setVisible(true);
+
+                if (address) {
+                    console.log(address);
+                    existAddress()
+                }
+            }
+        }
+        catch (e) {
+            console.error(e)
+        }
+    }
+
+    useEffect(() => {
+        getUserAddress()
+    }, [])
+
+    useEffect(() => {
+        if (address) {
+            setShowAddress(existAddress());
+        }
+    }, [address]);
     return (
-        <div>
-        {/* <div style={{ display: "flex", width: "100vw", height: "100vh", padding: "20px" }}> */}
-                     {/* Left: Payment Square */}
-                     {/* <div
+        <div style={{ paddingTop: '60px' }}>
+
+            {address ? showAddress : <></>}
+            <div>
+                {/* <div style={{ display: "flex", width: "100vw", height: "100vh", padding: "20px" }}> */}
+                {/* Left: Payment Square */}
+                {/* <div
                          style={{
                              width: "30%",
                              display: "flex",
@@ -284,124 +344,125 @@ const Payment = () => {
                              boxShadow: "2px 2px 10px rgba(0,0,0,0.1)",
                          }}
                      > */}
-                     <>
-                         <h3>Choose Payment</h3>
-                        <Button label="Pay with PayPal" icon="pi pi-paypal" className="p-button-info p-mb-2" onClick={()=>createPurchase("paypal")} />
-                        <Button label="Pay with Google Pay" icon="pi pi-google" className="p-button-warning" onClick={()=>createPurchase("google")}/>
-                     {/* </div> */}
-                     </>
-            {/* </div> */}
-     <div style={{ width: "65%", marginLeft: "auto" }}>
-        <div className="form-demo">
-            <Dialog visible={showMessage} onHide={() => setShowMessage(false)} position="top" footer={<Button label="Close" onClick={() => setShowMessage(false)} />} showHeader={false} breakpoints={{ '960px': '80vw' }} style={{ width: '40vw' }}>
-                <div className="flex justify-content-center flex-column pt-6 px-3">
-                    <i className="pi pi-check-circle" style={{ fontSize: '5rem', color: 'var(--green-500)' }}></i>
-                    <h5>Address Added Successfully!</h5>
+                <>
+                    <h3>Choose Payment</h3>
+                    <Button label="Pay with PayPal" icon="pi pi-paypal" className="p-button-info p-mb-2" onClick={() => createPurchase("paypal")} />
+                    <Button label="Pay with Google Pay" icon="pi pi-google" className="p-button-warning" onClick={() => createPurchase("google")} />
+                    {/* </div> */}
+                </>
+                {/* </div> */}
+                <div style={{ width: "65%", marginLeft: "auto" }}>
+                    <div className="form-demo">
+                        <Dialog visible={showMessage} onHide={() => setShowMessage(false)} position="top" footer={<Button label="Close" onClick={() => setShowMessage(false)} />} showHeader={false} breakpoints={{ '960px': '80vw' }} style={{ width: '40vw' }}>
+                            <div className="flex justify-content-center flex-column pt-6 px-3">
+                                <i className="pi pi-check-circle" style={{ fontSize: '5rem', color: 'var(--green-500)' }}></i>
+                                <h5>Address Added Successfully!</h5>
+                            </div>
+                        </Dialog>
+                        <div className="flex justify-content-center">
+                            <div className="card" style={{ width: '60%', maxWidth: '300px' }}>
+                                <h5 className="text-center">Add Address</h5>
+                                <form onSubmit={handleSubmit(onSubmit)} className="p-fluid">
+                                    <div className="field">
+                                        <span className="p-float-label">
+                                            <Controller name="country" control={control} defaultValue="ישראל" rules={{ required: 'Country is required.' }} render={({ field }) => (
+                                                <InputText id={field.name} {...field} />
+                                            )} />
+                                            <label htmlFor="country">*Country</label>
+                                        </span>
+                                        {getFormErrorMessage('country')}
+                                    </div>
+
+                                    <div className="field">
+                                        <span className="p-float-label">
+                                            <Controller name="city" control={control} rules={{ required: 'City is required.' }} render={({ field }) => (
+                                                <InputText id={field.name} {...field} />
+                                            )} />
+                                            <label htmlFor="city">*City</label>
+                                        </span>
+                                        {getFormErrorMessage('city')}
+                                    </div>
+
+                                    <div className="field">
+                                        <span className="p-float-label">
+                                            <Controller name="street" control={control} rules={{ required: 'Street is required.' }} render={({ field }) => (
+                                                <InputText id={field.name} {...field} />
+                                            )} />
+                                            <label htmlFor="street">*Street</label>
+                                        </span>
+                                        {getFormErrorMessage('street')}
+                                    </div>
+
+                                    <div className="field">
+                                        <span className="p-float-label">
+                                            <Controller name="building_num" control={control} rules={{ required: 'Building number is required.' }} render={({ field }) => (
+                                                <InputText id={field.name} type="number" {...field} />
+                                            )} />
+                                            <label htmlFor="building_num">*Building Number</label>
+                                        </span>
+                                        {getFormErrorMessage('building_num')}
+                                    </div>
+
+                                    <div className="field">
+                                        <span className="p-float-label">
+                                            <Controller name="apartment_num" control={control} rules={{ required: 'Apartment number is required.' }} render={({ field }) => (
+                                                <InputText id={field.name} type="number" {...field} />
+                                            )} />
+                                            <label htmlFor="apartment_num">*Apartment Number</label>
+                                        </span>
+                                        {getFormErrorMessage('apartment_num')}
+                                    </div>
+
+                                    <div className="field">
+                                        <span className="p-float-label">
+                                            <Controller name="floor" control={control} rules={{ required: 'Floor is required.' }} render={({ field }) => (
+                                                <InputText id={field.name} type="number" {...field} />
+                                            )} />
+                                            <label htmlFor="floor">*Floor</label>
+                                        </span>
+                                        {getFormErrorMessage('floor')}
+                                    </div>
+
+                                    <div className="field">
+                                        <span className="p-float-label">
+                                            <Controller name="zip_code" control={control} rules={{ required: 'Zip code is required.' }} render={({ field }) => (
+                                                <InputText id={field.name} {...field} />
+                                            )} />
+                                            <label htmlFor="zip_code">*Zip Code</label>
+                                        </span>
+                                        {getFormErrorMessage('zip_code')}
+                                    </div>
+
+                                    <Button type="submit" label="Add Address" className="mt-2" />
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </Dialog>
-            <div className="flex justify-content-center">
-                <div className="card" style={{ width: '60%', maxWidth: '300px' }}>
-                    <h5 className="text-center">Add Address</h5>
-                    <form onSubmit={handleSubmit(onSubmit)} className="p-fluid">
-                        <div className="field">
-                            <span className="p-float-label">
-                                <Controller name="country" control={control} defaultValue="ישראל" rules={{ required: 'Country is required.' }} render={({ field }) => (
-                                    <InputText id={field.name} {...field} />
-                                )} />
-                                <label htmlFor="country">*Country</label>
-                            </span>
-                            {getFormErrorMessage('country')}
+                <div className="flex">
+                    {/* Left Panel with Payment Button */}
+                    <div className="card p-4 mr-4" style={{ width: '20%', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}>
+                        <h3>סך הכל</h3>
+                        {/* {setTotalAmount(amount)} */}
+                        {/* <h4>{amount} ש"ח</h4> */}
+                        <div className="flex justify-content-center align-items-center" style={{ height: '200px', border: '2px solid #e0e0e0', borderRadius: '8px' }}>
+                            {/* <Button label="לשלם עכשיו" icon="pi pi-credit-card" onClick={goToPayment} className="p-button-success p-button-rounded" style={{ width: '150px' }} /> */}
                         </div>
+                    </div>
 
-                        <div className="field">
-                            <span className="p-float-label">
-                                <Controller name="city" control={control} rules={{ required: 'City is required.' }} render={({ field }) => (
-                                    <InputText id={field.name} {...field} />
-                                )} />
-                                <label htmlFor="city">*City</label>
-                            </span>
-                            {getFormErrorMessage('city')}
+                    {/* Right Side with Shopping Basket Items */}
+                    <div className="card flex-1">
+                        <div className="flex justify-content-end">
+                            <IconField iconPosition="left">
+                                <InputIcon className="pi pi-search" />
+                            </IconField>
                         </div>
-
-                        <div className="field">
-                            <span className="p-float-label">
-                                <Controller name="street" control={control} rules={{ required: 'Street is required.' }} render={({ field }) => (
-                                    <InputText id={field.name} {...field} />
-                                )} />
-                                <label htmlFor="street">*Street</label>
-                            </span>
-                            {getFormErrorMessage('street')}
+                        <div style={{ width: "65%", marginLeft: "auto" }}>
+                            <DataView value={basket} listTemplate={listTemplate} layout={layout} header={header()} />
                         </div>
-
-                        <div className="field">
-                            <span className="p-float-label">
-                                <Controller name="building_num" control={control} rules={{ required: 'Building number is required.' }} render={({ field }) => (
-                                    <InputText id={field.name} type="number" {...field} />
-                                )} />
-                                <label htmlFor="building_num">*Building Number</label>
-                            </span>
-                            {getFormErrorMessage('building_num')}
-                        </div>
-
-                        <div className="field">
-                            <span className="p-float-label">
-                                <Controller name="apartment_num" control={control} rules={{ required: 'Apartment number is required.' }} render={({ field }) => (
-                                    <InputText id={field.name} type="number" {...field} />
-                                )} />
-                                <label htmlFor="apartment_num">*Apartment Number</label>
-                            </span>
-                            {getFormErrorMessage('apartment_num')}
-                        </div>
-
-                        <div className="field">
-                            <span className="p-float-label">
-                                <Controller name="floor" control={control} rules={{ required: 'Floor is required.' }} render={({ field }) => (
-                                    <InputText id={field.name} type="number" {...field} />
-                                )} />
-                                <label htmlFor="floor">*Floor</label>
-                            </span>
-                            {getFormErrorMessage('floor')}
-                        </div>
-
-                        <div className="field">
-                            <span className="p-float-label">
-                                <Controller name="zip_code" control={control} rules={{ required: 'Zip code is required.' }} render={({ field }) => (
-                                    <InputText id={field.name} {...field} />
-                                )} />
-                                <label htmlFor="zip_code">*Zip Code</label>
-                            </span>
-                            {getFormErrorMessage('zip_code')}
-                        </div>
-
-                        <Button type="submit" label="Add Address" className="mt-2" />
-                    </form>
+                    </div>
                 </div>
             </div>
-        </div>
-        </div>
-        <div className="flex">
-        {/* Left Panel with Payment Button */}
-        <div className="card p-4 mr-4" style={{ width: '20%', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}>
-            <h3>סך הכל</h3>
-            {/* {setTotalAmount(amount)} */}
-            {/* <h4>{amount} ש"ח</h4> */}
-            <div className="flex justify-content-center align-items-center" style={{ height: '200px', border: '2px solid #e0e0e0', borderRadius: '8px' }}>
-                {/* <Button label="לשלם עכשיו" icon="pi pi-credit-card" onClick={goToPayment} className="p-button-success p-button-rounded" style={{ width: '150px' }} /> */}
-            </div>
-        </div>
-
-        {/* Right Side with Shopping Basket Items */}
-        <div className="card flex-1">
-            <div className="flex justify-content-end">
-                <IconField iconPosition="left">
-                    <InputIcon className="pi pi-search" />
-                </IconField>
-            </div>
-            <div style={{ width: "65%", marginLeft: "auto" }}>
-            <DataView value={basket} listTemplate={listTemplate} layout={layout} header={header()} />
-            </div>
-            </div>
-        </div>
         </div>
     );
 };

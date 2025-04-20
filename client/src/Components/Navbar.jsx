@@ -114,6 +114,8 @@ const Navbar = () => {
 
     return (
         <>
+                <div style={{ paddingTop: '60px' }}>
+
             <Routes>
                 <Route path='/branch' element={<Suspense fallback="Loading..."><Branch /></Suspense>}></Route>
                 <Route path='/branch/add' element={<Suspense fallback="Loading..."><AddBranch/></Suspense>}></Route>
@@ -137,6 +139,7 @@ const Navbar = () => {
                         <MegaMenu model={acItems} orientation="vertical" breakpoint="960px" />
                     </div>
                 )}
+            </div>
             </div>
         </>
 

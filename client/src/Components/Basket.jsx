@@ -459,6 +459,8 @@ const Basket = () => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
     console.log("token Basket",token)
+    
+
     let amount =0;
     if(basket){
         basket.map(b=> amount+=b.price)
@@ -560,9 +562,15 @@ const Basket = () => {
             getShoppingBag();
             amount = 0;
         }
+        else{
+        alert("to save thing in your basket you need to register")
+        navigate("/register")
+        }
+
     }, [token]);
 
     return (
+        <div style={{ paddingTop: '60px' }}>
         <div className="flex">
         {/* Left Panel with Payment Button */}
         <div className="card p-4 mr-4" style={{ width: '200px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}>
@@ -584,6 +592,7 @@ const Basket = () => {
             <DataView value={basket} listTemplate={listTemplate} layout={layout} header={header()} />
         </div>
     </div>
+    </div>
 );
         // <div className="card">
         //     <div className="flex justify-content-end">
@@ -594,6 +603,7 @@ const Basket = () => {
         //     <DataView value={basket} listTemplate={listTemplate} layout={layout} header={header()} />
         // </div>
     // );
+ 
 };
 
 export default Basket;

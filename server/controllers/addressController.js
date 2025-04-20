@@ -25,11 +25,11 @@ const readAddresses = async (req, res) => {
 
 const readAddressesByUserId = async (req,res) => {
     const user_id = req.user._id
-    const addresses = await Address.findById(user_id).lean()
+    const address = await Address.find({user_id:user_id}).lean()
 
-    if(!addresses)
+    if(!address)
         return res.status(404).json({ message: "no address for this user" })
-    return res.status(200).json(addresses)
+    return res.status(200).json(address)
 }
 
 const updateAddress = async (req, res) => {

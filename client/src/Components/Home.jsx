@@ -101,11 +101,12 @@ const Home = () => {
 
     return (
         <>
+                <div style={{ paddingTop: '60px' }}>
             <AirConditionerTypes />
+                    </div>
         </>
-    )
+    );
 }
 
 export default Home
-
 

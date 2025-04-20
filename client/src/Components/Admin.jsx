@@ -21,8 +21,9 @@ const Admin= ()=> {
     console.log("aaaa");
     return(
         <>
-        <br/><br/><br/><br/>
+            <div style={{ paddingTop: '60px' }}>
    <Button type="button"label="הוספת מזכירה" className="mt-2" onClick={registerOfficial} /> 
+   </div>
    </>
     )
 }

@@ -11,11 +11,13 @@ import { classNames } from 'primereact/utils';
 import axios from 'axios'
 import '../Login.css';
 import { useSelector } from 'react-redux';
+import { Navigate, useNavigate } from 'react-router-dom';
 
 const Register = () => {
     const [showMessage, setShowMessage] = useState(false);
     const [formData, setFormData] = useState({});
     const {userDetails} = useSelector((state) => state.userDetails);
+    const navigate = useNavigate()
     const defaultValues = {
         name: '',
         username: '',
@@ -29,6 +31,7 @@ const Register = () => {
 
   
     const onSubmit = async (data) => {
+        console.log("here");
         setFormData(data);
         const user = {
             name: data.name,
@@ -39,7 +42,9 @@ const Register = () => {
         }
         try {
             const res = await axios.post(`http://localhost:8000/api/auth/register`,user)
-            if(res.status===200){
+            if(res.status===201){
+                console.log("res");
+                navigate('/')
                 setShowMessage(true);
             }
         } catch (error) {
@@ -68,6 +73,8 @@ const Register = () => {
     );
 
     return (
+        <div style={{ paddingTop: '60px' }}>
+
         <div className="form-demo">
             <Dialog visible={showMessage} onHide={() => setShowMessage(false)} position="top" footer={dialogFooter} showHeader={false} breakpoints={{ '960px': '80vw' }} style={{ width: '30vw' }}>
                 <div className="flex justify-content-center flex-column pt-6 px-3">
@@ -143,6 +150,7 @@ const Register = () => {
                 </div>
             </div>
         </div>
+           </div>
     );
 }
 
