@@ -14,6 +14,7 @@ import Add_AirConditioner from './Add_AirConditioner';
 import { setCompanies } from '../../store/companySlice'
 import { setBasket } from '../../store/basketSlice';
 import { setOverheads } from '../../store/air-conditioner/overHeadsSlice';
+import SideFillter from '../SideFillter';
 
 
 const Overhead = lazy(() => import('./Overhead'));
@@ -30,15 +31,14 @@ const Overheads = () => {
     const [overheads2, setOverheads2] = useState([])
     const [value, setValue] = useState('')
     const [shoppingBags, setShoppingBags] = useState([])
+    const [registered, setRegistered] = useState(false);
 
-    const [layout, setLayout] = useState('list');
+    const [layout, setLayout] = useState('grid');
     const navigate = useNavigate();
     const dispatch = useDispatch();
+   
 
-
-    // const goToAddOverhead = (type) => {
-    //     navigate(`/overheads/add`, {type: type});
-    //   };
+    
     const goToAddOverhead = (type) => {
         const navigationData = {
             type: type,
@@ -114,20 +114,19 @@ const Overheads = () => {
     //         console.error(e)
     //     }
     // }
+
     const getOverheadByTitle = async (c) => {
         try {
             setValue(c.target.value)
             const res = await axios.get(`http://localhost:8000/api/air-conditioner/overhead/${c.target.value}`)
             if (res.status === 200) {
-                setOverheads2(overheads)
-                setOverheads(res.data)
+                dispatch(setOverheads(res.data))
             }
         }
         catch (e) {
             console.error(e)
         }
-    }
-   
+    }  
 
     const getSeverity = (s) => {
         if (s >= 50) {
@@ -158,64 +157,125 @@ const Overheads = () => {
                 return null;
         }
     };
-    const listItem = (product, index) => {
-        return (
-            <>
-                <div className="col-12" key={product._id}>
-                    <div className={classNames('flex flex-column xl:flex-row xl:align-items-start p-4 gap-4', { 'border-top-1 surface-border': index !== 0 })}>
-                        <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`/${product?.company?.imagePath}`} />
-                        <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`${product.imagepath}`} />
-                        <div className="flex flex-column sm:flex-row justify-content-between align-items-center xl:align-items-start flex-1 gap-4">
-                            <div className="flex flex-column align-items-center sm:align-items-start gap-3">
-                                {/* <Link to={{pathName:`/overheads/${product.title}` , state: {product:product} }}><div className="text-2xl font-bold text-900" style={{}} >{product.title}</div></Link> */}
-                                <Link to={`/overheads/overhead/${product._id}` } params={{ product: product }}><div className="text-2xl font-bold text-900" style={{}} >{product.title}</div></Link>
-                                <p>{product.imagepath}</p>
-                                <div className="flex align-items-center gap-3">
-                                    <Tag value={getSeverityText(product)} severity={getSeverity(product.stock)}></Tag>
-                                </div>
-                            </div>
-                            <div className="flex sm:flex-column align-items-center sm:align-items-end gap-3 sm:gap-2">
-                                <span className="text-2xl font-semibold">₪{product.price}</span>
-                                <Button icon="pi pi-shopping-cart" className="p-button-rounded" disabled={getSeverity(product.stock) === "danger"} onClick={()=>addToBasket(product)}></Button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </>
-        );
-    };
+    // const listItem = (product, index) => {
+    //     return (
+    //         <>
+    //             <div className="col-12" key={product._id}>
+    //                 <div className={classNames('flex flex-column xl:flex-row xl:align-items-start p-4 gap-4', { 'border-top-1 surface-border': index !== 0 })}>
+    //                     <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`/${product?.company?.imagePath}`} />
+    //                     <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`${product.imagepath}`} />
+    //                     <div className="flex flex-column sm:flex-row justify-content-between align-items-center xl:align-items-start flex-1 gap-4">
+    //                         <div className="flex flex-column align-items-center sm:align-items-start gap-3">
+    //                             {/* <Link to={{pathName:`/overheads/${product.title}` , state: {product:product} }}><div className="text-2xl font-bold text-900" style={{}} >{product.title}</div></Link> */}
+    //                             <Link to={`/overheads/overhead/${product._id}` } params={{ product: product }}><div className="text-2xl font-bold text-900" style={{}} >{product.title}</div></Link>
+    //                             <p>{product.imagepath}</p>
+    //                             <div className="flex align-items-center gap-3">
+    //                                 <Tag value={getSeverityText(product)} severity={getSeverity(product.stock)}></Tag>
+    //                             </div>
+    //                         </div>
+    //                         <div className="flex sm:flex-column align-items-center sm:align-items-end gap-3 sm:gap-2">
+    //                             <span className="text-2xl font-semibold">₪{product.price}</span>
+    //                             <Button icon="pi pi-shopping-cart" className="p-button-rounded" disabled={getSeverity(product.stock) === "danger"} onClick={()=>addToBasket(product)}></Button>
+    //                         </div>
+    //                     </div>
+    //                 </div>
+    //             </div>
+    //         </>
+    //     );
+    // };
 
+    // const gridItem = (product, index) => {
+    //     return (
+    //         <>
+    //         <div className="col-12 sm:col-6 lg:col-12 xl:col-4 p-2" key={product._id}>
+    //             <div className="p-4 border-1 surface-border surface-card border-round">
+    //                 <div className="flex flex-wrap align-items-center justify-content-between gap-2">
+    //                     {/* <img className="w-9 shadow-2 border-round" src={`${product.company.imagePath}`} /> */}
+    //                     <div className="flex align-items-center gap-2">
+    //                         <Link to={"/overheads/overhead"}><div className="text-2xl font-bold text-900" style={{}}>{product.title}</div></Link>
+    //                     </div>
+    //                 </div>
+    //                 <div className="flex flex-column align-items-center gap-3 py-5">
+    //                     <img className="w-9 shadow-2 border-round" src={`${product.imagepath}`} />
+    //                 </div>
+    //                 <Tag value={getSeverityText(product)} severity={getSeverity(product.stock)}></Tag>
+
+    //                 <div className="flex align-items-center justify-content-between">
+    //                     <span className="text-2xl font-semibold">₪{product.price}</span>
+    //                     <Button icon="pi pi-shopping-cart" className="p-button-rounded" disabled={getSeverity(product.stock) === "danger"} onClick={()=>addToBasket(product)}></Button>
+    //                 </div>
+    //             </div>
+    //         </div>
+    //         <div className="col-12 sm:col-6 lg:col-12 xl:col-4 p-2" key={product._id}>
+    //         <div className={classNames('p-4 border-1 surface-border surface-card border-roun', { 'border-top-1 surface-border': index !== 0 })}>
+    //             <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`/${product?.company?.imagePath}`} />
+    //             <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`${product.imagepath}`} />
+    //             <div className="flex flex-column sm:flex-row justify-content-between align-items-center xl:align-items-start flex-1 gap-4">
+    //                 <div className="flex flex-column align-items-center sm:align-items-start gap-3">
+    //                     {/* <Link to={{pathName:`/overheads/${product.title}` , state: {product:product} }}><div className="text-2xl font-bold text-900" style={{}} >{product.title}</div></Link> */}
+    //                     <Link to={`/overheads/overhead/${product._id}` } params={{ product: product }}><div className="text-2xl font-bold text-900" style={{}} >{product.title}</div></Link>
+    //                     <p>{product.imagepath}</p>
+    //                     <div className="flex align-items-center gap-3">
+    //                         <Tag value={getSeverityText(product)} severity={getSeverity(product.stock)}></Tag>
+    //                     </div>
+    //                 </div>
+    //                 <div className="flex sm:flex-column align-items-center sm:align-items-end gap-3 sm:gap-2">
+    //                     <span className="text-2xl font-semibold">₪{product.price}</span>
+    //                     <Button icon="pi pi-shopping-cart" className="p-button-rounded" disabled={getSeverity(product.stock) === "danger"} onClick={()=>addToBasket(product)}></Button>
+    //                 </div>
+    //             </div>
+    //         </div>
+    //     </div>
+    //     </>
+    //     );
+    // };
     const gridItem = (product) => {
         return (
-            <div className="col-12 sm:col-6 lg:col-12 xl:col-4 p-2" key={product._id}>
-                <div className="p-4 border-1 surface-border surface-card border-round">
-                    <div className="flex flex-wrap align-items-center justify-content-between gap-2">
-                        {/* <img className="w-9 shadow-2 border-round" src={`${product.company.imagePath}`} /> */}
-                        <div className="flex align-items-center gap-2">
-                            <Link to={"/overheads/overhead"}><div className="text-2xl font-bold text-900" style={{}}>{product.title}</div></Link>
-                        </div>
-                    </div>
-                    <div className="flex flex-column align-items-center gap-3 py-5">
-                        <img className="w-9 shadow-2 border-round" src={`${product.imagepath}`} />
-                    </div>
-                    <Tag value={getSeverityText(product)} severity={getSeverity(product.stock)}></Tag>
-
-                    <div className="flex align-items-center justify-content-between">
-                        <span className="text-2xl font-semibold">₪{product.price}</span>
-                        <Button icon="pi pi-shopping-cart" className="p-button-rounded" disabled={getSeverity(product.stock) === "danger"} onClick={()=>addToBasket(product)}></Button>
-                    </div>
+            <div className="col-12 sm:col-6 lg:col-3 p-3" key={product._id}>
+                <div className="border-1 surface-border border-round p-4 shadow-3 h-full flex flex-column justify-content-between gap-4">
+    
+                    {/* תמונת החברה - גדולה ובולטת */}
+                    <img
+                        src={`/${product?.company?.imagePath}`}
+                        alt="Company"
+                        className="w-full h-10rem object-contain border-round"
+                    />
+    
+                    {/* תמונת המוצר - גדולה ורחבה */}
+                    <img
+                        src={`overheads/${product.imagepath}`}
+                        alt={product.title}
+                        className="w-full h-12rem object-contain border-round"
+                    />
+    
+                    {/* פרטי המוצר */}
+                    <div className="flex flex-column align-items-center text-center gap-2">
+                        <Link to={`/overheads/overhead/${product._id}`}>
+                            <div className="text-xl font-bold text-900">{product.title}</div>
+                        </Link>
+    
+                        <Tag value={getSeverityText(product)} severity={getSeverity(product.stock)} />
+                        <span className="text-lg font-medium text-primary">₪{product.price}</span>
+                    </div>                      
+                    <Button
+                        label="הוספה לעגלה"
+                        icon="pi pi-shopping-cart"
+                        className="w-full"
+                        disabled={
+                            getSeverity(product.stock) === "danger" || registered === false
+                        }
+                        onClick={() => addToBasket(product)}
+                    />      
                 </div>
             </div>
         );
     };
-
+    
     const itemTemplate = (product, layout, index) => {
         if (!product) {
             return;
         }
-        
-        if (layout === 'list') return listItem(product, index);
-        else if (layout === 'grid') return gridItem(product);
+         if (layout === 'grid') return gridItem(product, index);
     };
 
     const listTemplate = (products, layout) => {
@@ -225,31 +285,28 @@ const Overheads = () => {
         return <div className="grid grid-nogutter">{overheads.map((product, index) => itemTemplate(product, layout, index))}</div>;
     };
 
-    const header = () => {
-        return (
-            <div className="flex justify-content-end">
-                <DataViewLayoutOptions layout={layout} onChange={(e) => setLayout(e.value)} />
-            </div>
-        );
-    };
+    // const header = () => {
+    //     return (
+    //         // <div className="flex justify-content-end">
+    //             // <DataViewLayoutOptions layout={layout} onChange={(e) => setLayout(e.value)} />
+    //         // </div>
+    //         <></>
+    //     );
+    // };
 
 
     useEffect(() => {
-        // getOverheads()
         // getCompanies()
+        
+        if(token){
+            setRegistered(true)
+        }
     }, [])
 
     return (
         <>
-{/* 
-            <Routes>
-                <Route path='/overheads/overhead' element={<Suspense fallback="Loading..."><Overhead /></Suspense>}></Route>
-            </Routes> */}
-            <br/><br/><br/><br/>
-            {userDetails.role === 'user'?<Button onClick={ ()=>goToAddOverhead("Overhead")}>add overhead</Button>: <></> }
+            {userDetails.role === 'admin'?<Button onClick={ ()=>goToAddOverhead("Overhead")}>add overhead</Button>: <></> }
             {/* {<Button onClick={ ()=>goToAddOverhead("Overhead")}>add overhead</Button>} */}
-
-
             <div className="card">
                 <div className="flex justify-content-end">
                     <IconField iconPosition="left">
@@ -257,8 +314,9 @@ const Overheads = () => {
                         <InputText placeholder="Search by name" onChange={(c) => getOverheadByTitle(c)} value={value} />
                     </IconField>
                 </div>
-                <DataView value={overheads} listTemplate={listTemplate} layout={layout} header={header()} />
+                <DataView value={overheads} listTemplate={listTemplate} layout={layout}/>
             </div>
+            <SideFillter/>
         </>
     )
 }

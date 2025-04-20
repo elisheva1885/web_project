@@ -75,6 +75,7 @@ const Home = () => {
             const res = await axios.get('http://localhost:8000/api/air-conditioner/overhead')
             if (res.status === 200) {
                 dispatch(setOverheads(res.data));
+                console.log(overheads);
             }
         }
         catch (e) {
