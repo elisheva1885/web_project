@@ -38,10 +38,7 @@ const overheadSchema = new mongoose.Schema({
         cool: { type: String },
         heat: { type: String }
     },
-    CFM:{
-        type:Number
-    },
-    recommended_model_C:{ 
+    recommended_model_C:{
         type:String
     },
     pipe_connection: {
@@ -58,7 +55,7 @@ const overheadSchema = new mongoose.Schema({
         depth: {type: Number},    
         height: {type: Number},
     },
-    air_flow:{
+    air_flow:{//xphe, tuuhr ספיקת אוויר
         type:Number
     },
     //icons

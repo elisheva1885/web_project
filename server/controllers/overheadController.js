@@ -83,6 +83,20 @@ const updateOverhead = async (req, res) => {
     res.status(200).json(overheads)
 }
 
+const updateOverheadStock = async (req,res) => {
+    const { _id, amount} = req.body
+    if(!_id){
+        return res.status(400).json({message: "all details are required"})
+    }
+    if(!amount){
+        return res.status(204).json({message: "the stock didn't change"})
+    }
+    const overhead = await Overhead.findById(_id).populate("company").exec()
+    overhead.stock= overhead.stock- amount
+    const updated = await overhead.save()
+    res.status(201).json(overhead)
+}
+
 const deleteOverhead = async (req,res)=> {
     const {_id} = req.body
     const overhead = await Overhead.findById(_id).exec()
@@ -97,4 +111,4 @@ const deleteOverhead = async (req,res)=> {
     return res.status(200).json(overheads)
 }
 
-module.exports = {createOverhead , readOverheads, readOverheadById,readOverheadByTitle , updateOverhead , deleteOverhead}
+module.exports = {createOverhead , readOverheads, readOverheadById,readOverheadByTitle , updateOverhead , updateOverheadStock, deleteOverhead}

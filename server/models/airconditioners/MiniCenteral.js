@@ -30,17 +30,26 @@ const minicenteralSchema = new mongoose.Schema({
         cool: { type: String },
         heat: { type: String }
     },
-    energy_rating:{//דיורג אנרגטי
+    efficiency_factor: {//מקדם יעילות
         cool: { type: String },
         heat: { type: String }
+    },
+    energy_rating:{//דיורג אנרגטי
+        type: String 
     },
     working_current: {//זרם עבודה
         cool: { type: String },
         heat: { type: String }
     },
-    recommended_model_C:{
-        type:String
+    CFM:{
+        type:Number
     },
+    Pa:{//לחץ סטטי
+        type:Number
+    },
+    // recommended_model_C:{ 
+    //     type:String
+    // },
     pipe_connection: {
         a:{ type:String},
         b:{ type:String},
@@ -55,14 +64,13 @@ const minicenteralSchema = new mongoose.Schema({
         depth: {type: Number},    
         height: {type: Number},
     },
-    air_flow:{//xphe, tuuhr
-        type:Number
-    },
+    // air_flow:{
+    //     type:Number
+    // },
     //icons
     quiet:{
         type: Boolean
-    },
-   
+    }, 
     wifi:{
         type: Boolean,
         default:false
@@ -74,23 +82,22 @@ const minicenteralSchema = new mongoose.Schema({
         type: Boolean,
         default:false
     },
-    night_mode: {
-        type: Boolean,
-        default:false
-    },
-    timer: {
-        type: Boolean,
-        default:false
-    },
+    // night_mode: {
+    //     type: Boolean,
+    //     default:false
+    // },
+    // timer: {
+    //     type: Boolean,
+    //     default:false
+    // },
     sabbath_command: {
         type: Boolean,
         default:false
     },
-    onof_auto:{
-        type: Boolean,
-        default:false
-    }
-
+    // onof_auto:{
+    //     type: Boolean,
+    //     default:false
+    // }
 
 })
 

@@ -125,13 +125,14 @@ import { Button } from 'primereact/button';
 import axios from 'axios';
 import classNames from 'classnames';
 import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { DataView, DataViewLayoutOptions } from 'primereact/dataview';
 import { Link } from 'react-router-dom';
 import { Tag } from 'primereact/tag';
 import { IconField } from 'primereact/iconfield';
 import { InputIcon } from 'primereact/inputicon';
 import { Checkbox } from 'primereact/checkbox';
+import { setOverheads } from '../store/air-conditioner/overHeadsSlice';
 
 
 const Payment = () => {
@@ -139,15 +140,18 @@ const Payment = () => {
     const [showMessage, setShowMessage] = useState(false);
     const navigate = useNavigate();
     const { token } = useSelector((state) => state.token);
+    const { overheads } = useSelector((state) => state.overheads);
+    const dispatch = useDispatch();
+
     const [address, setAddress] = useState([]);
     const [newAddress, setNewAddress] = useState([]);
-    const [showAddress, setShowAddress] = useState([])
     const { basket } = useSelector((state) => state.basket);
     const [layout, setLayout] = useState('list');
     const [selectedItems, setSelectedItems] = useState([]);
     const [purchase, setPurcase] = useState([])
     const [products, setProducts] = useState([])
     const [visible, setVisible] = useState(false);
+    const [formDisabled, setFromDisabled] = useState(false);
 
     const createAddress = async (address) => {
         try {
@@ -168,9 +172,76 @@ const Payment = () => {
         }
     };
 
+    const updateProductsStock = async (products) => {
+        console.log(" aa  ",products);
+        try {
+            const headers = {
+                'Authorization': `Bearer ${token}`
+            };
+            const updateRequests = products.map(product => {
+                console.log("product",product);
+                try{
+                    const data = {
+                        _id: product._id,
+                        amount: 1
+                    };
+                    console.log(data);
+                    return axios.put("http://localhost:8000/api/air-conditioner/overhead/stock", data, { headers });
+                }
+                catch(e){
+                    alert("error")
+                }
+            });
+        
+                const responses = await Promise.all(updateRequests);
+            console.log(responses);
+
+            const updatedOverheads = responses
+                .filter(res => res.status === 200)
+                .map(res => res.data);
+            console.log(updatedOverheads);
+            if (updatedOverheads.length > 0) {
+                dispatch(setOverheads(overheads => {
+                    const existingMap = new Map(overheads.map(item => [item._id, item]));
+                    updatedOverheads.forEach(item => {
+                        existingMap.set(item._id, item); // מחליף אם כבר קיים
+                    });
+                    return Array.from(existingMap.values());
+                }));           
+             }    
+        } catch (error) {
+            if (error.response?.status === 400) {
+                alert("All details are required");
+            } else if (error.response?.status === 204) {
+                alert("The stock didn't change");
+            } 
+        }
+    };
+    const createDelivery =  async ()=> {
+        const details = {
+            address: address?address:newAddress,
+            purchase: purchase
+        }
+        try{
+            const headers = {
+                'Authorization': `Bearer ${token}`
+            };
+            const res = await axios.post("http://localhost:8000/api/delivery", details, { headers });
+            if(res.status === 201){
+                alert("the deleviry created in the system")
+                navigate('/')
+            }
+
+        }
+        catch(e){
+            if (e.response?.status === 400) {
+                alert("All details are required");
+            } 
+    }
+}
     const createPurchase = async (paymentType) => {
         setProducts(selectedItems)
-        console.log(selectedItems);
+        if(selectedItems){
         const purchase = {
             products: selectedItems,
             paymentType: paymentType
@@ -181,9 +252,13 @@ const Payment = () => {
             };
             const res = await axios.post("http://localhost:8000/api/user/purchase", purchase, { headers });
             if (res.status === 201) {
+                console.log("to the function");
+                updateProductsStock(selectedItems)
                 setPurcase(res.data);
                 alert("ההזמנה הושלמה")
-                console.log(res.data);
+                // setProducts([])
+                createDelivery()
+
             }
         } catch (error) {
             console.log(error);
@@ -191,6 +266,7 @@ const Payment = () => {
                 alert("Error");
             }
         }
+    }
     }
     const onSubmit = (data) => {
         createAddress(data)
@@ -217,9 +293,7 @@ const Payment = () => {
     };
 
     const listItem = (product, index) => {
-        // const isSelected = selectedItems?.includes(product?._id);
         const isSelected = selectedItems.some(item => item._id === product._id);
-
         const handleSelectionChange = (product) => {
             const isSelected = selectedItems.some(item => item._id === product._id);
             if (isSelected) {
@@ -228,7 +302,7 @@ const Payment = () => {
                 setSelectedItems([...selectedItems, product]);
             }
         };
-        if (product) {
+        if (product && product.stock > 0) {
             return (
 
                 <div className="col-12" key={product._id}>
@@ -270,27 +344,41 @@ const Payment = () => {
             </div>
         );
     };
+    const usingAddress = () => {
+        setFromDisabled(true)
+    }
     const existAddress = () => {
-        console.log("in func", address)
         return (
-            <Dialog
-                header="כתובת שמורה"
-                visible={visible}
-                style={{ width: '50vw' }}
-                onHide={() => setVisible(false)}
-            >
-                <div>
-                    <h6>עיר: {address.city}</h6>
-                    <h6>רחוב: {address.street} {address.building_num}</h6>
-                    <h6>דירה: {address.apartment_num}, קומה: {address.floor}</h6>
-                    <h6>מיקוד: {address.zip_code}</h6>
-                </div>
-                <Button >לשימוש בכתובת</Button>
-                <Button>ליצירת כתובת חדשה</Button>
-
-            </Dialog>
-
-        )
+            <div>
+                <Dialog
+                    header="כתובת שמורה"
+                    visible={visible}
+                    style={{ width: '50vw' }}
+                    onHide={() => setVisible(false)}
+                    modal
+                >
+                    <div>
+                        <h6>עיר: {address.city}</h6>
+                        <h6>רחוב: {address.street} {address.building_num}</h6>
+                        <h6>דירה: {address.apartment_num}, קומה: {address.floor}</h6>
+                        <h6>מיקוד: {address.zip_code}</h6>
+                    </div>
+                    <Button
+                        label="לשימוש בכתובת"
+                        onClick={() => {
+                            usingAddress();
+                            setVisible(false);
+                        }}
+                        className="p-button-success"
+                    />
+                    <Button
+                        label="ליצירת כתובת חדשה"
+                        onClick={() => setVisible(false)}
+                        className="p-button-secondary"
+                    />
+                </Dialog>
+            </div>
+        );
     }
     const getUserAddress = async (c) => {
         try {
@@ -300,13 +388,8 @@ const Payment = () => {
             const res = await axios.get(`http://localhost:8000/api/user/address/existAddress`, { headers })
             if (res.status === 200) {
                 setAddress(res.data[0])
-                console.log(address);
                 setVisible(true);
 
-                if (address) {
-                    console.log(address);
-                    existAddress()
-                }
             }
         }
         catch (e) {
@@ -318,15 +401,10 @@ const Payment = () => {
         getUserAddress()
     }, [])
 
-    useEffect(() => {
-        if (address) {
-            setShowAddress(existAddress());
-        }
-    }, [address]);
     return (
         <div style={{ paddingTop: '60px' }}>
 
-            {address ? showAddress : <></>}
+            {address ? existAddress() : <></>}
             <div>
                 {/* <div style={{ display: "flex", width: "100vw", height: "100vh", padding: "20px" }}> */}
                 {/* Left: Payment Square */}
@@ -353,7 +431,7 @@ const Payment = () => {
                 {/* </div> */}
                 <div style={{ width: "65%", marginLeft: "auto" }}>
                     <div className="form-demo">
-                        <Dialog visible={showMessage} onHide={() => setShowMessage(false)} position="top" footer={<Button label="Close" onClick={() => setShowMessage(false)} />} showHeader={false} breakpoints={{ '960px': '80vw' }} style={{ width: '40vw' }}>
+                        <Dialog visible={showMessage} onHide={() => setShowMessage(false)} position="top" footer={<Button label="Close" onClick={() => setShowMessage(false)} />} showHeader={false} breakpoints={{ '960px': '80vw' }} style={{ width: '40vw' }} disabled={formDisabled}>
                             <div className="flex justify-content-center flex-column pt-6 px-3">
                                 <i className="pi pi-check-circle" style={{ fontSize: '5rem', color: 'var(--green-500)' }}></i>
                                 <h5>Address Added Successfully!</h5>
@@ -366,7 +444,7 @@ const Payment = () => {
                                     <div className="field">
                                         <span className="p-float-label">
                                             <Controller name="country" control={control} defaultValue="ישראל" rules={{ required: 'Country is required.' }} render={({ field }) => (
-                                                <InputText id={field.name} {...field} />
+                                                <InputText id={field.name} {...field} disabled={formDisabled} />
                                             )} />
                                             <label htmlFor="country">*Country</label>
                                         </span>
@@ -376,7 +454,7 @@ const Payment = () => {
                                     <div className="field">
                                         <span className="p-float-label">
                                             <Controller name="city" control={control} rules={{ required: 'City is required.' }} render={({ field }) => (
-                                                <InputText id={field.name} {...field} />
+                                                <InputText id={field.name} {...field} disabled={formDisabled} />
                                             )} />
                                             <label htmlFor="city">*City</label>
                                         </span>
@@ -386,7 +464,7 @@ const Payment = () => {
                                     <div className="field">
                                         <span className="p-float-label">
                                             <Controller name="street" control={control} rules={{ required: 'Street is required.' }} render={({ field }) => (
-                                                <InputText id={field.name} {...field} />
+                                                <InputText id={field.name} {...field} disabled={formDisabled} />
                                             )} />
                                             <label htmlFor="street">*Street</label>
                                         </span>
@@ -396,7 +474,7 @@ const Payment = () => {
                                     <div className="field">
                                         <span className="p-float-label">
                                             <Controller name="building_num" control={control} rules={{ required: 'Building number is required.' }} render={({ field }) => (
-                                                <InputText id={field.name} type="number" {...field} />
+                                                <InputText id={field.name} type="number" {...field} disabled={formDisabled} />
                                             )} />
                                             <label htmlFor="building_num">*Building Number</label>
                                         </span>
@@ -406,7 +484,7 @@ const Payment = () => {
                                     <div className="field">
                                         <span className="p-float-label">
                                             <Controller name="apartment_num" control={control} rules={{ required: 'Apartment number is required.' }} render={({ field }) => (
-                                                <InputText id={field.name} type="number" {...field} />
+                                                <InputText id={field.name} type="number" {...field} disabled={formDisabled} />
                                             )} />
                                             <label htmlFor="apartment_num">*Apartment Number</label>
                                         </span>
@@ -416,7 +494,7 @@ const Payment = () => {
                                     <div className="field">
                                         <span className="p-float-label">
                                             <Controller name="floor" control={control} rules={{ required: 'Floor is required.' }} render={({ field }) => (
-                                                <InputText id={field.name} type="number" {...field} />
+                                                <InputText id={field.name} type="number" {...field} disabled={formDisabled} />
                                             )} />
                                             <label htmlFor="floor">*Floor</label>
                                         </span>
@@ -426,14 +504,14 @@ const Payment = () => {
                                     <div className="field">
                                         <span className="p-float-label">
                                             <Controller name="zip_code" control={control} rules={{ required: 'Zip code is required.' }} render={({ field }) => (
-                                                <InputText id={field.name} {...field} />
+                                                <InputText id={field.name} {...field} disabled={formDisabled} />
                                             )} />
                                             <label htmlFor="zip_code">*Zip Code</label>
                                         </span>
                                         {getFormErrorMessage('zip_code')}
                                     </div>
 
-                                    <Button type="submit" label="Add Address" className="mt-2" />
+                                    <Button type="submit" label="Add Address" className="mt-2" disabled={formDisabled} />
                                 </form>
                             </div>
                         </div>
