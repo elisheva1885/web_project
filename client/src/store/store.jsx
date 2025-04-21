@@ -8,7 +8,7 @@ import { combineReducers } from "@reduxjs/toolkit";
 import tokenSlice from "./tokenSlice";
 import overHeadsSlice from "./air-conditioner/overHeadsSlice";
 import basketSlice from "./basketSlice";
-import companySlice from "./companySlice";
+import companiesSlice from "./companySlice";
 import userDetailsSlice from "./userDetailsSlice";
 
 // חיבור הסלאייסים עם rootReducer
@@ -16,7 +16,7 @@ const rootReducer = combineReducers({
   token: tokenSlice,
   overheads: overHeadsSlice,
   basket: basketSlice,
-  company: companySlice,
+  companies: companiesSlice,
   userDetails: userDetailsSlice,
 });
 

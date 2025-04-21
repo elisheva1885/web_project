@@ -11,7 +11,7 @@ const Home = () => {
 
     const navigate = useNavigate();
     const {overheads} = useSelector((state) => state.overheads)
-    const {companies} = useSelector((state) => state.company)
+    const {companies} = useSelector((state) => state.companies)
     const {userDetails} = useSelector((state) => state.userDetails);
     const {basket} = useSelector((state) => state.basket);
     console.log("HomeBasket",basket);
@@ -87,6 +87,7 @@ const Home = () => {
         try{
             const res = await axios.get('http://localhost:8000/api/company')
             if(res.status === 200){
+                console.log("in getCompanies");
                 dispatch(setCompanies(res.data))
             }
         }

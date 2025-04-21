@@ -27,8 +27,8 @@ const minicenteralSchema = new mongoose.Schema({
         required:true
     },
     BTU_output: {
-        cool: { type: String },
-        heat: { type: String }
+        cool: { type: Number },
+        heat: { type: Number }
     },
     efficiency_factor: {//מקדם יעילות
         cool: { type: String },

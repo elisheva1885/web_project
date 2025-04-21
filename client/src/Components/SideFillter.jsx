@@ -1,16 +1,48 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { Sidebar } from 'primereact/sidebar';
 import { Button } from 'primereact/button';
 import { Avatar } from 'primereact/avatar';
-import { Ripple } from 'primereact/ripple';
-import { StyleClass } from 'primereact/styleclass';
+import { Slider } from 'primereact/slider';
+import { useSelector } from 'react-redux';
 
-const SideFillter = () => {
+const SideFilter = () => {
     const [visible, setVisible] = useState(true);
-    const btnRef1 = useRef(null);
-    const btnRef2 = useRef(null);
-    const btnRef3 = useRef(null);
-    const btnRef4 = useRef(null);
+
+    const [openSections, setOpenSections] = useState({
+        company: false,
+        shabbat: false,
+        wifi: false,
+        price: false,
+        btuHeating: false,
+        btuCooling: false,
+        energy: false,
+    });
+
+    const toggleSection = (key) => {
+        setOpenSections((prev) => ({
+            ...prev,
+            [key]: !prev[key],
+        }));
+    };
+
+    const [selectedOptions, setSelectedOptions] = useState([]);
+    const [shabbatMode, setShabbatMode] = useState(false);
+    const [wifi, setWifi] = useState(false);
+    const [priceRange, setPriceRange] = useState([100, 1000]);
+    const [btuHeating, setBtuHeating] = useState(9500);
+    const [btuCooling, setBtuCooling] = useState(9500);
+    const [energyRating, setEnergyRating] = useState('');
+
+    const { companies } = useSelector((state) => state.companies);
+    const options = companies.map(company => company.name);
+
+    const toggleOption = (option) => {
+        setSelectedOptions((prev) =>
+            prev.includes(option)
+                ? prev.filter((item) => item !== option)
+                : [...prev, option]
+        );
+    };
 
     return (
         <div className="card flex justify-content-center">
@@ -27,10 +59,7 @@ const SideFillter = () => {
                             <div className="flex flex-column h-full">
                                 <div className="flex align-items-center justify-content-between px-4 pt-3 flex-shrink-0">
                                     <span className="inline-flex align-items-center gap-2">
-                                        <svg width="35" height="35" viewBox="0 0 35 35" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            {/* הסימן */}
-                                        </svg>
-                                        <span className="font-semibold text-2xl text-primary">Your Logo</span>
+                                        <svg width="35" height="35" viewBox="0 0 35 35" fill="none" xmlns="http://www.w3.org/2000/svg" />
                                     </span>
                                     <span>
                                         <Button
@@ -41,28 +70,192 @@ const SideFillter = () => {
                                             rounded
                                             outlined
                                             className="h-2rem w-2rem"
-                                        ></Button>
+                                        />
                                     </span>
                                 </div>
-                                <div className="overflow-y-auto">
-                                    <ul className="list-none p-3 m-0">
-                                        {/* הפריטים בתוך ה-Sidebar */}
+
+                                <div className="overflow-y-auto px-3">
+                                    <ul className="list-none p-0 m-0">
+
+                                        {/* סינון לפי חברה */}
+                                        <li className="mb-4">
+                                            <button
+                                                onClick={() => toggleSection('company')}
+                                                className="w-full text-right font-medium text-lg text-primary hover:underline"
+                                            >
+                                                סינון לפי חברה
+                                            </button>
+                                            {openSections.company && (
+                                                <div className="mt-2 pl-2 text-right">
+                                                    {options.map((option) => (
+                                                        <label key={option} className="block mb-2">
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={selectedOptions.includes(option)}
+                                                                onChange={() => toggleOption(option)}
+                                                                className="ml-2"
+                                                            />
+                                                            {option}
+                                                        </label>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </li>
+
+                                        {/* מצב שבת */}
+                                        <li className="mb-4">
+                                            <button
+                                                onClick={() => toggleSection('shabbat')}
+                                                className="w-full text-right font-medium text-lg text-primary hover:underline"
+                                            >
+                                                מצב שבת
+                                            </button>
+                                            {openSections.shabbat && (
+                                                <div className="mt-2 pl-2 text-right">
+                                                    <label className="block mb-2">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={shabbatMode}
+                                                            onChange={(e) => setShabbatMode(e.target.checked)}
+                                                            className="ml-2"
+                                                        />
+                                                        מופעל
+                                                    </label>
+                                                </div>
+                                            )}
+                                        </li>
+
+                                        {/* WiFi */}
+                                        <li className="mb-4">
+                                            <button
+                                                onClick={() => toggleSection('wifi')}
+                                                className="w-full text-right font-medium text-lg text-primary hover:underline"
+                                            >
+                                                WiFi
+                                            </button>
+                                            {openSections.wifi && (
+                                                <div className="mt-2 pl-2 text-right">
+                                                    <label className="block mb-2">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={wifi}
+                                                            onChange={(e) => setWifi(e.target.checked)}
+                                                            className="ml-2"
+                                                        />
+                                                        קיים
+                                                    </label>
+                                                </div>
+                                            )}
+                                        </li>
+
+                                        {/* טווח מחיר */}
+                                        <li className="mb-4">
+                                            <button
+                                                onClick={() => toggleSection('price')}
+                                                className="w-full text-right font-medium text-lg text-primary hover:underline"
+                                            >
+                                                סינון לפי מחיר
+                                            </button>
+                                            {openSections.price && (
+                                                <div className="mt-2 text-right">
+                                                    <Slider
+                                                        value={priceRange}
+                                                        onChange={(e) => setPriceRange(e.value)}
+                                                        range
+                                                        min={0}
+                                                        max={2000}
+                                                        step={50}
+                                                    />
+                                                    <div className="mt-2 text-sm text-gray-700">
+                                                        ₪{priceRange[0]} - ₪{priceRange[1]}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </li>
+
+                                        {/* BTU חימום */}
+                                        <li className="mb-4">
+                                            <button
+                                                onClick={() => toggleSection('btuHeating')}
+                                                className="w-full text-right font-medium text-lg text-primary hover:underline"
+                                            >
+                                                BTU חימום (מ-)
+                                            </button>
+                                            {openSections.btuHeating && (
+                                                <div className="mt-2 text-right">
+                                                    <Slider
+                                                        value={btuHeating}
+                                                        onChange={(e) => setBtuHeating(e.value)}
+                                                        min={9500}
+                                                        max={40000}
+                                                        step={500}
+                                                    />
+                                                    <div className="mt-2 text-sm text-gray-700">מ־ {btuHeating} BTU</div>
+                                                </div>
+                                            )}
+                                        </li>
+
+                                        {/* BTU קירור */}
+                                        <li className="mb-4">
+                                            <button
+                                                onClick={() => toggleSection('btuCooling')}
+                                                className="w-full text-right font-medium text-lg text-primary hover:underline"
+                                            >
+                                                BTU קירור (מ-)
+                                            </button>
+                                            {openSections.btuCooling && (
+                                                <div className="mt-2 text-right">
+                                                    <Slider
+                                                        value={btuCooling}
+                                                        onChange={(e) => setBtuCooling(e.value)}
+                                                        min={9500}
+                                                        max={40000}
+                                                        step={500}
+                                                    />
+                                                    <div className="mt-2 text-sm text-gray-700">מ־ {btuCooling} BTU</div>
+                                                </div>
+                                            )}
+                                        </li>
+
+                                        {/* דירוג אנרגטי */}
+                                        <li className="mb-4">
+                                            <button
+                                                onClick={() => toggleSection('energy')}
+                                                className="w-full text-right font-medium text-lg text-primary hover:underline"
+                                            >
+                                                דירוג אנרגטי
+                                            </button>
+                                            {openSections.energy && (
+                                                <div className="mt-2 text-right">
+                                                    {['A', 'A+', 'A++'].map((rating) => (
+                                                        <label key={rating} className="block mb-2">
+                                                            <input
+                                                                type="radio"
+                                                                name="energyRating"
+                                                                value={rating}
+                                                                checked={energyRating === rating}
+                                                                onChange={() => setEnergyRating(rating)}
+                                                                className="ml-2"
+                                                            />
+                                                            {rating}
+                                                        </label>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </li>
                                     </ul>
                                 </div>
-                                <div className="mt-auto">
-                                    <hr className="mb-3 mx-3 border-top-1 border-none surface-border" />
-                                    <a className="m-3 flex align-items-center cursor-pointer p-3 gap-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
-                                        <Avatar image="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png" shape="circle" />
-                                        <span className="font-bold">Amy Elsner</span>
-                                    </a>
+
+                                <div className="mt-auto p-3">
+                                    <Button className="w-full" label="סנן תוצאות" />
                                 </div>
                             </div>
                         </div>
                     </div>
                 )}
-            ></Sidebar>
+            />
         </div>
     );
 };
 
-export default SideFillter;
+export default SideFilter;

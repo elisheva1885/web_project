@@ -27,8 +27,8 @@ const overheadSchema = new mongoose.Schema({
         required:true
     },
     BTU_output: {
-        cool: { type: String },
-        heat: { type: String }
+        cool: { type: Number },
+        heat: { type: Number }
     },
     energy_rating:{//דיורג אנרגטי
         cool: { type: String },
