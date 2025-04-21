@@ -133,12 +133,32 @@ const Navbar = () => {
                 <Route path='/basket/Payment' element={<Suspense fallback="Loading..."><Payment/></Suspense>}></Route>
             </Routes>
             <div className="flex align-items-center gap-2">
-                <Menubar model={items} start={start} end={end} style={{ position: 'fixed', top: 0 }} />
-                {hoverMenuVisible && (
-                    <div  onMouseEnter={() => setHoverMenuVisible(true)} onMouseLeave={() => setHoverMenuVisible(false)}>
-                        <MegaMenu model={acItems} orientation="vertical" breakpoint="960px" />
-                    </div>
-                )}
+                <div style={{ position: "relative" }}
+                    >
+
+                    <Menubar model={items} start={start} end={end} style={{ position: "fixed", top: 0, width: "100%", zIndex: 999 }} />
+
+                    {hoverMenuVisible && (
+                        <div
+                            onMouseEnter={() => setHoverMenuVisible(true)}
+                            onMouseLeave={() => setHoverMenuVisible(false)}
+                            style={{
+                                position: "fixed",
+                                top: "50px",  // Ensures it appears just below the navbar
+                                left: "22px", // Adjust this if necessary
+                                width: "auto", // Prevents it from taking full width
+                                minWidth: "80px", // Adjust based on the menu size
+                                zIndex: 1000,
+                                background: "white",
+                                boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+                                borderRadius: "4px",
+                                overflow: "visible"
+                            }}
+                        >
+                            <MegaMenu model={acItems} orientation="vertical" breakpoint="960px" />
+                        </div>
+                    )}
+                </div>
             </div>
             </div>
         </>
