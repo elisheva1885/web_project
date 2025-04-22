@@ -13,39 +13,35 @@ import { useDispatch, useSelector } from 'react-redux';
 import Add_AirConditioner from './Add_AirConditioner';
 import { setCompanies } from '../../store/companySlice'
 import { setBasket } from '../../store/basketSlice';
-import { setOverheads } from '../../store/air-conditioner/overHeadsSlice';
+import { setMiniCenterals } from '../../store/air-conditioner/MiniCenteralsSlice';
 import SideFillter from '../SideFillter';
-import UpdateOverhead from './updateOvearhead';
 
 
-const Overhead = lazy(() => import('./Overhead'));
+const MiniCenteral = lazy(() => import('./MiniCenteral'));
 
 
-const Overheads = () => {
+const MiniCenterals = () => {
 
     const {token} = useSelector((state) => state.token)
     // const {companies} = useSelector((state) => state.companies)
     const {basket} = useSelector((state) => state.basket)
     const {userDetails} = useSelector((state) => state.userDetails);
-
-    const {overheads}= useSelector((state) => state.overheads);
-    const [overheads2, setOverheads2] = useState([])
+    const {MiniCenterals}= useSelector((state) => state.MiniCenterals);
     const [value, setValue] = useState('')
     const [shoppingBags, setShoppingBags] = useState([])
     const [registered, setRegistered] = useState(false);
-
     const [layout, setLayout] = useState('grid');
     const navigate = useNavigate();
     const dispatch = useDispatch();
    
 
     
-    const goToAddOverhead = (type) => {
+    const goToAddMiniCenteral = (type) => {
         const navigationData = {
             type: type,
             // You can add any other data you may want to send
         };
-        navigate('/overheads/add', { state: navigationData });
+        navigate('/MiniCenterals/add', { state: navigationData });
     };
 
     const addToBasket = async(product) => {
@@ -54,7 +50,7 @@ const Overheads = () => {
         alert("shoping")
         const shoppingBagDetails = {
             product_id  : product._id,
-            type : "overhead"
+            type : "MiniCenteral"
         }
         try {
             const headers = {
@@ -62,7 +58,7 @@ const Overheads = () => {
             }
             const res = await axios.post('http://localhost:8000/api/user/shoppingBag', shoppingBagDetails, {headers},)
             if (res.status === 200) {
-                alert("im here")
+                alert("in here")
                 dispatch(setBasket(basket.push(res.data)))
                 console.log("res.data",res.data);
                 console.log("useState",shoppingBags);
@@ -99,16 +95,16 @@ const Overheads = () => {
         })
     }
 
-    // const getOverheads = async () => {
+    // const getMiniCenterals = async () => {
     //     try {
     //         const headers = {
     //             'Authorization': `Bearer ${token}`
     //         }
     //         console.log(headers);
-    //         const res = await axios.get('http://localhost:8000/api/air-conditioner/overhead',{headers})
+    //         const res = await axios.get('http://localhost:8000/api/air-conditioner/MiniCenteral',{headers})
     //         if (res.status === 200) {
     //             sortData(res.data)
-    //             setOverheads(res.data)
+    //             setMiniCenterals(res.data)
     //         }
     //     }
     //     catch (e) {
@@ -116,12 +112,12 @@ const Overheads = () => {
     //     }
     // }
 
-    const getOverheadByTitle = async (c) => {
+    const getMiniCenteralByTitle = async (c) => {
         try {
             setValue(c.target.value)
-            const res = await axios.get(`http://localhost:8000/api/air-conditioner/overhead/${c.target.value}`)
+            const res = await axios.get(`http://localhost:8000/api/air-conditioner/MiniCenteral/${c.target.value}`)
             if (res.status === 200) {
-                dispatch(setOverheads(res.data))
+                dispatch(setMiniCenterals(res.data))
             }
         }
         catch (e) {
@@ -167,8 +163,8 @@ const Overheads = () => {
     //                     <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`${product.imagepath}`} />
     //                     <div className="flex flex-column sm:flex-row justify-content-between align-items-center xl:align-items-start flex-1 gap-4">
     //                         <div className="flex flex-column align-items-center sm:align-items-start gap-3">
-    //                             {/* <Link to={{pathName:`/overheads/${product.title}` , state: {product:product} }}><div className="text-2xl font-bold text-900" style={{}} >{product.title}</div></Link> */}
-    //                             <Link to={`/overheads/overhead/${product._id}` } params={{ product: product }}><div className="text-2xl font-bold text-900" style={{}} >{product.title}</div></Link>
+    //                             {/* <Link to={{pathName:`/MiniCenterals/${product.title}` , state: {product:product} }}><div className="text-2xl font-bold text-900" style={{}} >{product.title}</div></Link> */}
+    //                             <Link to={`/MiniCenterals/MiniCenteral/${product._id}` } params={{ product: product }}><div className="text-2xl font-bold text-900" style={{}} >{product.title}</div></Link>
     //                             <p>{product.imagepath}</p>
     //                             <div className="flex align-items-center gap-3">
     //                                 <Tag value={getSeverityText(product)} severity={getSeverity(product.stock)}></Tag>
@@ -193,7 +189,7 @@ const Overheads = () => {
     //                 <div className="flex flex-wrap align-items-center justify-content-between gap-2">
     //                     {/* <img className="w-9 shadow-2 border-round" src={`${product.company.imagePath}`} /> */}
     //                     <div className="flex align-items-center gap-2">
-    //                         <Link to={"/overheads/overhead"}><div className="text-2xl font-bold text-900" style={{}}>{product.title}</div></Link>
+    //                         <Link to={"/MiniCenterals/MiniCenteral"}><div className="text-2xl font-bold text-900" style={{}}>{product.title}</div></Link>
     //                     </div>
     //                 </div>
     //                 <div className="flex flex-column align-items-center gap-3 py-5">
@@ -213,8 +209,8 @@ const Overheads = () => {
     //             <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`${product.imagepath}`} />
     //             <div className="flex flex-column sm:flex-row justify-content-between align-items-center xl:align-items-start flex-1 gap-4">
     //                 <div className="flex flex-column align-items-center sm:align-items-start gap-3">
-    //                     {/* <Link to={{pathName:`/overheads/${product.title}` , state: {product:product} }}><div className="text-2xl font-bold text-900" style={{}} >{product.title}</div></Link> */}
-    //                     <Link to={`/overheads/overhead/${product._id}` } params={{ product: product }}><div className="text-2xl font-bold text-900" style={{}} >{product.title}</div></Link>
+    //                     {/* <Link to={{pathName:`/MiniCenterals/${product.title}` , state: {product:product} }}><div className="text-2xl font-bold text-900" style={{}} >{product.title}</div></Link> */}
+    //                     <Link to={`/MiniCenterals/MiniCenteral/${product._id}` } params={{ product: product }}><div className="text-2xl font-bold text-900" style={{}} >{product.title}</div></Link>
     //                     <p>{product.imagepath}</p>
     //                     <div className="flex align-items-center gap-3">
     //                         <Tag value={getSeverityText(product)} severity={getSeverity(product.stock)}></Tag>
@@ -244,20 +240,19 @@ const Overheads = () => {
     
                     {/* תמונת המוצר - גדולה ורחבה */}
                     <img
-                        src={`overheads/${product.imagepath}`}
+                        src={`MiniCenterals/${product.imagepath}`}
                         alt={product.title}
                         className="w-full h-12rem object-contain border-round"
                     />
     
                     {/* פרטי המוצר */}
                     <div className="flex flex-column align-items-center text-center gap-2">
-                        <Link to={`/overheads/overhead/${product._id}`}>
+                        <Link to={`/MiniCenterals/MiniCenteral/${product._id}`}>
                             <div className="text-xl font-bold text-900">{product.title}</div>
                         </Link>
     
                         <Tag value={getSeverityText(product)} severity={getSeverity(product.stock)} />
                         <span className="text-lg font-medium text-primary">₪{product.price}</span>
-                        {userDetails?.role==='official'|| userDetails?.role==='admin' ?<Button onClick={()=>UpdateOverhead(product)}><i className="pi pi-pencil" style={{ fontSize: '1rem' }}></i></Button>: <></>}
                     </div>                      
                     <Button
                         label="הוספה לעגלה"
@@ -281,10 +276,10 @@ const Overheads = () => {
     };
 
     const listTemplate = (products, layout) => {
-        if (!Array.isArray(overheads) || overheads.length === 0) {
-            return <h1>No overheads available</h1>; // Fallback UI          
+        if (!Array.isArray(MiniCenterals) || MiniCenterals.length === 0) {
+            return <h1>No MiniCenterals available</h1>; // Fallback UI          
             }
-        return <div className="grid grid-nogutter">{overheads.map((product, index) => itemTemplate(product, layout, index))}</div>;
+        return <div className="grid grid-nogutter">{MiniCenterals.map((product, index) => itemTemplate(product, layout, index))}</div>;
     };
 
     // const header = () => {
@@ -307,20 +302,20 @@ const Overheads = () => {
 
     return (
         <>
-            {userDetails.role === 'admin'?<Button onClick={ ()=>goToAddOverhead("Overhead")}>add overhead</Button>: <></> }
-            {/* {<Button onClick={ ()=>goToAddOverhead("Overhead")}>add overhead</Button>} */}
+            {userDetails.role === 'admin'?<Button onClick={ ()=>goToAddMiniCenteral("MiniCenteral")}>add MiniCenteral</Button>: <></> }
+            {/* {<Button onClick={ ()=>goToAddMiniCenteral("MiniCenteral")}>add MiniCenteral</Button>} */}
             <div className="card">
                 <div className="flex justify-content-end">
                     <IconField iconPosition="left">
                         <InputIcon className="pi pi-search" />
-                        <InputText placeholder="Search by name" onChange={(c) => getOverheadByTitle(c)} value={value} />
+                        <InputText placeholder="Search by name" onChange={(c) => getMiniCenteralByTitle(c)} value={value} />
                     </IconField>
                 </div>
-                <DataView value={overheads} listTemplate={listTemplate} layout={layout}/>
+                <DataView value={MiniCenterals} listTemplate={listTemplate} layout={layout}/>
             </div>
             <SideFillter/>
         </>
     )
 }
 
-export default Overheads
+export default MiniCenterals

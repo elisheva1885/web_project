@@ -1,0 +1,15 @@
+const express = require("express")
+const router = express.Router()
+const MiniCenteralController = require("../controllers/MiniCenteralController")
+const adminVerify = require("../middleware/adminVerify")
+const officialVerify = require("../middleware/officialVerify")
+const verifyJWT = require("../middleware/verifyJWT")
+router.post("/",MiniCenteralController.createMiniCenteral)
+router.get("/",MiniCenteralController.readMiniCenterals)
+router.get("/overhead/:_id",MiniCenteralController.readMiniCenteralById)
+router.get("/:title",MiniCenteralController.readMiniCenteralsByTitle)
+router.put("/", MiniCenteralController.updateMiniCenteral)
+router.put("/stock",verifyJWT, MiniCenteralController.updatMiniCenteralStock)
+router.delete("/", MiniCenteralController.deleteMiniCenteral)
+
+module.exports = router
