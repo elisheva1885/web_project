@@ -19,6 +19,7 @@ const UpdateBranch = lazy(() => import('./UpdateBranch'));
 const AddBranch = lazy(() => import('./AddBranch'));
 const Admin = lazy(() => import('./Admin'));
 const UserAccont = lazy(() => import('./UserAccont'));
+const UpdateOverheadAC = lazy(() => import('./air-conditioners/updateOvearhead'));
 
 const Navbar = () => {
 
@@ -123,6 +124,7 @@ const Navbar = () => {
                 <Route path='/about' element={<Suspense fallback="Loading..."><About /></Suspense>}></Route>
                 <Route path='/overheads' element={<Suspense fallback="Loading..."><Overheads /></Suspense>}>        </Route>
                 <Route path={`/overheads/overhead/:product`} element={<Suspense fallback="Loading..."><Overhead /></Suspense>}></Route>
+                <Route path='/overheads/overhead/update' element={<Suspense fallback="Loading..."><UpdateOverheadAC/></Suspense>}></Route>
                 <Route path='/login' element={<Suspense fallback="Loading..."><Login /></Suspense>}></Route>
                 <Route path='/register' element={<Suspense fallback="Loading..."><Register /></Suspense>}></Route>
                 <Route path='/overheads/add' element={<Suspense fallback="Loading..."><Add_AirConditioner /></Suspense>}></Route>
