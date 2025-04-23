@@ -230,6 +230,17 @@ const Overheads = () => {
     //     </>
     //     );
     // };
+
+    const UpdateOverhead = async (o) => {
+        const navigationData = {
+            type: o,
+            // You can add any other data you may want to send
+        };
+        console.log(o);
+        navigate('/overheads/overhead/update' , { state: navigationData })
+       // dispatch(setOverheads(res.data))
+    }
+
     const gridItem = (product) => {
         return (
             <div className="col-12 sm:col-6 lg:col-3 p-3" key={product._id}>
