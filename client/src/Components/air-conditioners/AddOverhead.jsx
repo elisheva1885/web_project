@@ -9,12 +9,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Dropdown } from 'primereact/dropdown';
 
 
-const AddOverheadForm = () => {
+const AddOverhead = () => {
     const { control, handleSubmit, formState: { errors } } = useForm();
     const [showMessage, setShowMessage] = useState(false);
     const [formData, setFormData] = useState({});
     // const {companies} = useSelector((state) => state.companies)
-    const {companies} = useSelector((state) => state.company)
+    const {companies} = useSelector((state) => state.companies)
 
     const onSubmit = async (data) => {
         console.log(data);
@@ -32,7 +32,6 @@ const AddOverheadForm = () => {
     };
 
     return (
-        
         <div className="form-demo">
             <Dialog visible={showMessage} onHide={() => setShowMessage(false)} position="top" footer={<Button label="Close" onClick={() => setShowMessage(false)} />} showHeader={false} breakpoints={{ '960px': '80vw' }} style={{ width: '40vw' }}>
                 <div className="flex justify-content-center flex-column pt-6 px-3">
@@ -353,6 +352,6 @@ const AddOverheadForm = () => {
     );
 };
 
-export default AddOverheadForm;
+export default AddOverhead;
 
 

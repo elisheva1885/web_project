@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Menubar } from 'primereact/menubar';
 import { Suspense, lazy } from 'react'
 import { Route, Routes, Link, Router } from 'react-router-dom';
-import Add_AirConditioner from './air-conditioners/Add_AirConditioner';
 import { useSelector } from 'react-redux';
 import { MegaMenu } from 'primereact/megamenu';
 import AdminRegister from './AdminRegister';
@@ -19,6 +18,8 @@ const UpdateBranch = lazy(() => import('./UpdateBranch'));
 const AddBranch = lazy(() => import('./AddBranch'));
 const Admin = lazy(() => import('./Admin'));
 const UserAccont = lazy(() => import('./UserAccont'));
+const MiniCenterals = lazy(() => import('./air-conditioners/MiniCentrals'));
+const Add_AirConditioner = lazy(() => import('./air-conditioners/Add_AirConditioner'));
 
 const Navbar = () => {
 
@@ -122,10 +123,12 @@ const Navbar = () => {
                 <Route path='/branch/update' element={<Suspense fallback="Loading..."><UpdateBranch/></Suspense>}></Route>
                 <Route path='/about' element={<Suspense fallback="Loading..."><About /></Suspense>}></Route>
                 <Route path='/overheads' element={<Suspense fallback="Loading..."><Overheads /></Suspense>}>        </Route>
+                <Route path='/miniCenterals' element={<Suspense fallback="Loading..."><MiniCenterals /></Suspense>}>        </Route>
                 <Route path={`/overheads/overhead/:product`} element={<Suspense fallback="Loading..."><Overhead /></Suspense>}></Route>
+                <Route path={`/miniCenterals/miniCenteral/:product`} element={<Suspense fallback="Loading..."><Overhead /></Suspense>}></Route>
                 <Route path='/login' element={<Suspense fallback="Loading..."><Login /></Suspense>}></Route>
                 <Route path='/register' element={<Suspense fallback="Loading..."><Register /></Suspense>}></Route>
-                <Route path='/overheads/add' element={<Suspense fallback="Loading..."><Add_AirConditioner /></Suspense>}></Route>
+                <Route path='/air_conditioner/add' element={<Suspense fallback="Loading..."><Add_AirConditioner/></Suspense>}></Route>
                 <Route path='/basket' element={<Suspense fallback="Loading..."><Basket /></Suspense>}></Route>
                 <Route path='/admin' element={<Suspense fallback="Loading..."><Admin/></Suspense>}></Route>
                 <Route path='/userAccount' element={<Suspense fallback="Loading..."><UserAccont/></Suspense>}></Route>

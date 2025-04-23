@@ -45,7 +45,7 @@ const Overheads = () => {
             type: type,
             // You can add any other data you may want to send
         };
-        navigate('/overheads/add', { state: navigationData });
+        navigate('/air_conditioner/add', { state: navigationData });
     };
 
     const addToBasket = async(product) => {

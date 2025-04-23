@@ -10,6 +10,7 @@ import overHeadsSlice from "./air-conditioner/overHeadsSlice";
 import basketSlice from "./basketSlice";
 import companiesSlice from "./companySlice";
 import userDetailsSlice from "./userDetailsSlice";
+import miniCenteralSlice from "./air-conditioner/miniCenteralsSlice";
 
 // חיבור הסלאייסים עם rootReducer
 const rootReducer = combineReducers({
@@ -18,6 +19,7 @@ const rootReducer = combineReducers({
   basket: basketSlice,
   companies: companiesSlice,
   userDetails: userDetailsSlice,
+  miniCenterals: miniCenteralSlice
 });
 
 // הגדרת persist

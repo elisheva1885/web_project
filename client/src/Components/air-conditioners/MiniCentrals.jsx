@@ -11,13 +11,10 @@ import { InputIcon } from 'primereact/inputicon';
 import { getToken } from '../../store/tokenSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import Add_AirConditioner from './Add_AirConditioner';
-import { setCompanies } from '../../store/companySlice'
 import { setBasket } from '../../store/basketSlice';
-import { setMiniCenterals } from '../../store/air-conditioner/MiniCenteralsSlice';
+import { setMiniCenterals } from '../../store/air-conditioner/miniCenteralsSlice'
 import SideFillter from '../SideFillter';
 
-
-const MiniCenteral = lazy(() => import('./MiniCenteral'));
 
 
 const MiniCenterals = () => {
@@ -26,22 +23,21 @@ const MiniCenterals = () => {
     // const {companies} = useSelector((state) => state.companies)
     const {basket} = useSelector((state) => state.basket)
     const {userDetails} = useSelector((state) => state.userDetails);
-    const {MiniCenterals}= useSelector((state) => state.MiniCenterals);
+    const {miniCenterals}= useSelector((state) => state.miniCenterals);
     const [value, setValue] = useState('')
     const [shoppingBags, setShoppingBags] = useState([])
     const [registered, setRegistered] = useState(false);
     const [layout, setLayout] = useState('grid');
     const navigate = useNavigate();
     const dispatch = useDispatch();
-   
-
+    console.log(miniCenterals);
     
     const goToAddMiniCenteral = (type) => {
         const navigationData = {
             type: type,
             // You can add any other data you may want to send
         };
-        navigate('/MiniCenterals/add', { state: navigationData });
+        navigate('/air_conditioner/add', { state: navigationData });
     };
 
     const addToBasket = async(product) => {
@@ -240,14 +236,14 @@ const MiniCenterals = () => {
     
                     {/* תמונת המוצר - גדולה ורחבה */}
                     <img
-                        src={`MiniCenterals/${product.imagepath}`}
+                        src={`miniCenterals/${product.imagepath}`}
                         alt={product.title}
                         className="w-full h-12rem object-contain border-round"
                     />
     
                     {/* פרטי המוצר */}
                     <div className="flex flex-column align-items-center text-center gap-2">
-                        <Link to={`/MiniCenterals/MiniCenteral/${product._id}`}>
+                        <Link to={`/miniCenterals/miniCenteral/${product._id}`}>
                             <div className="text-xl font-bold text-900">{product.title}</div>
                         </Link>
     
@@ -276,10 +272,10 @@ const MiniCenterals = () => {
     };
 
     const listTemplate = (products, layout) => {
-        if (!Array.isArray(MiniCenterals) || MiniCenterals.length === 0) {
+        if (!Array.isArray(miniCenterals) || miniCenterals.length === 0) {
             return <h1>No MiniCenterals available</h1>; // Fallback UI          
             }
-        return <div className="grid grid-nogutter">{MiniCenterals.map((product, index) => itemTemplate(product, layout, index))}</div>;
+        return <div className="grid grid-nogutter">{miniCenterals.map((product, index) => itemTemplate(product, layout, index))}</div>;
     };
 
     // const header = () => {
@@ -292,9 +288,7 @@ const MiniCenterals = () => {
     // };
 
 
-    useEffect(() => {
-        // getCompanies()
-        
+    useEffect(() => {   
         if(token){
             setRegistered(true)
         }
@@ -311,7 +305,7 @@ const MiniCenterals = () => {
                         <InputText placeholder="Search by name" onChange={(c) => getMiniCenteralByTitle(c)} value={value} />
                     </IconField>
                 </div>
-                <DataView value={MiniCenterals} listTemplate={listTemplate} layout={layout}/>
+                <DataView value={miniCenterals} listTemplate={listTemplate} layout={layout}/>
             </div>
             <SideFillter/>
         </>

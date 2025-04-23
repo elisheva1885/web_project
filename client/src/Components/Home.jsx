@@ -5,12 +5,15 @@ import styles from '../home.module.css'
 import { useDispatch, useSelector } from 'react-redux';
 import { setOverheads } from '../store/air-conditioner/overHeadsSlice';
 import { setCompanies } from '../store/companySlice';
+import { setMiniCenterals } from '../store/air-conditioner/miniCenteralsSlice';
 
 
 const Home = () => {
 
     const navigate = useNavigate();
     const {overheads} = useSelector((state) => state.overheads)
+    const {miniCenterals} = useSelector((state) => state.miniCenterals)
+
     const {companies} = useSelector((state) => state.companies)
     const {userDetails} = useSelector((state) => state.userDetails);
     const {basket} = useSelector((state) => state.basket);
@@ -51,7 +54,7 @@ const Home = () => {
                         <div key={ac.id} className="flex justify-center items-center p-4">
                             <div className={styles.cardContainer}
                                 style={{ backgroundImage: `url(${ac.imageUrl})` }}
-                                onClick={() => goToACDetail(1)}>
+                                onClick={() => goToACDetail(ac.id)}>
                                 <div className={styles.imageOverlay}></div> {/* Overlay for background effect */}
                                 <div className={styles.cardContent}>
                                     <div className="text-2xl font-bold">
@@ -83,6 +86,24 @@ const Home = () => {
         }
     }
 
+    const getMiniCenterals = async () => {
+        try {
+            // const headers = {
+            //     'Authorization': `Bearer ${token}`
+            // }
+            // const res = await axios.get('http://localhost:8000/api/air-conditioner/overhead',{headers})
+            const res = await axios.get('http://localhost:8000/api/air-conditioner/miniCenteral')
+            if (res.status === 200) {
+                dispatch(setMiniCenterals(res.data));
+                console.log(miniCenterals);
+            }
+        }
+        catch (e) {
+            console.error(e)
+        }
+    }
+
+
     const getCompanies = async()=>{
         try{
             const res = await axios.get('http://localhost:8000/api/company')
@@ -99,6 +120,7 @@ const Home = () => {
     useEffect(() => {
         getOverheads()
         getCompanies()
+        getMiniCenterals()
     }, [])
 
     return (
