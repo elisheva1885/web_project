@@ -1,0 +1,83 @@
+.product-details-card {
+    padding: 1rem;
+    background-color: white;
+    color: #495057;
+  }
+  
+  @media (min-width: 768px) {
+    .product-details-card {
+      padding: 1.5rem;
+    }
+  }
+  
+  @media (min-width: 992px) {
+    .product-details-card {
+      padding: 2rem;
+    }
+  }
+  
+  .text-primary {
+    color: #007bff; /* Example primary color */
+  }
+  
+  .text-green-700 {
+    color: #198754; /* Example green color */
+  }
+  
+  .p-steps {
+    overflow: hidden;
+    position: relative;
+  }
+  
+  .p-steps-items {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    display: flex;
+    justify-content: flex-end; /* Right-align the steps */
+  }
+  
+  .p-steps-item {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    flex: 1 1 auto;
+  }
+  
+  .p-steps-item.p-highlight .p-steps-number {
+    background-color: #007bff;
+    color: #ffffff;
+  }
+  
+  .p-steps-item .p-steps-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    border-radius: 50%;
+    width: 2rem;
+    height: 2rem;
+    background-color: #ced4da;
+    color: #495057;
+    margin-left: 0.5rem; /* Space to the left */
+  }
+  
+  .p-steps-item .p-steps-title {
+    font-size: 0.875rem;
+    white-space: nowrap;
+  }
+  
+  .p-steps-item:not(:first-child)::before {
+    content: '';
+    position: absolute;
+    top: 1rem;
+    right: 50%;
+    left: -50%;
+    height: 2px;
+    background-color: #ced4da;
+    z-index: 1;
+  }
+  
+  .p-steps-item.p-highlight:not(:first-child)::before {
+    background-color: #007bff;
+  }

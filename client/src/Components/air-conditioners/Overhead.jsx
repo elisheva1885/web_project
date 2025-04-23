@@ -218,117 +218,292 @@
 
 // export default Overhead;
 
-
-
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
 import { Stepper } from 'primereact/stepper';
 import { StepperPanel } from 'primereact/stepperpanel';
-import { Button } from 'primereact/button';
-import { Divider } from 'primereact/divider';
+import 'primereact/resources/themes/lara-light-indigo/theme.css'; // Or your preferred theme
+import 'primereact/resources/primereact.min.css';
+import 'primeicons/primeicons.css';
 
 const Overhead = () => {
-    const { product } = useParams();
-    const stepperRef = useRef(null);
-    const [overhead, setOverhead] = useState(null);
+  const { product: productId } = useParams();
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const stepperRef = useRef(null);
 
-    const getOverheadById = async (_id) => {
-        try {
-            const res = await axios.get(`http://localhost:8000/api/air-conditioner/overhead/overhead/${_id}`);
-            if (res.status === 200) {
-                setOverhead(res.data);
-            }
-        } catch (e) {
-            console.error(e);
+  useEffect(() => {
+    const getOverhead = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await fetch(`http://localhost:8000/api/air-conditioner/overhead/overhead/${productId}`);
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
         }
+        const data = await res.json();
+        setProduct(data);
+      } catch (e) {
+        setError(e.message);
+      } finally {
+        setLoading(false);
+      }
     };
-    
 
-    useEffect(() => {
-        getOverheadById(product);
-    }, [product]);
+    getOverhead();
+  }, [productId]);
 
-    if (!overhead) return <p>Loading...</p>;
+  if (loading) {
+    return <p style={styles.loading}>טוען פרטי מוצר...</p>;
+  }
 
-    return (
-        <div className="p-4 md:p-6 lg:p-8 bg-white surface-card text-gray-800">
-            <div className="grid md:grid-cols-2 gap-6">
-                <div className="flex flex-col items-center md:items-start gap-4">
-                    <img className="w-full max-w-md rounded-xl shadow-2" src={`/overheads/${overhead.imagepath}`} alt="product" />
-                    <img className="w-28" src={`/${overhead.company?.imagePath}`} alt="brand" />
-                </div>
+  if (error) {
+    return <p style={styles.error}>שגיאה בטעינת המוצר: {error}</p>;
+  }
 
-                <div className="flex flex-col gap-3">
-                    <h1 className="text-3xl font-bold text-primary">{overhead.title}</h1>
-                    <p className="text-lg text-gray-600">{overhead.describe}</p>
-                    <Divider />
-                    <div className="flex items-center gap-2">
-                        <img src="/BTU_cool.png" alt="cool" className="w-6 h-6" />
-                        <img src="/BTU_heat.png" alt="heat" className="w-6 h-6" />
-                    </div>
-                    <h2 className="text-2xl font-semibold text-green-700">₪{overhead.price}</h2>
+  if (!product) {
+    return null;
+  }
 
-                    <Button label="הוספה לסל" icon="pi pi-shopping-cart" className="w-fit mt-4" severity="primary" />
-                </div>
+  return (
+    <div style={styles.container}>
+      <div style={styles.imageContainer}>
+        <img src={`/overheads/${product.imagepath}`} alt={product.title} style={styles.productImage} />
+        {product.company?.imagePath && (
+          <img src={`/${product.company.imagePath}`} alt={product.company.name} style={styles.companyImage} />
+        )}
+      </div>
+
+      <div style={styles.detailsContainer}>
+        <h1 style={styles.title}>{product.title}</h1>
+        <p style={styles.description}>{product.describe}</p>
+        <div style={styles.featuresRow}>
+          {product.BTU_output?.cool && (
+            <div style={styles.featureItem}>
+              <img src="/BTU_cool.png" alt="cool" style={styles.featureIcon} />
+              <span>{product.BTU_output.cool}</span>
+              <span style={styles.featureUnit}>BTU</span>
             </div>
-
-            <Divider className="my-6" />
-
-            <div className="card">
-                <Stepper ref={stepperRef} style={{ direction: 'rtl' }}>
-                    <StepperPanel header="תפוקה ונתונים טכניים">
-                        <table className="w-full text-right border-collapse">
-                            <tbody>
-                                <Row label="תפוקת קירור (BTU)" value={overhead.BTU_output?.cool} />
-                                <Row label="תפוקת חימום (BTU)" value={overhead.BTU_output?.heat} />
-                                <Row label="דירוג אנרגטי קירור" value={overhead.energy_rating?.cool} />
-                                <Row label="דירוג אנרגטי חימום" value={overhead.energy_rating?.heat} />
-                                <Row label="זרם עבודה קירור" value={overhead.working_current?.cool} />
-                                <Row label="זרם עבודה חימום" value={overhead.working_current?.heat} />
-                                <Row label="קוטר חיבור צנרת א" value={overhead.pipe_connection?.a} />
-                                <Row label="קוטר חיבור צנרת ב" value={overhead.pipe_connection?.b} />
-                                <Row label="מידות פנימיות" value={`${overhead.in_size?.width} x ${overhead.in_size?.depth} x ${overhead.in_size?.height}`} />
-                                <Row label="מידות חיצוניות" value={`${overhead.out_size?.width} x ${overhead.out_size?.depth} x ${overhead.out_size?.height}`} />
-                                <Row label="זרימת אוויר" value={overhead.air_flow} />
-                            </tbody>
-                        </table>
-                    </StepperPanel>
-
-                    <StepperPanel header="מאפיינים">
-                        <table className="w-full text-right border-collapse">
-                            <tbody>
-                                <Feature label="מצב שקט" value={overhead.quiet} />
-                                <Feature label="WiFi" value={overhead.wifi} />
-                                <Feature label="מהירויות" value={overhead.speeds} isBoolean={false} />
-                                <Feature label="תלת מימד" value={overhead.air4d} />
-                                <Feature label="מצב לילה" value={overhead.night_mode} />
-                                <Feature label="טיימר" value={overhead.timer} />
-                                <Feature label="פיקוד שבת" value={overhead.sabbath_command} />
-                                <Feature label="הדלקה וכיבוי אוטומטיים" value={overhead.onof_auto} />
-                            </tbody>
-                        </table>
-                    </StepperPanel>
-                </Stepper>
+          )}
+          {product.BTU_output?.heat && (
+            <div style={styles.featureItem}>
+              <img src="/BTU_heat.png" alt="heat" style={styles.featureIcon} />
+              <span>{product.BTU_output.heat}</span>
+              <span style={styles.featureUnit}>BTU</span>
             </div>
+          )}
+          {product.energy_rating?.cool && (
+            <div style={styles.featureItem}>
+              <span style={styles.energyRating}>{product.energy_rating.cool}</span>
+              <span>דירוג אנרגיה קירור</span>
+            </div>
+          )}
+          {product.energy_rating?.heat && (
+            <div style={styles.featureItem}>
+              <span style={styles.energyRating}>{product.energy_rating.heat}</span>
+              <span>דירוג אנרגיה חימום</span>
+            </div>
+          )}
         </div>
-    );
+        <h2 style={styles.price}>₪{product.price}</h2>
+        <button style={styles.addToCartButton}>הוספה לסל</button>
+      </div>
+
+      {/* Stepper for Tables */}
+      <div style={styles.stepperContainer}>
+        <Stepper ref={stepperRef} style={{ direction: 'rtl' }} activeIndex={0}>
+          <StepperPanel header="תפוקה ונתונים טכניים">
+            <table style={{ ...styles.table, direction: 'rtl' }}>
+              <tbody>
+                <TableRow label="תפוקת קירור (BTU)" value={product.BTU_output?.cool} />
+                <TableRow label="תפוקת חימום (BTU)" value={product.BTU_output?.heat} />
+                <TableRow label="דירוג אנרגטי קירור" value={product.energy_rating?.cool} />
+                <TableRow label="דירוג אנרגטי חימום" value={product.energy_rating?.heat} />
+                <TableRow label="זרם עבודה קירור" value={product.working_current?.cool} />
+                <TableRow label="זרם עבודה חימום" value={product.working_current?.heat} />
+                <TableRow label="קוטר חיבור צנרת א" value={product.pipe_connection?.a} />
+                <TableRow label="קוטר חיבור צנרת ב" value={product.pipe_connection?.b} />
+                <TableRow label="מידות פנימיות" value={`${product.in_size?.width} x ${product.in_size?.depth} x ${product.in_size?.height}`} />
+                <TableRow label="מידות חיצוניות" value={`${product.out_size?.width} x ${product.out_size?.depth} x ${product.out_size?.height}`} />
+                <TableRow label="זרימת אוויר" value={product.air_flow} />
+              </tbody>
+            </table>
+          </StepperPanel>
+          <StepperPanel header="מאפיינים">
+            <table style={{ ...styles.table, direction: 'rtl' }}>
+              <tbody>
+                <FeatureRow label="מצב שקט" value={product.quiet} />
+                <FeatureRow label="WiFi" value={product.wifi} />
+                <FeatureRow label="מהירויות" value={product.speeds} isBoolean={false} />
+                <FeatureRow label="תלת מימד" value={product.air4d} />
+                <FeatureRow label="מצב לילה" value={product.night_mode} />
+                <FeatureRow label="טיימר" value={product.timer} />
+                <FeatureRow label="פיקוד שבת" value={product.sabbath_command} />
+                <FeatureRow label="הדלקה וכיבוי אוטומטיים" value={product.onof_auto} />
+              </tbody>
+            </table>
+          </StepperPanel>
+        </Stepper>
+      </div>
+    </div>
+  );
 };
 
-const Row = ({ label, value }) => (
-    <tr className="border-b">
-        <td className="p-2 font-semibold">{label}</td>
-        <td className="p-2">{value}</td>
-    </tr>
+const TableRow = ({ label, value }) => (
+  <tr style={styles.tableRow}>
+    <td style={styles.tableCellValue}>{value}</td>
+    <td style={styles.tableCellLabel}>{label}</td>
+  </tr>
 );
 
-const Feature = ({ label, value, isBoolean = true }) => (
-    <tr className="border-b">
-        <td className="p-2 font-semibold">{label}</td>
-        <td className="p-2">
-            {isBoolean ? (value ? <span className="text-green-500 pi pi-check" /> : <span className="text-red-500 pi pi-times" />) : value}
-        </td>
-    </tr>
+const FeatureRow = ({ label, value, isBoolean = true }) => (
+  <tr style={styles.tableRow}>
+    <td style={styles.tableCellValue}>
+      {isBoolean ? (
+        value ? <span style={styles.featureCheck}>&#10004;</span> : <span style={styles.featureCross}>&#10006;</span>
+      ) : (
+        value
+      )}
+    </td>
+    <td style={styles.tableCellLabel}>{label}</td>
+  </tr>
 );
+
+const styles = {
+    container: {
+      display: 'flex',
+      flexDirection: 'column',
+      backgroundColor: '#fff',
+      borderRadius: '8px',
+      overflow: 'hidden',
+      boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
+      margin: '16px',
+      padding: '16px',
+    },
+    imageContainer: {
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      padding: '16px',
+    },
+    productImage: {
+      maxWidth: '100%',
+      height: 'auto',
+      borderRadius: '4px',
+      marginBottom: '16px',
+    },
+    companyImage: {
+      width: '25%', // Increased width
+      height: 'auto', // Maintain aspect ratio
+      marginBottom: '8px', // Add some space below the logo if needed
+    },
+    detailsContainer: {
+      padding: '16px',
+      textAlign: 'right',
+      borderBottom: '1px solid #eee',
+      marginBottom: '16px',
+    },
+    title: {
+      fontSize: '1.75rem',
+      fontWeight: 'bold',
+      color: '#343a40',
+      marginBottom: '8px',
+    },
+    description: {
+      color: '#6c757d',
+      marginBottom: '16px',
+      lineHeight: '1.5',
+    },
+    featuresRow: {
+      display: 'flex',
+      flexWrap: 'wrap',
+      gap: '10px',
+      marginBottom: '16px',
+      justifyContent: 'flex-end',
+      alignItems: 'center',
+    },
+    featureItem: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '4px',
+      fontSize: '0.9rem',
+      color: '#495057',
+    },
+    featureIcon: {
+      width: '20px',
+      height: '20px',
+    },
+    featureUnit: {
+      marginLeft: '2px',
+    },
+    energyRating: {
+      backgroundColor: '#ffc107',
+      color: '#fff',
+      borderRadius: '4px',
+      padding: '2px 6px',
+      fontWeight: 'bold',
+    },
+    price: {
+      fontSize: '2rem',
+      fontWeight: 'bold',
+      color: '#28a745',
+      marginBottom: '16px',
+    },
+    addToCartButton: {
+      backgroundColor: '#007bff',
+      color: '#fff',
+      border: 'none',
+      borderRadius: '4px',
+      padding: '12px 24px',
+      cursor: 'pointer',
+      fontSize: '1.1rem',
+    },
+    stepperContainer: {
+      padding: '16px',
+    },
+    table: {
+      width: '100%',
+      borderCollapse: 'collapse',
+      marginBottom: '16px',
+    },
+    tableRow: {
+      borderBottom: '1px solid #eee',
+      display: 'flex',
+      flexDirection: 'row-reverse',
+    },
+    tableCellLabel: {
+      padding: '8px',
+      fontWeight: 'bold',
+      textAlign: 'right',
+      flex: '1',
+    },
+    tableCellValue: {
+      padding: '8px',
+      textAlign: 'left',
+      flex: '1',
+    },
+    featureCheck: {
+      color: '#28a745',
+      fontSize: '1rem',
+    },
+    featureCross: {
+      color: '#dc3545',
+      fontSize: '1rem',
+    },
+    loading: {
+      textAlign: 'center',
+      padding: '20px',
+      fontSize: '1rem',
+      color: '#6c757d',
+    },
+    error: {
+      textAlign: 'center',
+      padding: '20px',
+      fontSize: '1rem',
+      color: '#dc3545',
+    },
+  
+};
 
 export default Overhead;

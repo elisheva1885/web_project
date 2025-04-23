@@ -3,7 +3,8 @@ const Delivery = require("../models/Delivery")
 const createDelivery = async (req, res) => {
     const user_id = req.user._id
     const { address, purchase, status} = req.body
-    if (!user_id || !address || !purchase ) {
+    console.log( address, purchase, status)
+    if (!user_id || !address.length || !purchase.length ) {
         return res.status(400).json({ message: "user_id, address and purchase are required" })
     }
     const delivery = await Delivery.create({ user_id, address, purchase, status})

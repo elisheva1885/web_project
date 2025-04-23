@@ -227,6 +227,7 @@ const Payment = () => {
                 'Authorization': `Bearer ${token}`
             };
             const res = await axios.post("http://localhost:8000/api/delivery", details, { headers });
+            console.log("res",res);
             if(res.status === 201){
                 alert("the deleviry created in the system")
                 navigate('/')
