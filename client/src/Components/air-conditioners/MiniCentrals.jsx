@@ -110,24 +110,20 @@ const MiniCenterals = () => {
                 </div>
                 <Button
                     label="לעדכון"
-                    onClick={ () => {
-                        // Call the updatePrice function and wait for it to finish
-                        updatePrice();
-
-                    }}
+                    onClick={handleSubmit(updatePrice)}
                     className="p-button-success"
                 />
             </Dialog>
         );
     };
-    const updatePrice = async () => {
+    const updatePrice = async (data) => {
         try {
             const headers = {
                 'Authorization': `Bearer ${token}`
             }
             const details = {
                 _id: selectedProduct._id,
-                price: priceValue
+                price: data.price
             }
             const res = await axios.put(`http://localhost:8000/api/air-conditioner/miniCenteral/price`, details, { headers });
             console.log(res);
@@ -139,7 +135,6 @@ const MiniCenterals = () => {
         catch (error) {
             console.error(error);
             setVisible(false);
-
         }
     }
     const UpdateMiniCenteral = async (mc) => {
@@ -337,11 +332,11 @@ const MiniCenterals = () => {
                         {/* {updateMiniCenteralPrice} */}
                         <div>
                             {userDetails?.role === 'official' || userDetails?.role === 'admin' ? (
-                                <Button onClick={() => openUpdateDialog(product)}>
+                                <Button onClick={() => updateMiniCenteralPrice(product)}>
                                     <i className="pi pi-pencil" style={{ fontSize: '1rem' }}> עדכון מחיר </i>
                                 </Button>
                             ) : null}
-                            {updateMiniCenteralPrice()}
+                            {/* {updateMiniCenteralPrice()} */}
                         </div>
                         {userDetails?.role === 'official' || userDetails?.role === 'admin' ? <Button onClick={() => updateMiniCenteralStock(product)}><i className="pi pi-pencil" style={{ fontSize: '1rem' }}> עדכון מלאי </i></Button> : <></>}
                     </div>
