@@ -16,7 +16,7 @@ import { setMiniCenterals } from '../../store/air-conditioner/miniCenteralsSlice
 import SideFillter from '../SideFillter';
 import UpdateMiniCenteral from './UpdateMiniCenteral';
 import { Dialog } from 'primereact/dialog';
-
+import { Controller, useForm } from 'react-hook-form';
 
 
 const MiniCenterals = () => {
@@ -31,9 +31,16 @@ const MiniCenterals = () => {
     const [registered, setRegistered] = useState(false);
     const [layout, setLayout] = useState('grid');
     const [visible, setVisible] = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState(null);
+    const { control, handleSubmit, formState: { errors }, watch } = useForm()
+
+
+    // const [showDialog, setShowDialog] = useState([]);
+
     const navigate = useNavigate();
     const dispatch = useDispatch();
     console.log(miniCenterals);
+    const priceValue = watch('price');
 
     const goToAddMiniCenteral = (type) => {
         const navigationData = {
@@ -71,12 +78,20 @@ const MiniCenterals = () => {
         }
 
     }
+
+
+    // Function to open the dialog
+    const openUpdateDialog = (product) => {
+        setSelectedProduct(product);
+        setVisible(true);
+    };
+
     const updateMiniCenteralStock = async (product) => {
 
     }
-    const updateMiniCenteralPrice = async (product) => {
+    const updateMiniCenteralPrice = async () => {
+        console.log("priceValue", priceValue);
         return (
-            <div>
             <Dialog
                 header="עדכון מחיר"
                 visible={visible}
@@ -84,22 +99,50 @@ const MiniCenterals = () => {
                 onHide={() => setVisible(false)}
                 modal
             >
-                <div>
-                    <h6>מחיר: {product.price}</h6>
+                <h6>מחיר:</h6>
+                <div className="field">
+                    <span className="p-float-label">
+                        <Controller name="price" control={control} render={({ field }) => (
+                            <InputText id={field.name} type="number" {...field} />
+                        )} />
+                        <label htmlFor="price">{selectedProduct?.price}</label>
+                    </span>
                 </div>
                 <Button
                     label="לעדכון"
-                    onClick={() => {
-                        // usingAddress();
+                    onClick={async () => {
+                        // Call the updatePrice function and wait for it to finish
+                        await updatePrice();
+
+                        // Then close the dialog
                         setVisible(false);
                     }}
                     className="p-button-success"
                 />
             </Dialog>
-            </div>
-        )
+        );
+    };
+    const updatePrice = async () => {
+        try {
+            const headers = {
+                'Authorization': `Bearer ${token}`
+            }
+            const details = {
+                _id: selectedProduct._id,
+                price: selectedProduct.price
+            }
+            const res = await axios.put(`http://localhost:8000/api/air-conditioner/miniCenteral`, details, { headers });
+            console.log(res);
+            if (res.status === 201) {
+                alert(`${selectedProduct.title} price updated`)
+                // setShowMessage(true);
+                // navigate('/minicenterals', { state: { data: res.data } });
+            }
+        }
+        catch (error) {
+            console.error(error);
+        }
     }
-
     const UpdateMiniCenteral = async (mc) => {
         const navigationData = {
             type: mc,
@@ -161,6 +204,7 @@ const MiniCenterals = () => {
             console.error(e)
         }
     }
+
 
     const getSeverity = (s) => {
         if (s >= 50) {
@@ -291,7 +335,16 @@ const MiniCenterals = () => {
                         <Tag value={getSeverityText(product)} severity={getSeverity(product.stock)} />
                         <span className="text-lg font-medium text-primary">₪{product.price}</span>
                         {userDetails?.role === 'official' || userDetails?.role === 'admin' ? <Button onClick={() => UpdateMiniCenteral(product)}><i className="pi pi-pencil" style={{ fontSize: '1rem' }}></i></Button> : <></>}
-                        {userDetails?.role === 'official' || userDetails?.role === 'admin' ? <Button onClick={() => updateMiniCenteralPrice(product)}><i className="pi pi-pencil" style={{ fontSize: '1rem' }}> עדכון מחיר </i></Button> : <></>}
+                        {/* {userDetails?.role === 'official' || userDetails?.role === 'admin' ? <Button onClick={()=>updateMiniCenteralPrice(product)}><i className="pi pi-pencil" style={{ fontSize: '1rem' }}> עדכון מחיר </i></Button> : <></>} */}
+                        {/* {updateMiniCenteralPrice} */}
+                        <div>
+                            {userDetails?.role === 'official' || userDetails?.role === 'admin' ? (
+                                <Button onClick={() => openUpdateDialog(product)}>
+                                    <i className="pi pi-pencil" style={{ fontSize: '1rem' }}> עדכון מחיר </i>
+                                </Button>
+                            ) : null}
+                            {updateMiniCenteralPrice()}
+                        </div>
                         {userDetails?.role === 'official' || userDetails?.role === 'admin' ? <Button onClick={() => updateMiniCenteralStock(product)}><i className="pi pi-pencil" style={{ fontSize: '1rem' }}> עדכון מלאי </i></Button> : <></>}
                     </div>
                     <Button

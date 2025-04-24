@@ -9,7 +9,8 @@ router.get("/",MiniCenteralController.readMiniCenterals)
 router.get("/miniCenteral/:_id",MiniCenteralController.readMiniCenteralById)
 router.get("/:title",MiniCenteralController.readMiniCenteralsByTitle)
 router.put("/",officialVerify, MiniCenteralController.updateMiniCenteral)
-router.put("/stock",verifyJWT, MiniCenteralController.updatMiniCenteralStock)
+router.put("/stock",officialVerify, MiniCenteralController.updatMiniCenteralStock)
+router.put("/price",officialVerify, MiniCenteralController.updatMiniCenteralPrice)
 router.delete("/", MiniCenteralController.deleteMiniCenteral)
 
 module.exports = router

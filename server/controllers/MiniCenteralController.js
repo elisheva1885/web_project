@@ -111,4 +111,19 @@ const updatMiniCenteralStock = async (req,res) => {
     res.status(201).json(miniCenteral)
 }
 
-module.exports = {createMiniCenteral,readMiniCenterals, readMiniCenteralsByTitle, readMiniCenteralById, updateMiniCenteral, updatMiniCenteralStock , deleteMiniCenteral} 
+
+const updatMiniCenteralPrice = async (req,res) => {
+    const { _id, price} = req.body
+    if(!_id){
+        return res.status(400).json({message: "all details are required"})
+    }
+    if(!price){
+        return res.status(204).json({message: "the price didn't change"})
+    }
+    const miniCenteral = await MiniCenteral.findById(_id).populate("company").exec()
+    miniCenteral.price= price
+    const updated = await miniCenteral.save()
+    res.status(201).json(miniCenteral)
+}
+
+module.exports = {createMiniCenteral,readMiniCenterals, readMiniCenteralsByTitle, readMiniCenteralById, updateMiniCenteral, updatMiniCenteralStock , deleteMiniCenteral, updatMiniCenteralPrice} 
