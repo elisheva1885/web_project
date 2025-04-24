@@ -293,6 +293,7 @@ const Overhead = () => {
               <span style={styles.featureUnit}>BTU</span>
             </div>
           )}
+          {/* <br/> */}
           {product.energy_rating?.cool && (
             <div style={styles.featureItem}>
               <span style={styles.energyRating}>{product.energy_rating.cool}</span>

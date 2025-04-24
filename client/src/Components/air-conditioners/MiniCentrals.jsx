@@ -14,6 +14,7 @@ import Add_AirConditioner from './Add_AirConditioner';
 import { setBasket } from '../../store/basketSlice';
 import { setMiniCenterals } from '../../store/air-conditioner/miniCenteralsSlice'
 import SideFillter from '../SideFillter';
+import UpdateMiniCenteral from './UpdateMiniCenteral';
 
 
 
@@ -67,6 +68,16 @@ const MiniCenterals = () => {
             console.error(e)
         }
 
+    }
+
+    const UpdateMiniCenteral = async (mc) => {
+        const navigationData = {
+            type: mc,
+            // You can add any other data you may want to send
+        };
+        console.log(mc);
+        navigate('/miniCenterals/miniCenteral/update' , { state: navigationData })
+       // dispatch(setOverheads(res.data))
     }
 
     // const getCompanies = async()=>{
@@ -249,6 +260,7 @@ const MiniCenterals = () => {
     
                         <Tag value={getSeverityText(product)} severity={getSeverity(product.stock)} />
                         <span className="text-lg font-medium text-primary">₪{product.price}</span>
+                        {userDetails?.role==='official'|| userDetails?.role==='admin' ?<Button onClick={()=>UpdateMiniCenteral(product)}><i className="pi pi-pencil" style={{ fontSize: '1rem' }}></i></Button>: <></>}
                     </div>                      
                     <Button
                         label="הוספה לעגלה"
