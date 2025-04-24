@@ -79,7 +79,6 @@ const MiniCenterals = () => {
 
     }
 
-
     // Function to open the dialog
     const openUpdateDialog = (product) => {
         setSelectedProduct(product);
@@ -228,6 +227,7 @@ const MiniCenterals = () => {
                 return null;
         }
     };
+
     // const listItem = (product, index) => {
     //     return (
     //         <>

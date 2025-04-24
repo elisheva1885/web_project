@@ -293,50 +293,50 @@ const Payment = () => {
         }
     };
 
-    const listItem = (product, index) => {
-        const isSelected = selectedItems.some(item => item._id === product._id);
-        const handleSelectionChange = (product) => {
-            const isSelected = selectedItems.some(item => item._id === product._id);
-            if (isSelected) {
-                setSelectedItems(selectedItems.filter(item => item._id !== product._id));
-            } else {
-                setSelectedItems([...selectedItems, product]);
-            }
-        };
-        if (product && product.stock > 0) {
-            return (
+    // const listItem = (product, index) => {
+    //     const isSelected = selectedItems.some(item => item._id === product._id);
+    //     const handleSelectionChange = (product) => {
+    //         const isSelected = selectedItems.some(item => item._id === product._id);
+    //         if (isSelected) {
+    //             setSelectedItems(selectedItems.filter(item => item._id !== product._id));
+    //         } else {
+    //             setSelectedItems([...selectedItems, product]);
+    //         }
+    //     };
+    //     if (product && product.stock > 0) {
+    //         return (
 
-                <div className="col-12" key={product._id}>
-                    <div className={classNames('flex flex-column xl:flex-row xl:align-items-start p-4 gap-4', { 'border-top-1 surface-border': index !== 0 })}>
-                        <Checkbox inputId={product._id} checked={isSelected} onChange={() => handleSelectionChange(product)} />
-                        <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`${product.imagepath}`} />
-                        <div className="flex flex-column sm:flex-row justify-content-between align-items-center xl:align-items-start flex-1 gap-4">
-                            <div className="flex flex-column align-items-center sm:align-items-start gap-3">
-                                <Link to={`/overheads/overhead/${product._id}`}><div className="text-2xl font-bold text-900">{product.title}</div></Link>
-                                <div className="flex align-items-center gap-3">
-                                    <Tag value={getSeverityText(product)} severity={getSeverity(product.stock)}></Tag>
-                                </div>
-                            </div>
-                            <div className="flex sm:flex-column align-items-center sm:align-items-end gap-3 sm:gap-2">
-                                <span className="text-2xl font-semibold">₪{product.price}</span>
-                                {/* <Button icon="pi pi-shopping-cart" className="p-button-rounded" disabled={getSeverity(product.stock) === "danger"} onClick={() => deleteShoppingBag(product)}> להסרה מהעגלה </Button> */}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            );
-        }
-        else {
-            return (<></>)
-        }
-    };
+    //             <div className="col-12" key={product._id}>
+    //                 <div className={classNames('flex flex-column xl:flex-row xl:align-items-start p-4 gap-4', { 'border-top-1 surface-border': index !== 0 })}>
+    //                     <Checkbox inputId={product._id} checked={isSelected} onChange={() => handleSelectionChange(product)} />
+    //                     <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`${product.imagepath}`} />
+    //                     <div className="flex flex-column sm:flex-row justify-content-between align-items-center xl:align-items-start flex-1 gap-4">
+    //                         <div className="flex flex-column align-items-center sm:align-items-start gap-3">
+    //                             <Link to={`/overheads/overhead/${product._id}`}><div className="text-2xl font-bold text-900">{product.title}</div></Link>
+    //                             <div className="flex align-items-center gap-3">
+    //                                 <Tag value={getSeverityText(product)} severity={getSeverity(product.stock)}></Tag>
+    //                             </div>
+    //                         </div>
+    //                         <div className="flex sm:flex-column align-items-center sm:align-items-end gap-3 sm:gap-2">
+    //                             <span className="text-2xl font-semibold">₪{product.price}</span>
+    //                             {/* <Button icon="pi pi-shopping-cart" className="p-button-rounded" disabled={getSeverity(product.stock) === "danger"} onClick={() => deleteShoppingBag(product)}> להסרה מהעגלה </Button> */}
+    //                         </div>
+    //                     </div>
+    //                 </div>
+    //             </div>
+    //         );
+    //     }
+    //     else {
+    //         return (<></>)
+    //     }
+    // };
 
-    const listTemplate = (products, layout) => {
-        if (!basket) {
-            return <h1>basket is empty</h1>
-        }
-        return <div className="grid grid-nogutter">{basket.map((product, index) => listItem(product, index))}</div>;
-    };
+    // const listTemplate = (products, layout) => {
+    //     if (!basket) {
+    //         return <h1>basket is empty</h1>
+    //     }
+    //     return <div className="grid grid-nogutter">{basket.map((product, index) => listItem(product, index))}</div>;
+    // };
 
     const header = () => {
         return (
@@ -428,6 +428,8 @@ const Payment = () => {
                     <Button label="Pay with PayPal" icon="pi pi-paypal" className="p-button-info p-mb-2" onClick={() => createPurchase("paypal")} />
                     <Button label="Pay with Google Pay" icon="pi pi-google" className="p-button-warning" onClick={() => createPurchase("google")} />
                     {/* </div> */}
+
+                    <script async src="https://pay.google.com/gp/p/js/pay.js" onload="onGooglePayLoaded()" ></script>
                 </>
                 {/* </div> */}
                 <div style={{ width: "65%", marginLeft: "auto" }}>
@@ -537,7 +539,7 @@ const Payment = () => {
                             </IconField>
                         </div>
                         <div style={{ width: "65%", marginLeft: "auto" }}>
-                            <DataView value={basket} listTemplate={listTemplate} layout={layout} header={header()} />
+                            {/* <DataView value={basket} listTemplate={listTemplate} layout={layout} header={header()} /> */}
                         </div>
                     </div>
                 </div>
