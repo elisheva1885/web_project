@@ -79,7 +79,6 @@ const MiniCenterals = () => {
 
     }
 
-
     // Function to open the dialog
     const openUpdateDialog = (product) => {
         setSelectedProduct(product);
@@ -110,7 +109,7 @@ const MiniCenterals = () => {
                 </div>
                 <Button
                     label="לעדכון"
-                    onClick={ () => {
+                    onClick={() => {
                         // Call the updatePrice function and wait for it to finish
                         updatePrice();
 
@@ -233,6 +232,7 @@ const MiniCenterals = () => {
                 return null;
         }
     };
+
     // const listItem = (product, index) => {
     //     return (
     //         <>

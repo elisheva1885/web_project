@@ -451,19 +451,19 @@ import { IconField } from 'primereact/iconfield';
 import { InputIcon } from 'primereact/inputicon';
 import { useDispatch, useSelector } from 'react-redux';
 import { setBasket } from '../store/basketSlice';
+import { Checkbox } from 'primereact/checkbox';
 
 const Basket = () => {
     const {basket} = useSelector((state) => state.basket);
     const {token} = useSelector((state) => state.token);
     const [layout, setLayout] = useState('list');
+    const [selectedItems, setSelectedItems] = useState([]);
     const dispatch = useDispatch()
     const navigate = useNavigate()
-    console.log("token Basket",token)
-    
 
     let amount =0;
     if(basket){
-        basket.map(b=> amount+=b.price)
+        selectedItems.map(b=> amount+=b.price)
     }
 
     const [totalAmount,setTotalAmount] =useState(0);
@@ -520,28 +520,62 @@ const Basket = () => {
         }
     };
 
+    // const listItem = (product, index) => {
+    //     return (
+    //         <div className="col-12" key={product._id}>
+    //             <div className={classNames('flex flex-column xl:flex-row xl:align-items-start p-4 gap-4', { 'border-top-1 surface-border': index !== 0 })}>
+    //                 <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`${product.imagepath}`} />
+    //                 <div className="flex flex-column sm:flex-row justify-content-between align-items-center xl:align-items-start flex-1 gap-4">
+    //                     <div className="flex flex-column align-items-center sm:align-items-start gap-3">
+    //                         <Link to={`/overheads/overhead/${product._id}`}><div className="text-2xl font-bold text-900">{product.title}</div></Link>
+    //                         <div className="flex align-items-center gap-3">
+    //                             <Tag value={getSeverityText(product)} severity={getSeverity(product.stock)}></Tag>
+    //                         </div>
+    //                     </div>
+    //                     <div className="flex sm:flex-column align-items-center sm:align-items-end gap-3 sm:gap-2">
+    //                         <span className="text-2xl font-semibold">₪{product.price}</span>
+    //                         <Button icon="pi pi-shopping-cart" className="p-button-rounded" disabled={getSeverity(product.stock) === "danger"} onClick={() => deleteShoppingBag(product)}> להסרה מהעגלה </Button>
+    //                     </div>
+    //                 </div>
+    //             </div>
+    //         </div>
+    //     );
+    // };
     const listItem = (product, index) => {
-        return (
-            <div className="col-12" key={product._id}>
-                <div className={classNames('flex flex-column xl:flex-row xl:align-items-start p-4 gap-4', { 'border-top-1 surface-border': index !== 0 })}>
-                    <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`${product.imagepath}`} />
-                    <div className="flex flex-column sm:flex-row justify-content-between align-items-center xl:align-items-start flex-1 gap-4">
-                        <div className="flex flex-column align-items-center sm:align-items-start gap-3">
-                            <Link to={`/overheads/overhead/${product._id}`}><div className="text-2xl font-bold text-900">{product.title}</div></Link>
-                            <div className="flex align-items-center gap-3">
-                                <Tag value={getSeverityText(product)} severity={getSeverity(product.stock)}></Tag>
+        const isSelected = selectedItems.some(item => item._id === product._id);
+        const handleSelectionChange = (product) => {
+            const isSelected = selectedItems.some(item => item._id === product._id);
+            if (isSelected) {
+                setSelectedItems(selectedItems.filter(item => item._id !== product._id));
+            } else {
+                setSelectedItems([...selectedItems, product]);
+            }
+        }
+    
+        if (product && product.stock > 0) {
+            return (
+
+                <div className="col-12" key={product._id}>
+                    <div className={classNames('flex flex-column xl:flex-row xl:align-items-start p-4 gap-4', { 'border-top-1 surface-border': index !== 0 })}>
+                        <Checkbox inputId={product._id} checked={isSelected} onChange={() => handleSelectionChange(product)} />
+                        <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`${product.imagepath}`} />
+                        <div className="flex flex-column sm:flex-row justify-content-between align-items-center xl:align-items-start flex-1 gap-4">
+                            <div className="flex flex-column align-items-center sm:align-items-start gap-3">
+                                <Link to={`/overheads/overhead/${product._id}`}><div className="text-2xl font-bold text-900">{product.title}</div></Link>
+                                <div className="flex align-items-center gap-3">
+                                    <Tag value={getSeverityText(product)} severity={getSeverity(product.stock)}></Tag>
+                                </div>
                             </div>
-                        </div>
-                        <div className="flex sm:flex-column align-items-center sm:align-items-end gap-3 sm:gap-2">
-                            <span className="text-2xl font-semibold">₪{product.price}</span>
-                            <Button icon="pi pi-shopping-cart" className="p-button-rounded" disabled={getSeverity(product.stock) === "danger"} onClick={() => deleteShoppingBag(product)}> להסרה מהעגלה </Button>
+                            <div className="flex sm:flex-column align-items-center sm:align-items-end gap-3 sm:gap-2">
+                                <span className="text-2xl font-semibold">₪{product.price}</span>
+                                {/* <Button icon="pi pi-shopping-cart" className="p-button-rounded" disabled={getSeverity(product.stock) === "danger"} onClick={() => deleteShoppingBag(product)}> להסרה מהעגלה </Button> */}
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        );
-    };
-
+            );
+        }
+    }
     const listTemplate = (products, layout) => {
         if(!basket){
             return <h1>basket is empty</h1>
@@ -549,13 +583,13 @@ const Basket = () => {
         return <div className="grid grid-nogutter">{basket.map((product, index) => listItem(product, index))}</div>;
     };
 
-    const header = () => {
-        return (
-            <div className="flex justify-content-end">
-                <DataViewLayoutOptions layout={layout} onChange={(e) => setLayout(e.value)} />
-            </div>
-        );
-    };
+    // const header = () => {
+    //     return (
+    //         <div className="flex justify-content-end">
+    //             <DataViewLayoutOptions layout={layout} onChange={(e) => setLayout(e.value)} />
+    //         </div>
+    //     );
+    // };
     useEffect(() => {
         if (token) {
             // קריאה ל-API רק אם יש טוקן
@@ -589,7 +623,7 @@ const Basket = () => {
                     <InputIcon className="pi pi-search" />
                 </IconField>
             </div>
-            <DataView value={basket} listTemplate={listTemplate} layout={layout} header={header()} />
+            <DataView value={basket} listTemplate={listTemplate} layout={layout}/>
         </div>
     </div>
     </div>
