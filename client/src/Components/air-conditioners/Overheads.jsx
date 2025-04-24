@@ -24,7 +24,7 @@ const Overhead = lazy(() => import('./Overhead'));
 const Overheads = () => {
 
     const {token} = useSelector((state) => state.token)
-    // const {companies} = useSelector((state) => state.companies)
+    const {companies} = useSelector((state) => state.companies)
     const {basket} = useSelector((state) => state.basket)
     const {userDetails} = useSelector((state) => state.userDetails);
 
@@ -307,6 +307,46 @@ const Overheads = () => {
     //     );
     // };
 
+    const filterOverheads = (filters) => {
+        // Filter overheads based on selected criteria
+        let filteredOverheads = overheads;
+        console.log(filteredOverheads)
+
+        // Example filter logic
+        if (filters.companies.length > 0) {
+            filteredOverheads = filteredOverheads.filter(overhead => 
+                filters.companies.includes(overhead.company.name)
+            );
+        }
+        if (filters.shabbatMode) {
+            filteredOverheads = filteredOverheads.filter(overhead => overhead.isShabbatCompatible);
+        }
+        if (filters.wifi) {
+            filteredOverheads = filteredOverheads.filter(overhead => overhead.hasWifi);
+        }
+        if (filters.priceRange) {
+            filteredOverheads = filteredOverheads.filter(overhead => 
+                overhead?.price >= filters.priceRange[0] && overhead.price <= filters.priceRange[1]
+            );
+        }
+        if (filters.btuHeating) {
+            filteredOverheads = filteredOverheads.filter(overhead => 
+                overhead?.btuHeating >= filters.btuHeating
+            );
+        }
+        if (filters.btuCooling) {
+            filteredOverheads = filteredOverheads.filter(overhead => 
+                overhead?.btuCooling >= filters.btuCooling
+            );
+        }
+        if (filters.energyRating) {
+            filteredOverheads = filteredOverheads.filter(overhead => 
+                overhead?.energyRating === filters.energyRating
+            );
+        }
+        console.log(filterOverheads)
+        dispatch(setOverheads(filteredOverheads)); // Update the state with the filtered results
+    }
 
     useEffect(() => {
         // getCompanies()
@@ -329,7 +369,7 @@ const Overheads = () => {
                 </div>
                 <DataView value={overheads} listTemplate={listTemplate} layout={layout}/>
             </div>
-            <SideFillter/>
+            <SideFillter onFilter={filterOverheads}/>
         </>
     )
 }
