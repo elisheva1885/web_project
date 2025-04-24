@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@google-pay/button-react": "^3.1.0",
     "@reduxjs/toolkit": "^2.6.0",
     "axios": "^1.7.9",
     "classnames": "^2.5.1",

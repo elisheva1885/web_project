@@ -133,7 +133,7 @@ import { IconField } from 'primereact/iconfield';
 import { InputIcon } from 'primereact/inputicon';
 import { Checkbox } from 'primereact/checkbox';
 import { setOverheads } from '../store/air-conditioner/overHeadsSlice';
-
+import GooglePayButton from '@google-pay/button-react';
 
 const Payment = () => {
     const { control, handleSubmit, formState: { errors } } = useForm();
@@ -152,10 +152,45 @@ const Payment = () => {
     // const [products, setProducts] = useState([])
     const [visible, setVisible] = useState(false);
     const [formDisabled, setFromDisabled] = useState(false);
+    const [buttonColor, setButtonColor] = useState("default");
+    const [buttonType, setButtonType] = useState("buy");
+    const [buttonSizeMode, setButtonSizeMode] = useState("static");
+    const [buttonWidth, setButtonWidth] = useState(240);
+    const [buttonHeight, setButtonHeight] = useState(40);
 
     const location = useLocation();
     const { products } = location.state || {}; // Access the type from state
     console.log(products);
+    const paymentRequest = {
+        apiVersion: 2,
+        apiVersionMinor: 0,
+        allowedPaymentMethods: [
+          {
+            type: "CARD",
+            parameters: {
+              allowedAuthMethods: ["PAN_ONLY", "CRYPTOGRAM_3DS"],
+              allowedCardNetworks: ["MASTERCARD", "VISA"]
+            },
+            tokenizationSpecification: {
+              type: "PAYMENT_GATEWAY",
+              parameters: {
+                gateway: "example"
+              }
+            }
+          }
+        ],
+        merchantInfo: {
+          merchantId: "12345678901234567890",
+          merchantName: "Demo Merchant"
+        },
+        transactionInfo: {
+          totalPriceStatus: "FINAL",
+          totalPriceLabel: "Total",
+          totalPrice: "100.00",
+          currencyCode: "USD",
+          countryCode: "US"
+        }
+      };
     const createAddress = async (address) => {
         try {
             const headers = {
@@ -406,8 +441,19 @@ const Payment = () => {
     }, [])
 
     return (
+        
         <div style={{ paddingTop: '60px' }}>
-
+ <GooglePayButton
+          environment="TEST"
+          buttonColor={buttonColor}
+          buttonType={buttonType}
+          buttonSizeMode={buttonSizeMode}
+          paymentRequest={paymentRequest}
+          onLoadPaymentData={paymentRequest => {
+            console.log("load payment data", paymentRequest);
+          }}
+          style={{ width: buttonWidth, height: buttonHeight }}
+        />
             {address ? existAddress() : <></>}
             <div>
                 {/* <div style={{ display: "flex", width: "100vw", height: "100vh", padding: "20px" }}> */}
