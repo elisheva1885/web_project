@@ -8,7 +8,7 @@ router.post("/",MiniCenteralController.createMiniCenteral)
 router.get("/",MiniCenteralController.readMiniCenterals)
 router.get("/miniCenteral/:_id",MiniCenteralController.readMiniCenteralById)
 router.get("/:title",MiniCenteralController.readMiniCenteralsByTitle)
-router.put("/", MiniCenteralController.updateMiniCenteral)
+router.put("/",officialVerify, MiniCenteralController.updateMiniCenteral)
 router.put("/stock",verifyJWT, MiniCenteralController.updatMiniCenteralStock)
 router.delete("/", MiniCenteralController.deleteMiniCenteral)
 

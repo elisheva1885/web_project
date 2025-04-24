@@ -56,6 +56,9 @@ const updateOverhead = async (req, res) => {
         return res.status(400).json({message: "all details are required"})
     }
     const overhead = await Overhead.findById(_id).exec()
+    if(!overhead){
+        return res.status(400).json({message: "overhead not found"})
+    }
     overhead.title= title?title:overhead.title
     overhead.describe= describe?describe:overhead.describe
     overhead.imagepath= imagepath?imagepath:overhead.imagepath

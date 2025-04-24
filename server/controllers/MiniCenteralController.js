@@ -54,6 +54,10 @@ const updateMiniCenteral = async (req, res) => {
         return res.status(400).json({message: "all details are required"})
     }
     const miniCenteral = await MiniCenteral.findById(_id).exec()
+
+    if(!miniCenteral){
+        return res.status(400).json({message: "miniCenteral not found"})
+    }
     miniCenteral.title= title?title:miniCenteral.title
     miniCenteral.describe= describe?describe:miniCenteral.describe
     miniCenteral.imagepath= imagepath?imagepath:miniCenteral.imagepath

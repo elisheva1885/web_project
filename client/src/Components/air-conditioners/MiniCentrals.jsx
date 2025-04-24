@@ -15,24 +15,26 @@ import { setBasket } from '../../store/basketSlice';
 import { setMiniCenterals } from '../../store/air-conditioner/miniCenteralsSlice'
 import SideFillter from '../SideFillter';
 import UpdateMiniCenteral from './UpdateMiniCenteral';
+import { Dialog } from 'primereact/dialog';
 
 
 
 const MiniCenterals = () => {
 
-    const {token} = useSelector((state) => state.token)
+    const { token } = useSelector((state) => state.token)
     // const {companies} = useSelector((state) => state.companies)
-    const {basket} = useSelector((state) => state.basket)
-    const {userDetails} = useSelector((state) => state.userDetails);
-    const {miniCenterals}= useSelector((state) => state.miniCenterals);
+    const { basket } = useSelector((state) => state.basket)
+    const { userDetails } = useSelector((state) => state.userDetails);
+    const { miniCenterals } = useSelector((state) => state.miniCenterals);
     const [value, setValue] = useState('')
     const [shoppingBags, setShoppingBags] = useState([])
     const [registered, setRegistered] = useState(false);
     const [layout, setLayout] = useState('grid');
+    const [visible, setVisible] = useState(false);
     const navigate = useNavigate();
     const dispatch = useDispatch();
     console.log(miniCenterals);
-    
+
     const goToAddMiniCenteral = (type) => {
         const navigationData = {
             type: type,
@@ -41,26 +43,26 @@ const MiniCenterals = () => {
         navigate('/air_conditioner/add', { state: navigationData });
     };
 
-    const addToBasket = async(product) => {
+    const addToBasket = async (product) => {
         //function to create prucace object
         //by the token and the object
         alert("shoping")
         const shoppingBagDetails = {
-            product_id  : product._id,
-            type : "MiniCenteral"
+            product_id: product._id,
+            type: "MiniCenteral"
         }
         try {
             const headers = {
                 'Authorization': `Bearer ${token}`
             }
-            const res = await axios.post('http://localhost:8000/api/user/shoppingBag', shoppingBagDetails, {headers},)
+            const res = await axios.post('http://localhost:8000/api/user/shoppingBag', shoppingBagDetails, { headers },)
             if (res.status === 200) {
                 alert("in here")
                 dispatch(setBasket(basket.push(res.data)))
-                console.log("res.data",res.data);
-                console.log("useState",shoppingBags);
+                console.log("res.data", res.data);
+                console.log("useState", shoppingBags);
             }
-            if(res.status === 409){
+            if (res.status === 409) {
                 // updateAmount(product)
             }
         }
@@ -69,6 +71,34 @@ const MiniCenterals = () => {
         }
 
     }
+    const updateMiniCenteralStock = async (product) => {
+
+    }
+    const updateMiniCenteralPrice = async (product) => {
+        return (
+            <div>
+            <Dialog
+                header="עדכון מחיר"
+                visible={visible}
+                style={{ width: '50vw' }}
+                onHide={() => setVisible(false)}
+                modal
+            >
+                <div>
+                    <h6>מחיר: {product.price}</h6>
+                </div>
+                <Button
+                    label="לעדכון"
+                    onClick={() => {
+                        // usingAddress();
+                        setVisible(false);
+                    }}
+                    className="p-button-success"
+                />
+            </Dialog>
+            </div>
+        )
+    }
 
     const UpdateMiniCenteral = async (mc) => {
         const navigationData = {
@@ -76,8 +106,8 @@ const MiniCenterals = () => {
             // You can add any other data you may want to send
         };
         console.log(mc);
-        navigate('/miniCenterals/miniCenteral/update' , { state: navigationData })
-       // dispatch(setOverheads(res.data))
+        navigate('/miniCenterals/miniCenteral/update', { state: navigationData })
+        // dispatch(setOverheads(res.data))
     }
 
     // const getCompanies = async()=>{
@@ -130,7 +160,7 @@ const MiniCenterals = () => {
         catch (e) {
             console.error(e)
         }
-    }  
+    }
 
     const getSeverity = (s) => {
         if (s >= 50) {
@@ -237,31 +267,33 @@ const MiniCenterals = () => {
         return (
             <div className="col-12 sm:col-6 lg:col-3 p-3" key={product._id}>
                 <div className="border-1 surface-border border-round p-4 shadow-3 h-full flex flex-column justify-content-between gap-4">
-    
+
                     {/* תמונת החברה - גדולה ובולטת */}
                     <img
                         src={`/${product?.company?.imagePath}`}
                         alt="Company"
                         className="w-full h-10rem object-contain border-round"
                     />
-    
+
                     {/* תמונת המוצר - גדולה ורחבה */}
                     <img
                         src={`miniCenterals/${product.imagepath}`}
                         alt={product.title}
                         className="w-full h-12rem object-contain border-round"
                     />
-    
+
                     {/* פרטי המוצר */}
                     <div className="flex flex-column align-items-center text-center gap-2">
                         <Link to={`/miniCenterals/miniCenteral/${product._id}`}>
                             <div className="text-xl font-bold text-900">{product.title}</div>
                         </Link>
-    
+
                         <Tag value={getSeverityText(product)} severity={getSeverity(product.stock)} />
                         <span className="text-lg font-medium text-primary">₪{product.price}</span>
-                        {userDetails?.role==='official'|| userDetails?.role==='admin' ?<Button onClick={()=>UpdateMiniCenteral(product)}><i className="pi pi-pencil" style={{ fontSize: '1rem' }}></i></Button>: <></>}
-                    </div>                      
+                        {userDetails?.role === 'official' || userDetails?.role === 'admin' ? <Button onClick={() => UpdateMiniCenteral(product)}><i className="pi pi-pencil" style={{ fontSize: '1rem' }}></i></Button> : <></>}
+                        {userDetails?.role === 'official' || userDetails?.role === 'admin' ? <Button onClick={() => updateMiniCenteralPrice(product)}><i className="pi pi-pencil" style={{ fontSize: '1rem' }}> עדכון מחיר </i></Button> : <></>}
+                        {userDetails?.role === 'official' || userDetails?.role === 'admin' ? <Button onClick={() => updateMiniCenteralStock(product)}><i className="pi pi-pencil" style={{ fontSize: '1rem' }}> עדכון מלאי </i></Button> : <></>}
+                    </div>
                     <Button
                         label="הוספה לעגלה"
                         icon="pi pi-shopping-cart"
@@ -270,23 +302,23 @@ const MiniCenterals = () => {
                             getSeverity(product.stock) === "danger" || registered === false
                         }
                         onClick={() => addToBasket(product)}
-                    />      
+                    />
                 </div>
             </div>
         );
     };
-    
+
     const itemTemplate = (product, layout, index) => {
         if (!product) {
             return;
         }
-         if (layout === 'grid') return gridItem(product, index);
+        if (layout === 'grid') return gridItem(product, index);
     };
 
     const listTemplate = (products, layout) => {
         if (!Array.isArray(miniCenterals) || miniCenterals.length === 0) {
             return <h1>No MiniCenterals available</h1>; // Fallback UI          
-            }
+        }
         return <div className="grid grid-nogutter">{miniCenterals.map((product, index) => itemTemplate(product, layout, index))}</div>;
     };
 
@@ -300,15 +332,15 @@ const MiniCenterals = () => {
     // };
 
 
-    useEffect(() => {   
-        if(token){
+    useEffect(() => {
+        if (token) {
             setRegistered(true)
         }
     }, [])
 
     return (
         <>
-            {userDetails.role === 'admin'?<Button onClick={ ()=>goToAddMiniCenteral("MiniCenteral")}>add MiniCenteral</Button>: <></> }
+            {userDetails.role === 'admin' ? <Button onClick={() => goToAddMiniCenteral("MiniCenteral")}>add MiniCenteral</Button> : <></>}
             {/* {<Button onClick={ ()=>goToAddMiniCenteral("MiniCenteral")}>add MiniCenteral</Button>} */}
             <div className="card">
                 <div className="flex justify-content-end">
@@ -317,9 +349,9 @@ const MiniCenterals = () => {
                         <InputText placeholder="Search by name" onChange={(c) => getMiniCenteralByTitle(c)} value={value} />
                     </IconField>
                 </div>
-                <DataView value={miniCenterals} listTemplate={listTemplate} layout={layout}/>
+                <DataView value={miniCenterals} listTemplate={listTemplate} layout={layout} />
             </div>
-            <SideFillter/>
+            <SideFillter />
         </>
     )
 }

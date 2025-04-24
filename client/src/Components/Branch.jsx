@@ -69,10 +69,14 @@ const Branches = () => {
         navigate('/branch/update', { state: { data: branchToUpdate } });
     };
 
-    const getInMap = (branch) => {
-        const address = encodeURIComponent(`${branch.address.city}, ${branch.address.street} ${branch.address.streetNum}`);
-        window.open(`https://www.google.com/maps/search/?api=1&query=${address}`, '_blank');
-    };
+    const getInMap = (branch)=> {
+        const lat = 32.0853; // קו רוחב (Latitude)
+        const lng = 34.7818; // קו אורך (Longitude)
+        const address = encodeURIComponent(`${branch.address.city}, ${branch.address.street},${branch.address.streetNum}`); // כתובת בעברית או אנגלית
+        // window.open(`https://www.google.com/maps/search/?api=1&query=${address}`, '_blank');
+        window.open(`https://www.google.com/maps/dir/?api=1&destination=${address}`, '_blank');
+
+    }
 
     const isOpen = (branch) => {
         const date = new Date();

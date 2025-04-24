@@ -6,11 +6,12 @@ import { Button } from 'primereact/button';
 import axios from 'axios';
 import classNames from 'classnames';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 const UpdateOverheadAC = () => {
     const location = useLocation();
     const o = location.state?.type || {}; // Extract 'type' from the state
-
+    const {token }= useSelector((state)=> state.token)
     const { control, handleSubmit, formState: { errors } } = useForm({
         defaultValues: o // Set defaultValues to o
     });
@@ -65,7 +66,10 @@ const UpdateOverheadAC = () => {
         };
 
         try {
-            const response = await axios.put(`http://localhost:8000/api/air-conditioner/overhead`, overheadAC);
+            const headers = {
+                'Authorization': `Bearer ${token}`
+            }
+            const response = await axios.put(`http://localhost:8000/api/air-conditioner/overhead`, overheadAC, {headers});
             if (response.status === 200) {
                 setShowMessage(true);
                 navigate('/overhead', { state: { data: response.data } });

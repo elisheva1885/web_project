@@ -6,8 +6,6 @@ import { useSelector } from 'react-redux';
 import { MegaMenu } from 'primereact/megamenu';
 import AdminRegister from './AdminRegister';
 import Payment from './Payment';
-// import UpdateMiniCenteral from './air-conditioners/UpdateMiniCenteral';
-
 const About = lazy(() => import('./About'));
 const Branch = lazy(() => import('./Branch'));
 const Overheads = lazy(() => import('./air-conditioners/Overheads'));
@@ -118,8 +116,7 @@ const Navbar = () => {
 
     return (
         <>
-                <div style={{ paddingTop: '60px' }}>
-
+            <div style={{ paddingTop: '60px' }}>
             <Routes>
                 <Route path='/branch' element={<Suspense fallback="Loading..."><Branch /></Suspense>}></Route>
                 <Route path='/branch/add' element={<Suspense fallback="Loading..."><AddBranch/></Suspense>}></Route>
@@ -129,8 +126,8 @@ const Navbar = () => {
                 <Route path='/miniCenterals' element={<Suspense fallback="Loading..."><MiniCenterals /></Suspense>}>        </Route>
                 <Route path={`/overheads/overhead/:product`} element={<Suspense fallback="Loading..."><Overhead /></Suspense>}></Route>
                 <Route path={`/miniCenterals/miniCenteral/:product`} element={<Suspense fallback="Loading..."><Overhead /></Suspense>}></Route>
-                <Route path='/miniCenterals/miniCenteral/update' element={<Suspense fallback="Loading..."><UpdateOverheadAC/></Suspense>}></Route>
-                <Route path='/overheads/overhead/update' element={<Suspense fallback="Loading..."><UpdateMiniCenteral/></Suspense>}></Route>
+                <Route path='/miniCenterals/miniCenteral/update' element={<Suspense fallback="Loading..."><UpdateMiniCenteral/></Suspense>}></Route>
+                <Route path='/overheads/overhead/update' element={<Suspense fallback="Loading..."><UpdateOverheadAC/></Suspense>}></Route>
                 <Route path='/login' element={<Suspense fallback="Loading..."><Login /></Suspense>}></Route>
                 <Route path='/register' element={<Suspense fallback="Loading..."><Register /></Suspense>}></Route>
                 <Route path='/air_conditioner/add' element={<Suspense fallback="Loading..."><Add_AirConditioner/></Suspense>}></Route>

@@ -5,10 +5,12 @@ import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 const UpdateMiniCenteral = () => {
     const location = useLocation();
     const mc = location.state?.type || {}; // Extract 'type' from the state
+    const {token }= useSelector((state)=> state.token)
 
     const { control, handleSubmit, formState: { errors } } = useForm({
         defaultValues: mc // Set defaultValues to o
@@ -62,28 +64,40 @@ const UpdateMiniCenteral = () => {
         };
 
         try {
-            const response = await axios.put(`http://localhost:8000/api/air-conditioner/minicenteral`, minicenteral);
-            if (response.status === 200) {
+            const headers = {
+                'Authorization': `Bearer ${token}`
+            }
+            const response = await axios.put(`http://localhost:8000/api/air-conditioner/miniCenteral`, minicenteral, {headers});
+            if (response.status === 201) {
                 setShowMessage(true);
-                navigate('/minicenteral', { state: { data: response.data } });
+                navigate('/minicenterals', { state: { data: response.data } });
             }
         } catch (error) {
             console.error(error);
         }
     };
-
+    
     return (
         <div style={{ paddingTop: '60px' }}>
             <Dialog visible={showMessage} onHide={() => setShowMessage(false)} position="top" footer={<Button label="Close" onClick={() => setShowMessage(false)} />} showHeader={false} breakpoints={{ '960px': '80vw' }} style={{ width: '40vw' }}>
                 <div className="flex justify-content-center flex-column pt-6 px-3">
                     <i className="pi pi-check-circle" style={{ fontSize: '5rem', color: 'var(--green-500)' }}></i>
-                    <h5>MiniCentral AC Updated Successfully!</h5>
+                    <h5>MiniCenteral AC Updated Successfully!</h5>
                 </div>
             </Dialog>
             <div className="flex justify-content-center">
                 <div className="card" style={{ width: '100%', maxWidth: '600px' }}>
                     <h5 className="text-center">Update MiniCenteral</h5>
                     <form onSubmit={handleSubmit(onSubmit)} className="p-fluid">
+                        <div className="field">
+                            <span className="p-float-label">
+                                <Controller name="company" control={control} render={({ field }) => (
+                                    <InputText id="company" {...field} />
+                                )} />
+                                <label htmlFor="company">Company</label>
+                            </span>
+                        </div>
+
                         <div className="field">
                             <span className="p-float-label">
                                 <Controller name="title" control={control} render={({ field }) => (
@@ -111,7 +125,7 @@ const UpdateMiniCenteral = () => {
                             </span>
                         </div>
 
-                        <div className="field">
+                        {/* <div className="field">
                             <span className="p-float-label">
                                 <Controller name="stock" control={control} render={({ field }) => (
                                     <InputText id="stock" type="number" {...field} />
@@ -127,10 +141,29 @@ const UpdateMiniCenteral = () => {
                                 )} />
                                 <label htmlFor="price">Price</label>
                             </span>
+                        </div> */}
+
+                        <div className="field">
+                            <div className="flex">
+                                <div style={{ flex: '1', marginRight: '10px' }}>
+                                    <span className="p-float-label">
+                                        <Controller name="BTU_output.cool" control={control} render={({ field }) => (
+                                            <InputText id="BTU_output.cool" {...field} />
+                                        )} />
+                                        <label htmlFor="BTU_output.cool">BTU Output Cool</label>
+                                    </span>
+                                </div>
+                                <div style={{ flex: '1', marginLeft: '10px' }}>
+                                    <span className="p-float-label">
+                                        <Controller name="BTU_output.heat" control={control} render={({ field }) => (
+                                            <InputText id="BTU_output.heat" {...field} />
+                                        )} />
+                                        <label htmlFor="BTU_output.heat">BTU Output Heat</label>
+                                    </span>
+                                </div>
+                            </div>
                         </div>
 
-                        {/* Repeat for other fields similar to the schema */}
-                        {/* Example for efficiency_factor */}
                         <div className="field">
                             <div className="flex">
                                 <div style={{ flex: '1', marginRight: '10px' }}>
@@ -138,7 +171,7 @@ const UpdateMiniCenteral = () => {
                                         <Controller name="efficiency_factor.cool" control={control} render={({ field }) => (
                                             <InputText id="efficiency_factor.cool" {...field} />
                                         )} />
-                                        <label htmlFor="efficiency_factor.cool">Efficiency Factor (Cool)</label>
+                                        <label htmlFor="efficiency_factor.cool">Efficiency Factor Cool</label>
                                     </span>
                                 </div>
                                 <div style={{ flex: '1', marginLeft: '10px' }}>
@@ -146,20 +179,183 @@ const UpdateMiniCenteral = () => {
                                         <Controller name="efficiency_factor.heat" control={control} render={({ field }) => (
                                             <InputText id="efficiency_factor.heat" {...field} />
                                         )} />
-                                        <label htmlFor="efficiency_factor.heat">Efficiency Factor (Heat)</label>
+                                        <label htmlFor="efficiency_factor.heat">Efficiency Factor Heat</label>
                                     </span>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Add fields for remaining schema properties */}
+                        <div className="field">
+                            <span className="p-float-label">
+                                <Controller name="energy_rating" control={control} render={({ field }) => (
+                                    <InputText id="energy_rating" {...field} />
+                                )} />
+                                <label htmlFor="energy_rating">Energy Rating</label>
+                            </span>
+                        </div>
+
+                        <div className="field">
+                            <div className="flex">
+                                <div style={{ flex: '1', marginRight: '10px' }}>
+                                    <span className="p-float-label">
+                                        <Controller name="working_current.cool" control={control} render={({ field }) => (
+                                            <InputText id="working_current.cool" {...field} />
+                                        )} />
+                                        <label htmlFor="working_current.cool">Working Current Cool</label>
+                                    </span>
+                                </div>
+                                <div style={{ flex: '1', marginLeft: '10px' }}>
+                                    <span className="p-float-label">
+                                        <Controller name="working_current.heat" control={control} render={({ field }) => (
+                                            <InputText id="working_current.heat" {...field} />
+                                        )} />
+                                        <label htmlFor="working_current.heat">Working Current Heat</label>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="field">
+                            <span className="p-float-label">
+                                <Controller name="CFM" control={control} render={({ field }) => (
+                                    <InputText id="CFM" type="number" {...field} />
+                                )} />
+                                <label htmlFor="CFM">CFM</label>
+                            </span>
+                        </div>
+
+                        <div className="field">
+                            <span className="p-float-label">
+                                <Controller name="Pa" control={control} render={({ field }) => (
+                                    <InputText id="Pa" type="number" {...field} />
+                                )} />
+                                <label htmlFor="Pa">Pa</label>
+                            </span>
+                        </div>
+        
+        
+                        <div className="field">
+        <div className="flex">
+            <div style={{ flex: '1', marginRight: '10px' }}>
+                <span className="p-float-label">
+                    <Controller name="in_size.width" control={control} render={({ field }) => (
+                        <InputText id="in_size.width" type="number" {...field} />
+                    )} />
+                    <label htmlFor="in_size.width">In Size Width</label>
+                </span>
+            </div>
+            <div style={{ flex: '1', marginLeft: '10px' }}>
+                <span className="p-float-label">
+                    <Controller name="in_size.depth" control={control} render={({ field }) => (
+                        <InputText id="in_size.depth" type="number" {...field} />
+                    )} />
+                    <label htmlFor="in_size.depth">In Size Depth</label>
+                </span>
+            </div>
+            <div style={{ flex: '1', marginLeft: '10px' }}>
+                <span className="p-float-label">
+                    <Controller name="in_size.height" control={control} render={({ field }) => (
+                        <InputText id="in_size.height" type="number" {...field} />
+                    )} />
+                    <label htmlFor="in_size.height">In Size Height</label>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    {/* out_size Fields */}
+    <div className="field">
+        <div className="flex">
+            <div style={{ flex: '1', marginRight: '10px' }}>
+                <span className="p-float-label">
+                    <Controller name="out_size.width" control={control} render={({ field }) => (
+                        <InputText id="out_size.width" type="number" {...field} />
+                    )} />
+                    <label htmlFor="out_size.width">Out Size Width</label>
+                </span>
+            </div>
+            <div style={{ flex: '1', marginLeft: '10px' }}>
+                <span className="p-float-label">
+                    <Controller name="out_size.depth" control={control} render={({ field }) => (
+                        <InputText id="out_size.depth" type="number" {...field} />
+                    )} />
+                    <label htmlFor="out_size.depth">Out Size Depth</label>
+                </span>
+            </div>
+            <div style={{ flex: '1', marginLeft: '10px' }}>
+                <span className="p-float-label">
+                    <Controller name="out_size.height" control={control} render={({ field }) => (
+                        <InputText id="out_size.height" type="number" {...field} />
+                    )} />
+                    <label htmlFor="out_size.height">Out Size Height</label>
+                </span>
+            </div>
+        </div>
+    </div>
+
+      {/* speeds Field */}
+      <div className="field">
+        <span className="p-float-label">
+            <Controller name="speeds" control={control} render={({ field }) => (
+                <InputText id="speeds" type="number" {...field} />
+            )} />
+            <label htmlFor="speeds">Speeds</label>
+        </span>
+    </div>
+
+    {/* quiet Field */}
+    <div className="field-checkbox">
+        <Controller name="quiet" control={control} render={({ field }) => (
+            <div>
+                <input type="checkbox" id="quiet" {...field} checked={field.value} />
+                <label htmlFor="quiet">Quiet</label>
+            </div>
+        )} />
+    </div>
+
+    {/* wifi Field */}
+    <div className="field-checkbox">
+        <Controller name="wifi" control={control} render={({ field }) => (
+            <div>
+                <input type="checkbox" id="wifi" {...field} checked={field.value} />
+                <label htmlFor="wifi">WiFi</label>
+            </div>
+        )} />
+    </div>
+
+  
+
+    {/* air4d Field */}
+    <div className="field-checkbox">
+        <Controller name="air4d" control={control} render={({ field }) => (
+            <div>
+                <input type="checkbox" id="air4d" {...field} checked={field.value} />
+                <label htmlFor="air4d">Air 4D</label>
+            </div>
+        )} />
+    </div>
+
+    {/* sabbath_command Field */}
+    <div className="field-checkbox">
+        <Controller name="sabbath_command" control={control} render={({ field }) => (
+            <div>
+                <input type="checkbox" id="sabbath_command" {...field} checked={field.value} />
+                <label htmlFor="sabbath_command">Sabbath Command</label>
+            </div>
+        )} />
+    </div>
+
+                        {/* Repeat similar structure for remaining fields */}
 
                         <Button type="submit" label="Update MiniCenteral" className="mt-2" />
                     </form>
                 </div>
             </div>
+            
         </div>
+        
     );
+
 };
 
 export default UpdateMiniCenteral;

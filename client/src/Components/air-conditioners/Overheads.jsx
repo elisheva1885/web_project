@@ -60,7 +60,7 @@ const Overheads = () => {
             const headers = {
                 'Authorization': `Bearer ${token}`
             }
-            const res = await axios.post('http://localhost:8000/api/user/shoppingBag', shoppingBagDetails, {headers},)
+            const res = await axios.post('http://localhost:8000/api/user/shoppingBag', shoppingBagDetails, {headers})
             if (res.status === 200) {
                 alert("im here")
                 dispatch(setBasket(basket.push(res.data)))
