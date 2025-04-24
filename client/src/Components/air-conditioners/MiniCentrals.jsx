@@ -110,12 +110,10 @@ const MiniCenterals = () => {
                 </div>
                 <Button
                     label="לעדכון"
-                    onClick={async () => {
+                    onClick={ () => {
                         // Call the updatePrice function and wait for it to finish
-                        await updatePrice();
+                        updatePrice();
 
-                        // Then close the dialog
-                        setVisible(false);
                     }}
                     className="p-button-success"
                 />
@@ -129,18 +127,19 @@ const MiniCenterals = () => {
             }
             const details = {
                 _id: selectedProduct._id,
-                price: selectedProduct.price
+                price: priceValue
             }
-            const res = await axios.put(`http://localhost:8000/api/air-conditioner/miniCenteral`, details, { headers });
+            const res = await axios.put(`http://localhost:8000/api/air-conditioner/miniCenteral/price`, details, { headers });
             console.log(res);
             if (res.status === 201) {
                 alert(`${selectedProduct.title} price updated`)
-                // setShowMessage(true);
-                // navigate('/minicenterals', { state: { data: res.data } });
+                setVisible(false);
             }
         }
         catch (error) {
             console.error(error);
+            setVisible(false);
+
         }
     }
     const UpdateMiniCenteral = async (mc) => {
@@ -204,7 +203,6 @@ const MiniCenterals = () => {
             console.error(e)
         }
     }
-
 
     const getSeverity = (s) => {
         if (s >= 50) {
