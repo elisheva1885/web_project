@@ -124,7 +124,7 @@ import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import axios from 'axios';
 import classNames from 'classnames';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { DataView, DataViewLayoutOptions } from 'primereact/dataview';
 import { Link } from 'react-router-dom';
@@ -149,10 +149,13 @@ const Payment = () => {
     const [layout, setLayout] = useState('list');
     const [selectedItems, setSelectedItems] = useState([]);
     const [purchase, setPurcase] = useState([])
-    const [products, setProducts] = useState([])
+    // const [products, setProducts] = useState([])
     const [visible, setVisible] = useState(false);
     const [formDisabled, setFromDisabled] = useState(false);
 
+    const location = useLocation();
+    const { products } = location.state || {}; // Access the type from state
+    console.log(products);
     const createAddress = async (address) => {
         try {
             const headers = {
@@ -241,7 +244,7 @@ const Payment = () => {
     }
 }
     const createPurchase = async (paymentType) => {
-        setProducts(selectedItems)
+        // setProducts(selectedItems)
         if(selectedItems){
         const purchase = {
             products: selectedItems,
@@ -526,6 +529,7 @@ const Payment = () => {
                         <h3>סך הכל</h3>
                         {/* {setTotalAmount(amount)} */}
                         {/* <h4>{amount} ש"ח</h4> */}
+                        
                         <div className="flex justify-content-center align-items-center" style={{ height: '200px', border: '2px solid #e0e0e0', borderRadius: '8px' }}>
                             {/* <Button label="לשלם עכשיו" icon="pi pi-credit-card" onClick={goToPayment} className="p-button-success p-button-rounded" style={{ width: '150px' }} /> */}
                         </div>
@@ -534,10 +538,13 @@ const Payment = () => {
                     {/* Right Side with Shopping Basket Items */}
                     <div className="card flex-1">
                         <div className="flex justify-content-end">
-                            <IconField iconPosition="left">
-                                <InputIcon className="pi pi-search" />
-                            </IconField>
+
+                            <h2> המוצרים שנבחרו</h2>
+                            <br/>
+
                         </div>
+                        <div> {products.map(product=> product.title)} </div>
+
                         <div style={{ width: "65%", marginLeft: "auto" }}>
                             {/* <DataView value={basket} listTemplate={listTemplate} layout={layout} header={header()} /> */}
                         </div>

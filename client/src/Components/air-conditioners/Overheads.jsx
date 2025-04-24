@@ -54,7 +54,8 @@ const Overheads = () => {
         alert("shoping")
         const shoppingBagDetails = {
             product_id  : product._id,
-            type : "overhead"
+            type : "overhead",
+            amount: 1
         }
         try {
             const headers = {

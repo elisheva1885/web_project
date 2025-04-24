@@ -41,8 +41,8 @@ const readShoppingBagByUserId = async (req,res)=> {
     const promises = shoppingBags.map(async (shoppingBag) => {
         switch (shoppingBag.type) {
             case "overhead":
-                const overhead = await Overhead.find({_id: shoppingBag.product_id}).populate("company").lean()
-                return overhead;        
+                const overhead = await Overhead.findOne({_id: shoppingBag.product_id}).populate("company").lean()
+                return {product: overhead,amount: shoppingBag.amount};        
             default:
                 break;
         }
