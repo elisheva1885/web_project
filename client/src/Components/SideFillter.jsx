@@ -3,9 +3,9 @@ import { Sidebar } from 'primereact/sidebar';
 import { Button } from 'primereact/button';
 import { Avatar } from 'primereact/avatar';
 import { Slider } from 'primereact/slider';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
-const SideFilter = () => {
+const SideFilter = ({ onFilter }) => {
     const [visible, setVisible] = useState(true);
 
     const [openSections, setOpenSections] = useState({
@@ -32,7 +32,7 @@ const SideFilter = () => {
     const [btuHeating, setBtuHeating] = useState(9500);
     const [btuCooling, setBtuCooling] = useState(9500);
     const [energyRating, setEnergyRating] = useState('');
-
+    const dispatch = useDispatch();
     const { companies } = useSelector((state) => state.companies);
     const options = companies.map(company => company.name);
 
@@ -43,6 +43,21 @@ const SideFilter = () => {
                 : [...prev, option]
         );
     };
+    const onSubmit = ()=>{
+        const filters = {
+            companies: selectedOptions,
+            shabbatMode,
+            wifi,
+            priceRange,
+            btuHeating,
+            btuCooling,
+            energyRating,
+        };
+        console.log("companies:",filters.companies)
+        onFilter(filters);
+        setVisible(false);
+        
+    }
 
     return (
         <div className="card flex justify-content-center">
@@ -247,7 +262,7 @@ const SideFilter = () => {
                                 </div>
 
                                 <div className="mt-auto p-3">
-                                    <Button className="w-full" label="סנן תוצאות" />
+                                    <Button className="w-full" label="סנן תוצאות" type='button' onClick={onSubmit}/>
                                 </div>
                             </div>
                         </div>

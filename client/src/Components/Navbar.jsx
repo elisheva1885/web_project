@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Menubar } from 'primereact/menubar';
 import { Suspense, lazy } from 'react'
-import { Route, Routes, Link, Router } from 'react-router-dom';
+import { Route, Routes, Link, Router, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { MegaMenu } from 'primereact/megamenu';
 import AdminRegister from './AdminRegister';
@@ -29,23 +29,28 @@ const Navbar = () => {
     const {userDetails} = useSelector((state) => state.userDetails);
     console.log("userDetails Navbar",userDetails)
     console.log("token Navbar",token)
+    const navigate = useNavigate();
 
     const acItems = [
         {
             label: 'מזגן עילי',
-            items: [{ label: 'Details for Overhead AC' }], // You can customize this
+            // items: [{ label: 'Details for Overhead AC' }],
+            command: () => navigate('/overheads'),
         },
         {
-            label: 'מזגן נייד',
-            items: [{ label: 'Details for Mobile AC' }],
+            label: 'מזגן מיני מרכזי',
+            // items: [{ label: 'Details for Mobile AC' }],
+            command: () => navigate('/miniCenterals'),
         },
         {
-            label: 'מזגן חלון',
-            items: [{ label: 'Details for Window AC' }],
+            label: 'מערכת VRF',
+            // items: [{ label: 'Details for Window AC' }],
+            command: () => navigate('/miniVrfs'),
         },
         {
-            label: 'מזגן מרכזי',
-            items: [{ label: 'Details for Central AC' }],
+            label: 'מולטי',
+            // items: [{ label: 'Details for Central AC' }],
+            command: () => navigate('/multis'),
         },
     ];
 

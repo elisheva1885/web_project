@@ -72,7 +72,7 @@ const UpdateOverheadAC = () => {
             const response = await axios.put(`http://localhost:8000/api/air-conditioner/overhead`, overheadAC, {headers});
             if (response.status === 200) {
                 setShowMessage(true);
-                navigate('/overhead', { state: { data: response.data } });
+                navigate('/overheads', { state: { data: response.data } });
             }
         } catch (error) {
             console.error(error);

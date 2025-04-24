@@ -222,7 +222,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { Stepper } from 'primereact/stepper';
 import { StepperPanel } from 'primereact/stepperpanel';
-import 'primereact/resources/themes/lara-light-indigo/theme.css'; // Or your preferred theme
+import 'primereact/resources/themes/lara-light-indigo/theme.css'; 
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
 
