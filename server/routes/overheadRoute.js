@@ -9,8 +9,9 @@ router.post("/",overheadController.createOverhead)
 router.get("/",overheadController.readOverheads)
 router.get("/overhead/:_id", overheadController.readOverheadById)
 router.get("/:title", overheadController.readOverheadByTitle)
-router.put("/", overheadController.updateOverhead)
-router.put("/stock",verifyJWT, overheadController.updateOverheadStock)
+router.put("/", officialVerify, overheadController.updateOverhead)
+router.put("/price",officialVerify, overheadController.updatOverheadPrice)
+router.put("/stock",officialVerify, overheadController.updateOverheadStock)
 
 router.delete("/", overheadController.deleteOverhead)
 

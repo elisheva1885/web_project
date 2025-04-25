@@ -62,7 +62,7 @@ const updateMiniCenteral = async (req, res) => {
     miniCenteral.describe= describe?describe:miniCenteral.describe
     miniCenteral.imagepath= imagepath?imagepath:miniCenteral.imagepath
     miniCenteral.stock= stock?stock:miniCenteral.stock
-    miniCenteral.price= miniCenteral.price
+    // miniCenteral.price= miniCenteral.price
     miniCenteral.BTU_output= BTU_output?BTU_output:miniCenteral.BTU_output
     miniCenteral.efficiency_factor= efficiency_factor?efficiency_factor:miniCenteral.efficiency_factor
     miniCenteral.energy_rating= energy_rating?energy_rating:miniCenteral.energy_rating
@@ -80,7 +80,7 @@ const updateMiniCenteral = async (req, res) => {
     miniCenteral.onof_auto= onof_auto?onof_auto:miniCenteral.onof_auto
     const updated = await miniCenteral.save()
     // const miniCenterals = await miniCenteral.find().populate("company").lean()
-    res.status(201).json(miniCenteral)
+    res.status(200).json(miniCenteral)
 }
 
 const deleteMiniCenteral = async (req,res)=> {
@@ -89,7 +89,7 @@ const deleteMiniCenteral = async (req,res)=> {
     if(!miniCenteral){
         return res.status(400).json({ message: "miniCenteral not found" })
     }
-    const result = await overhead.deleteOne()
+    const result = await miniCenteral.deleteOne()
     // const overheads = await MiniCenteral.find().populate("company").lean()
     // if(!overheads?.length){
     //     return res.status(400).json({ message: "no overheads found" })
@@ -108,7 +108,7 @@ const updatMiniCenteralStock = async (req,res) => {
     const miniCenteral = await MiniCenteral.findById(_id).populate("company").exec()
     miniCenteral.stock= miniCenteral.stock- amount
     const updated = await miniCenteral.save()
-    res.status(201).json(miniCenteral)
+    res.status(200).json(miniCenteral)
 }
 
 
@@ -123,7 +123,7 @@ const updatMiniCenteralPrice = async (req,res) => {
     const miniCenteral = await MiniCenteral.findById(_id).populate("company").exec()
     miniCenteral.price= price
     const updated = await miniCenteral.save()
-    res.status(201).json(miniCenteral)
+    res.status(200).json(miniCenteral)
 }
 
 module.exports = {createMiniCenteral,readMiniCenterals, readMiniCenteralsByTitle, readMiniCenteralById, updateMiniCenteral, updatMiniCenteralStock , deleteMiniCenteral, updatMiniCenteralPrice} 

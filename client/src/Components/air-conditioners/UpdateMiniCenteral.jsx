@@ -5,28 +5,28 @@ import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { setMiniCenterals } from '../../store/air-conditioner/miniCenteralsSlice';
 
 const UpdateMiniCenteral = () => {
     const location = useLocation();
     const mc = location.state?.type || {}; // Extract 'type' from the state
     const {token }= useSelector((state)=> state.token)
+    const {miniCenterals }= useSelector((state)=> state.miniCenterals)
 
     const { control, handleSubmit, formState: { errors } } = useForm({
         defaultValues: mc // Set defaultValues to o
     });
     const [showMessage, setShowMessage] = useState(false);
     const navigate = useNavigate();
-    
+    const dispatch = useDispatch()
     const onSubmit = async (data) => {
         const minicenteral = {
             _id: data._id,
-            company: data.company,
             title: data.title,
             describe: data.describe,
             imagepath: data.imagepath,
             stock: data.stock,
-            price: data.price,
             BTU_output: {
                 cool: data.BTU_output?.cool,
                 heat: data.BTU_output?.heat
@@ -62,15 +62,16 @@ const UpdateMiniCenteral = () => {
             air4d: data.air4d,
             sabbath_command: data.sabbath_command
         };
-
         try {
             const headers = {
                 'Authorization': `Bearer ${token}`
             }
-            const response = await axios.put(`http://localhost:8000/api/air-conditioner/miniCenteral`, minicenteral, {headers});
-            if (response.status === 201) {
+            const res = await axios.put(`http://localhost:8000/api/air-conditioner/miniCenteral`, minicenteral, {headers});
+            if (res.status === 200) {
                 setShowMessage(true);
-                navigate('/minicenterals', { state: { data: response.data } });
+                const unUpdatedMiniCenterals = miniCenterals.filter(minicenteral=> minicenteral._id != res.data._id)
+                dispatch(setMiniCenterals([...unUpdatedMiniCenterals , res.data]))
+                navigate('/minicenterals');
             }
         } catch (error) {
             console.error(error);
@@ -89,15 +90,6 @@ const UpdateMiniCenteral = () => {
                 <div className="card" style={{ width: '100%', maxWidth: '600px' }}>
                     <h5 className="text-center">Update MiniCenteral</h5>
                     <form onSubmit={handleSubmit(onSubmit)} className="p-fluid">
-                        <div className="field">
-                            <span className="p-float-label">
-                                <Controller name="company" control={control} render={({ field }) => (
-                                    <InputText id="company" {...field} />
-                                )} />
-                                <label htmlFor="company">Company</label>
-                            </span>
-                        </div>
-
                         <div className="field">
                             <span className="p-float-label">
                                 <Controller name="title" control={control} render={({ field }) => (
@@ -125,7 +117,7 @@ const UpdateMiniCenteral = () => {
                             </span>
                         </div>
 
-                        {/* <div className="field">
+                         <div className="field">
                             <span className="p-float-label">
                                 <Controller name="stock" control={control} render={({ field }) => (
                                     <InputText id="stock" type="number" {...field} />
@@ -134,7 +126,7 @@ const UpdateMiniCenteral = () => {
                             </span>
                         </div>
 
-                        <div className="field">
+                       {/*} <div className="field">
                             <span className="p-float-label">
                                 <Controller name="price" control={control} render={({ field }) => (
                                     <InputText id="price" type="number" {...field} />

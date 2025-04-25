@@ -16,6 +16,8 @@ import { setBasket } from '../../store/basketSlice';
 import { setOverheads } from '../../store/air-conditioner/overHeadsSlice';
 import SideFillter from '../SideFillter';
 import UpdateOverhead from './updateOvearhead';
+import { Controller, useForm } from 'react-hook-form';
+import { Dialog } from 'primereact/dialog';
 
 
 const Overhead = lazy(() => import('./Overhead'));
@@ -23,23 +25,27 @@ const Overhead = lazy(() => import('./Overhead'));
 
 const Overheads = () => {
 
-    const {token} = useSelector((state) => state.token)
-    const {companies} = useSelector((state) => state.companies)
-    const {basket} = useSelector((state) => state.basket)
-    const {userDetails} = useSelector((state) => state.userDetails);
+    const { token } = useSelector((state) => state.token)
+    const { companies } = useSelector((state) => state.companies)
+    const { basket } = useSelector((state) => state.basket)
+    const { userDetails } = useSelector((state) => state.userDetails);
 
-    const {overheads}= useSelector((state) => state.overheads);
-    const [overheads2, setOverheads2] = useState([])
+    const { overheads } = useSelector((state) => state.overheads);
+    const [selectedProduct, setSelectedProduct] = useState(null);
     const [value, setValue] = useState('')
     const [shoppingBags, setShoppingBags] = useState([])
     const [registered, setRegistered] = useState(false);
+    const [priceVisible, setPriceVisible] = useState(false);
+    const [stockVisible, setStockVisible] = useState(false);
+    const { control, handleSubmit, formState: { errors }, watch } = useForm()
 
     const [layout, setLayout] = useState('grid');
     const navigate = useNavigate();
     const dispatch = useDispatch();
-   
+    const priceValue = watch('price');
+    const stockValue = watch('stock');
 
-    
+
     const goToAddOverhead = (type) => {
         const navigationData = {
             type: type,
@@ -48,27 +54,25 @@ const Overheads = () => {
         navigate('/air_conditioner/add', { state: navigationData });
     };
 
-    const addToBasket = async(product) => {
-        //function to create prucace object
-        //by the token and the object
+    const addToBasket = async (product) => {
         alert("shoping")
         const shoppingBagDetails = {
-            product_id  : product._id,
-            type : "overhead",
+            product_id: product._id,
+            type: "overhead",
             amount: 1
         }
         try {
             const headers = {
                 'Authorization': `Bearer ${token}`
             }
-            const res = await axios.post('http://localhost:8000/api/user/shoppingBag', shoppingBagDetails, {headers})
+            const res = await axios.post('http://localhost:8000/api/user/shoppingBag', shoppingBagDetails, { headers })
             if (res.status === 200) {
                 alert("im here")
                 dispatch(setBasket(basket.push(res.data)))
-                console.log("res.data",res.data);
-                console.log("useState",shoppingBags);
+                console.log("res.data", res.data);
+                console.log("useState", shoppingBags);
             }
-            if(res.status === 409){
+            if (res.status === 409) {
                 // updateAmount(product)
             }
         }
@@ -77,6 +81,86 @@ const Overheads = () => {
         }
 
     }
+
+    const deleteOverhead = async (product) => {
+        try {
+            const headers = {
+                'Authorization': `Bearer ${token}`
+            };
+            const _id = {
+                _id: product._id
+            };
+            const res = await axios.delete('http://localhost:8000/api/air-conditioner/overhead', {
+                headers: headers,
+                data: _id
+            });
+            if (res.status === 200) {
+                const updatedOverheads = overheads.filter(overhead => overhead._id != product._id)
+                dispatch(setOverheads(updatedOverheads))
+            }
+        } catch (e) {
+            console.log(e);
+        }
+    };
+    const openPriceUpdateDialog = (product) => {
+        setSelectedProduct(product);
+        setPriceVisible(true);
+    };
+
+    const openStockUpdateDialog = (product) => {
+        setSelectedProduct(product);
+        setStockVisible(true);
+    };
+
+
+    const updatePrice = async (data) => {
+        try {
+            const headers = {
+                'Authorization': `Bearer ${token}`
+            }
+            const details = {
+                _id: selectedProduct._id,
+                price: priceValue
+            }
+            console.log(details);
+            const res = await axios.put(`http://localhost:8000/api/air-conditioner/overhead/price`, details, { headers });
+            console.log(res);
+            if (res.status === 200) {
+                alert(`${selectedProduct.title} price updated`)
+                const unUpdatedOverheads = overheads.filter(overhead => overhead._id != res.data._id)
+                dispatch(setOverheads([...unUpdatedOverheads, res.data]))
+                setPriceVisible(false);
+            }
+        }
+        catch (error) {
+            console.error(error);
+            setPriceVisible(false);
+        }
+    }
+
+    // const updateStock = async (data) => {
+    //     try {
+    //         const headers = {
+    //             'Authorization': `Bearer ${token}`
+    //         }
+    //         const details = {
+    //             _id: selectedProduct._id,
+    //             stock: stockValue
+    //         }
+    //         const res = await axios.put(`http://localhost:8000/api/air-conditioner/overhead/stock`, details, { headers });
+    //         console.log(res);
+    //         if (res.status === 200) {
+    //             alert(`${selectedProduct.title} stock updated`)
+    //             const unUpdatedOverheads = overheads.filter(overhead => overhead._id != res.data._id)
+    //             dispatch(setOverheads([...unUpdatedOverheads, res.data]))
+    //             setStockVisible(false);
+    //         }
+    //     }
+    //     catch (error) {
+    //         console.error(error);
+    //         setStockVisible(false);
+    //     }
+    // }
 
     // const getCompanies = async()=>{
     //     try{
@@ -128,7 +212,7 @@ const Overheads = () => {
         catch (e) {
             console.error(e)
         }
-    }  
+    }
 
     const getSeverity = (s) => {
         if (s >= 50) {
@@ -238,39 +322,45 @@ const Overheads = () => {
             // You can add any other data you may want to send
         };
         console.log(o);
-        navigate('/overheads/overhead/update' , { state: navigationData })
-       // dispatch(setOverheads(res.data))
+        navigate('/overheads/overhead/update', { state: navigationData })
+        // dispatch(setOverheads(res.data))
     }
 
     const gridItem = (product) => {
         return (
             <div className="col-12 sm:col-6 lg:col-3 p-3" key={product._id}>
                 <div className="border-1 surface-border border-round p-4 shadow-3 h-full flex flex-column justify-content-between gap-4">
-    
+
                     {/* תמונת החברה - גדולה ובולטת */}
                     <img
                         src={`/${product?.company?.imagePath}`}
                         alt="Company"
                         className="w-full h-10rem object-contain border-round"
                     />
-    
+
                     {/* תמונת המוצר - גדולה ורחבה */}
                     <img
                         src={`overheads/${product.imagepath}`}
                         alt={product.title}
                         className="w-full h-12rem object-contain border-round"
                     />
-    
+
                     {/* פרטי המוצר */}
                     <div className="flex flex-column align-items-center text-center gap-2">
                         <Link to={`/overheads/overhead/${product._id}`}>
                             <div className="text-xl font-bold text-900">{product.title}</div>
                         </Link>
-    
+
                         <Tag value={getSeverityText(product)} severity={getSeverity(product.stock)} />
                         <span className="text-lg font-medium text-primary">₪{product.price}</span>
-                        {userDetails?.role==='official'|| userDetails?.role==='admin' ?<Button onClick={()=>UpdateOverhead(product)}><i className="pi pi-pencil" style={{ fontSize: '1rem' }}></i></Button>: <></>}
-                    </div>                      
+                        {userDetails?.role === 'official' || userDetails?.role === 'admin' ? <Button onClick={() => UpdateOverhead(product)}><i className="pi pi-pencil" style={{ fontSize: '1rem' }}></i></Button> : <></>}
+                        {userDetails?.role === 'official' || userDetails?.role === 'admin' ? (<Button onClick={() => openPriceUpdateDialog(product)}><i className="pi pi-pencil" style={{ fontSize: '1rem' }}> עדכון מחיר </i> </Button>) : <></>}
+                        {/* {userDetails?.role === 'official' || userDetails?.role === 'admin' ? <Button onClick={() => openStockUpdateDialog(product)}><i className="pi pi-pencil" style={{ fontSize: '1rem' }}> עדכון מלאי </i></Button> : <></>} */}
+
+                        {userDetails?.role === 'admin' && (
+                            <Button icon="pi pi-trash" className="p-button-rounded p-button-danger p-button-sm" onClick={() => deleteOverhead(product)} tooltip="מחק" tooltipOptions={{ position: 'bottom' }} />
+                        )}
+                    </div>
                     <Button
                         label="הוספה לעגלה"
                         icon="pi pi-shopping-cart"
@@ -279,23 +369,23 @@ const Overheads = () => {
                             getSeverity(product.stock) === "danger" || registered === false
                         }
                         onClick={() => addToBasket(product)}
-                    />      
+                    />
                 </div>
             </div>
         );
     };
-    
+
     const itemTemplate = (product, layout, index) => {
         if (!product) {
             return;
         }
-         if (layout === 'grid') return gridItem(product, index);
+        if (layout === 'grid') return gridItem(product, index);
     };
 
     const listTemplate = (products, layout) => {
         if (!Array.isArray(overheads) || overheads.length === 0) {
             return <h1>No overheads available</h1>; // Fallback UI          
-            }
+        }
         return <div className="grid grid-nogutter">{overheads.map((product, index) => itemTemplate(product, layout, index))}</div>;
     };
 
@@ -315,7 +405,7 @@ const Overheads = () => {
 
         // Example filter logic
         if (filters.companies.length > 0) {
-            filteredOverheads = filteredOverheads.filter(overhead => 
+            filteredOverheads = filteredOverheads.filter(overhead =>
                 filters.companies.includes(overhead.company.name)
             );
         }
@@ -326,22 +416,22 @@ const Overheads = () => {
             filteredOverheads = filteredOverheads.filter(overhead => overhead.hasWifi);
         }
         if (filters.priceRange) {
-            filteredOverheads = filteredOverheads.filter(overhead => 
+            filteredOverheads = filteredOverheads.filter(overhead =>
                 overhead?.price >= filters.priceRange[0] && overhead.price <= filters.priceRange[1]
             );
         }
         if (filters.btuHeating) {
-            filteredOverheads = filteredOverheads.filter(overhead => 
+            filteredOverheads = filteredOverheads.filter(overhead =>
                 overhead?.btuHeating >= filters.btuHeating
             );
         }
         if (filters.btuCooling) {
-            filteredOverheads = filteredOverheads.filter(overhead => 
+            filteredOverheads = filteredOverheads.filter(overhead =>
                 overhead?.btuCooling >= filters.btuCooling
             );
         }
         if (filters.energyRating) {
-            filteredOverheads = filteredOverheads.filter(overhead => 
+            filteredOverheads = filteredOverheads.filter(overhead =>
                 overhead?.energyRating === filters.energyRating
             );
         }
@@ -351,15 +441,15 @@ const Overheads = () => {
 
     useEffect(() => {
         // getCompanies()
-        
-        if(token){
+
+        if (token) {
             setRegistered(true)
         }
     }, [])
 
     return (
         <>
-            {userDetails.role === 'admin'?<Button onClick={ ()=>goToAddOverhead("Overhead")}>add overhead</Button>: <></> }
+            {userDetails.role === 'admin' ? <Button onClick={() => goToAddOverhead("Overhead")}>add overhead</Button> : <></>}
             {/* {<Button onClick={ ()=>goToAddOverhead("Overhead")}>add overhead</Button>} */}
             <div className="card">
                 <div className="flex justify-content-end">
@@ -368,9 +458,64 @@ const Overheads = () => {
                         <InputText placeholder="Search by name" onChange={(c) => getOverheadByTitle(c)} value={value} />
                     </IconField>
                 </div>
-                <DataView value={overheads} listTemplate={listTemplate} layout={layout}/>
+                <DataView value={overheads} listTemplate={listTemplate} layout={layout} />
             </div>
-            <SideFillter onFilter={filterOverheads}/>
+            <SideFillter onFilter={filterOverheads} />
+
+
+            <Dialog
+    header="עדכון מחיר"
+    visible={priceVisible}
+    style={{ width: '50vw' }}
+    onHide={() => priceVisible(false)}
+    modal
+>
+    <h6>מחיר:</h6>
+    <div className="field">
+        <span className="p-float-label">
+            <Controller
+                name="price"
+                control={control}
+                render={({ field }) => (
+                    <InputText id={field.name} type="number" {...field} />
+                )}
+            />
+            <label htmlFor="price">{selectedProduct?.price}</label>
+        </span>
+    </div>
+    <Button
+        label="לעדכון"
+        onClick={handleSubmit(updatePrice)}
+        className="p-button-success"
+    />
+</Dialog>
+
+{/* <Dialog
+    header="עדכון מלאי"
+    visible={stockVisible}
+    style={{ width: '50vw' }}
+    onHide={() => setStockVisible(false)}
+    modal
+>
+    <h6>מלאי:</h6>
+    <div className="field">
+        <span className="p-float-label">
+            <Controller
+                name="stock"
+                control={control}
+                render={({ field }) => (
+                    <InputText id={field.name} type="number" {...field} />
+                )}
+            />
+            <label htmlFor="stock">{selectedProduct?.stock}</label>
+        </span>
+    </div>
+    <Button
+        label="לעדכון"
+        onClick={handleSubmit(updateStock)}
+        className="p-button-success"
+    />
+</Dialog> */}
         </>
     )
 }

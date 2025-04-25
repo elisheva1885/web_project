@@ -6,12 +6,18 @@ import { Button } from 'primereact/button';
 import axios from 'axios';
 import classNames from 'classnames';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import Overhead from './Overhead';
+import { setMiniCenterals } from '../../store/air-conditioner/miniCenteralsSlice';
+import { setOverheads } from '../../store/air-conditioner/overHeadsSlice';
 
 const UpdateOverheadAC = () => {
     const location = useLocation();
     const o = location.state?.type || {}; // Extract 'type' from the state
     const {token }= useSelector((state)=> state.token)
+    const {overheads }= useSelector((state)=> state.overheads)
+    const dispatch = useDispatch()
+
     const { control, handleSubmit, formState: { errors } } = useForm({
         defaultValues: o // Set defaultValues to o
     });
@@ -26,7 +32,6 @@ const UpdateOverheadAC = () => {
             describe: data.describe,
             imagepath: data.imagepath,
             stock: data.stock,
-            price: data.price,
             BTU_output: {
                 cool: data.BTU_output?.cool,
                 heat: data.BTU_output?.heat
@@ -69,10 +74,13 @@ const UpdateOverheadAC = () => {
             const headers = {
                 'Authorization': `Bearer ${token}`
             }
-            const response = await axios.put(`http://localhost:8000/api/air-conditioner/overhead`, overheadAC, {headers});
-            if (response.status === 200) {
+            const res = await axios.put(`http://localhost:8000/api/air-conditioner/overhead`, overheadAC, {headers});
+            if (res.status === 200) {
                 setShowMessage(true);
-                navigate('/overheads', { state: { data: response.data } });
+                console.log(res.data);
+                const unUpdatedOverheads = overheads.filter(overhead=> overhead._id != res.data._id)
+                dispatch(setOverheads([...unUpdatedOverheads , res.data]))
+                navigate('/overheads');
             }
         } catch (error) {
             console.error(error);
@@ -374,14 +382,14 @@ const UpdateOverheadAC = () => {
                         </span>
                     </div>
 
-                    <div className="field">
+                    {/* <div className="field">
                         <span className="p-float-label">
                             <Controller name="price" control={control} render={({ field }) => (
                                 <InputText id={field.name} type="number" {...field} />
                             )} />
                             <label htmlFor="price">Price</label>
                         </span>
-                    </div>
+                    </div> */}
 
                     <div className="field">
                         <div className="flex">
