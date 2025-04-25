@@ -26,7 +26,7 @@ const rootReducer = combineReducers({
 const persistConfig = {
   key: "root",
   storage, // נשמור את המידע ב-sessionStorage. אפשר להחליף ל-localStorage אם רוצים
-  whitelist: ["token", "basket", "userDetails", "company", "overheads"], // רק את אלה שברצונך לשמור
+  whitelist: ["token", "basket", "userDetails", "company", "overheads", "miniCenterals"], // רק את אלה שברצונך לשמור
 };
 
 // שימוש ב-persistReducer

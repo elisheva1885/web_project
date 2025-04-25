@@ -13,7 +13,7 @@ const basketSlice = createSlice({
         },
         clearBasket(state) {
             state.basket = null;
-        }
+        },
     }
 })
 
