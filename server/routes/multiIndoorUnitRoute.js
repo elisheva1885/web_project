@@ -1,0 +1,16 @@
+const express = require("express")
+const router = express.Router()
+const multiIndoorUnitController = require("../controllers/multiIndoorUnitController")
+const adminVerify = require("../middleware/adminVerify")
+const officialVerify = require("../middleware/officialVerify")
+const verifyJWT = require("../middleware/verifyJWT")
+router.post("/",multiIndoorUnitController.createMultiIndoorUnit)
+router.get("/",multiIndoorUnitController.readMultiIndoorUnits)
+router.get("/miniCenteral/:_id",multiIndoorUnitController.readMultiIndoorUnitById)
+router.get("/:title",multiIndoorUnitController.readMultiIndoorUnitsByTitle)
+router.put("/",officialVerify, multiIndoorUnitController.updateMultiIndoorUnit)
+router.put("/stock",officialVerify, multiIndoorUnitController.updatMultiIndoorUnitStock)
+router.put("/price",officialVerify, multiIndoorUnitController.updatMultiIndoorUnitPrice)
+router.delete("/", multiIndoorUnitController.deleteMultiIndoorUnit)
+
+module.exports = router

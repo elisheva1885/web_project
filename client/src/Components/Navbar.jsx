@@ -21,6 +21,8 @@ const MiniCenterals = lazy(() => import('./air-conditioners/MiniCentrals'));
 const Add_AirConditioner = lazy(() => import('./air-conditioners/Add_AirConditioner'));
 const UpdateOverheadAC = lazy(() => import('./air-conditioners/updateOvearhead'));
 const UpdateMiniCenteral = lazy(() => import('./air-conditioners/UpdateMiniCenteral'));
+const MultiIndoorUnits = lazy(() => import('./air-conditioners/MultiIndoorUnits'));
+
 
 const Navbar = () => {
 
@@ -129,6 +131,7 @@ const Navbar = () => {
                 <Route path='/about' element={<Suspense fallback="Loading..."><About /></Suspense>}></Route>
                 <Route path='/overheads' element={<Suspense fallback="Loading..."><Overheads /></Suspense>}>        </Route>
                 <Route path='/miniCenterals' element={<Suspense fallback="Loading..."><MiniCenterals /></Suspense>}>        </Route>
+                <Route path='/multiIndoorUnits' element={<Suspense fallback="Loading..."><MultiIndoorUnits /></Suspense>}>        </Route>
                 <Route path={`/overheads/overhead/:product`} element={<Suspense fallback="Loading..."><Overhead /></Suspense>}></Route>
                 <Route path={`/miniCenterals/miniCenteral/:product`} element={<Suspense fallback="Loading..."><Overhead /></Suspense>}></Route>
                 <Route path='/miniCenterals/miniCenteral/update' element={<Suspense fallback="Loading..."><UpdateMiniCenteral/></Suspense>}></Route>

@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setOverheads } from '../store/air-conditioner/overHeadsSlice';
 import { setCompanies } from '../store/companySlice';
 import { setMiniCenterals } from '../store/air-conditioner/miniCenteralsSlice';
+import { setMultiIndoorUnits } from '../store/air-conditioner/multiIndoorUnitsSlice';
 
 
 const Home = () => {
@@ -40,7 +41,7 @@ const Home = () => {
                     navigate('/miniVrfs')                    
                     break;
                 case 4:
-                    navigate('/multis')                    
+                    navigate('/multiIndoorUnits')                    
                     break;
                 default:
                     break;
@@ -86,6 +87,23 @@ const Home = () => {
         }
     }
 
+    const getMultiIndoorUnit = async () => {
+        try {
+            // const headers = {
+            //     'Authorization': `Bearer ${token}`
+            // }
+            // const res = await axios.get('http://localhost:8000/api/air-conditioner/overhead',{headers})
+            const res = await axios.get('http://localhost:8000/api/air-conditioner/multiIndoorUnit')
+            if (res.status === 200) {
+                dispatch(setMultiIndoorUnits(res.data));
+                // console.log(overheads);
+            }
+        }
+        catch (e) {
+            console.error(e)
+        }
+    }
+
     const getMiniCenterals = async () => {
         try {
             // const headers = {
@@ -121,6 +139,7 @@ const Home = () => {
         getOverheads()
         getCompanies()
         getMiniCenterals()
+        getMultiIndoorUnit()
     }, [])
 
     return (
