@@ -7,7 +7,7 @@ const createPurchase = async (req, res) => {
     if (!user_id || !products.length || !paymentType) {
         return res.status(400).json({ message: "all details are required" })
     }
-    checkProductsStock(products)
+    // checkProductsStock(products)
     const purchase = await Purchase.create({user_id, products,paymentType})
     if (purchase) {
         // const purchases = await Purchase.find().lean()
@@ -17,9 +17,9 @@ const createPurchase = async (req, res) => {
         return res.status(400).json({ message: "invalid purchase" })
     }
 }
-const checkProductsStock = async (products)=>{
-    
-} 
+// const checkProductsStock = async (products)=>{   
+// } 
+
 const readPurchases = async (req, res) => {
     const purchases = await Purchase.find().lean()
     if (!purchases?.length)

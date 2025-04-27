@@ -11,12 +11,11 @@ const deliverySchema = new mongoose.Schema({
          ref: 'Address' ,
         required: true
     },
-    purchase: {
+    purchase: [{
         type: mongoose.Schema.Types.ObjectId,
-        required: true,
-        ref: "Purchase",
-        immutable: true
-    },
+        ref: 'Purchase', 
+        required: true
+    }],
     status: {
         type: String,
         enum: ["waiting to be delivered","on the way","arrived","recieved"],

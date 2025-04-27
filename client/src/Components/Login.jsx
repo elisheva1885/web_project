@@ -13,6 +13,7 @@ import myStore from '../store/store';
 import { setBasket ,clearBasket  } from '../store/basketSlice';
 import { clearUserDetails, setUserDetails } from '../store/userDetailsSlice';
 import Basket from './Basket';
+import { clearUserDeliveries } from '../store/userDeliveriesSlice';
 
 const Login  =() => {
     const {token} = useSelector((state) => state.token)
@@ -37,6 +38,7 @@ const Login  =() => {
     const signOut = ()=> {
         clearToken()
         clearBasket()
+        clearUserDeliveries()
     }
 
     const getShoppingBag = async () => {
@@ -89,11 +91,7 @@ const Login  =() => {
     };
 
     const dialogFooter = <div className="flex justify-content-center"><Button label="OK" className="p-button-text" autoFocus onClick={() => setShowMessage(false)} /></div>;
-    useEffect(() => {
-        // if (token) {
-        //     // קריאה ל-API רק אם יש טוקן
-        // }
-    }, [token]);
+
     return (
           <div style={{ paddingTop: '60px' }}>
 

@@ -16,7 +16,7 @@ const Basket = lazy(() => import('./Basket'));
 const UpdateBranch = lazy(() => import('./UpdateBranch'));
 const AddBranch = lazy(() => import('./AddBranch'));
 const Admin = lazy(() => import('./Admin'));
-const UserAccont = lazy(() => import('./UserAccont'));
+const UserAcount = lazy(() => import('./UserAcount'));
 const MiniCenterals = lazy(() => import('./air-conditioners/MiniCentrals'));
 const Add_AirConditioner = lazy(() => import('./air-conditioners/Add_AirConditioner'));
 const UpdateOverheadAC = lazy(() => import('./air-conditioners/updateOvearhead'));
@@ -75,7 +75,7 @@ const Navbar = () => {
             // label: token != null ?'התנתקות' : 'התחברות',
             label:userDetails?.username? userDetails?.username:'התחברות',
             icon: 'pi pi-user',
-            url: userDetails?.username? '/userAccount': '/login'
+            url: userDetails?.username? '/userAcount': '/login'
         }
         ,
         {
@@ -141,7 +141,7 @@ const Navbar = () => {
                 <Route path='/air_conditioner/add' element={<Suspense fallback="Loading..."><Add_AirConditioner/></Suspense>}></Route>
                 <Route path='/basket' element={<Suspense fallback="Loading..."><Basket /></Suspense>}></Route>
                 <Route path='/admin' element={<Suspense fallback="Loading..."><Admin/></Suspense>}></Route>
-                <Route path='/userAccount' element={<Suspense fallback="Loading..."><UserAccont/></Suspense>}></Route>
+                <Route path='/userAcount' element={<Suspense fallback="Loading..."><UserAcount/></Suspense>}></Route>
                 <Route path='/admin/register' element={<Suspense fallback="Loading..."><AdminRegister/></Suspense>}></Route>
                 <Route path='/basket/Payment' element={<Suspense fallback="Loading..."><Payment/></Suspense>}></Route>
             </Routes>

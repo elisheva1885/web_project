@@ -41,37 +41,37 @@ const Payment = () => {
 
     const location = useLocation();
     const { products } = location.state || {}; // Access the type from state
-    console.log(products);
+    // console.log(products);
     const paymentRequest = {
         apiVersion: 2,
         apiVersionMinor: 0,
         allowedPaymentMethods: [
-          {
-            type: "CARD",
-            parameters: {
-              allowedAuthMethods: ["PAN_ONLY", "CRYPTOGRAM_3DS"],
-              allowedCardNetworks: ["MASTERCARD", "VISA"]
-            },
-            tokenizationSpecification: {
-              type: "PAYMENT_GATEWAY",
-              parameters: {
-                gateway: "example"
-              }
+            {
+                type: "CARD",
+                parameters: {
+                    allowedAuthMethods: ["PAN_ONLY", "CRYPTOGRAM_3DS"],
+                    allowedCardNetworks: ["MASTERCARD", "VISA"]
+                },
+                tokenizationSpecification: {
+                    type: "PAYMENT_GATEWAY",
+                    parameters: {
+                        gateway: "example"
+                    }
+                }
             }
-          }
         ],
         merchantInfo: {
-          merchantId: "12345678901234567890",
-          merchantName: "Demo Merchant"
+            merchantId: "12345678901234567890",
+            merchantName: "Demo Merchant"
         },
         transactionInfo: {
-          totalPriceStatus: "FINAL",
-          totalPriceLabel: "Total",
-          totalPrice: "100.00",
-          currencyCode: "USD",
-          countryCode: "US"
+            totalPriceStatus: "FINAL",
+            totalPriceLabel: "Total",
+            totalPrice: "100.00",
+            currencyCode: "USD",
+            countryCode: "US"
         }
-      };
+    };
     const createAddress = async (address) => {
         try {
             const headers = {
@@ -92,14 +92,14 @@ const Payment = () => {
     };
 
     const updateProductsStock = async (products) => {
-        console.log(" aa  ",products);
+        console.log(" aa  ", products);
         try {
             const headers = {
                 'Authorization': `Bearer ${token}`
             };
             const updateRequests = products.map(product => {
-                console.log("product",product);
-                try{
+                console.log("product", product);
+                try {
                     const data = {
                         _id: product._id,
                         amount: 1
@@ -107,12 +107,12 @@ const Payment = () => {
                     console.log(data);
                     return axios.put("http://localhost:8000/api/air-conditioner/overhead/stock", data, { headers });
                 }
-                catch(e){
+                catch (e) {
                     alert("error")
                 }
             });
-        
-                const responses = await Promise.all(updateRequests);
+
+            const responses = await Promise.all(updateRequests);
             console.log(responses);
 
             const updatedOverheads = responses
@@ -126,68 +126,71 @@ const Payment = () => {
                         existingMap.set(item._id, item); // מחליף אם כבר קיים
                     });
                     return Array.from(existingMap.values());
-                }));           
-             }    
+                }));
+            }
         } catch (error) {
             if (error.response?.status === 400) {
                 alert("All details are required");
             } else if (error.response?.status === 204) {
                 alert("The stock didn't change");
-            } 
+            }
         }
     };
-    const createDelivery =  async ()=> {
+    const createDelivery = async () => {
         const details = {
-            address: address?address:newAddress,
-            purchase: purchase
-        }
-        try{
-            const headers = {
-                'Authorization': `Bearer ${token}`
-            };
-            const res = await axios.post("http://localhost:8000/api/delivery", details, { headers });
-            console.log("res",res);
-            if(res.status === 201){
-
-                alert("the deleviry created in the system")
-                navigate('/')
-            }
-
-        }
-        catch(e){
-            if (e.response?.status === 400) {
-                alert("All details are required");
-            } 
-    }
-}
-    const createPurchase = async (paymentType) => {
-        // setProducts(selectedItems)
-        if(selectedItems){
-        const data = {
-            products: products,
-            paymentType: paymentType
+            address: address ? address : newAddress,
+            purchase:  selectedItems.map(item => item._id)
         }
         try {
             const headers = {
                 'Authorization': `Bearer ${token}`
             };
-            const res = await axios.post("http://localhost:8000/api/user/purchase", data, { headers });
+            const res = await axios.post("http://localhost:8000/api/delivery", details, { headers });
+            console.log("res", res);
             if (res.status === 201) {
-                console.log("to the function");
-                updateProductsStock(selectedItems)
-                setPurcase(res.data);
-                alert("ההזמנה הושלמה")
-                // setProducts([])
-                createDelivery()
-
+                alert("the deleviry created in the system")
+                navigate('/')
             }
-        } catch (error) {
-            console.log(error);
-            if (error.response?.status === 400) {
-                alert("Error");
+
+        } catch (e) {
+            if (e.response) {
+                console.error("Error response from server:", e.response.data);
+                if (e.response.status === 400) {
+                    alert("Error: " + e.response.data.message);
+                }
+            } else {
+                console.error("Error making request:", e.message);
             }
         }
     }
+    const createPurchase = async (paymentType) => {
+        // setProducts(selectedItems)
+        if (selectedItems) {
+            const data = {
+                products: products,
+                paymentType: paymentType
+            }
+            try {
+                const headers = {
+                    'Authorization': `Bearer ${token}`
+                };
+                const res = await axios.post("http://localhost:8000/api/user/purchase", data, { headers });
+                if (res.status === 201) {
+                    console.log("to the function");
+                    updateProductsStock(selectedItems)
+                    setPurcase(res.data);
+                    alert("ההזמנה הושלמה")
+                    // setProducts([])
+                    createDelivery()
+
+                }
+            } catch (error) {
+                console.log(error);
+                if (error.response?.status === 400) {
+                    alert("Error");
+                }
+            }
+        }
     }
     const onSubmit = (data) => {
         createAddress(data)
@@ -302,15 +305,16 @@ const Payment = () => {
         );
     }
     const getUserAddress = async (c) => {
+        console.log("address: ")
         try {
             const headers = {
                 'Authorization': `Bearer ${token}`
             };
             const res = await axios.get(`http://localhost:8000/api/user/address/existAddress`, { headers })
             if (res.status === 200) {
+                console.log("address: ", res.data[0])
                 setAddress(res.data[0])
                 setVisible(true);
-
             }
         }
         catch (e) {
@@ -323,19 +327,19 @@ const Payment = () => {
     }, [])
 
     return (
-        
+
         <div style={{ paddingTop: '60px' }}>
- <GooglePayButton
-          environment="TEST"
-          buttonColor={buttonColor}
-          buttonType={buttonType}
-          buttonSizeMode={buttonSizeMode}
-          paymentRequest={paymentRequest}
-          onLoadPaymentData={paymentRequest => {
-            console.log("load payment data", paymentRequest);
-          }}
-          style={{ width: buttonWidth, height: buttonHeight }}
-        />
+            <GooglePayButton
+                environment="TEST"
+                buttonColor={buttonColor}
+                buttonType={buttonType}
+                buttonSizeMode={buttonSizeMode}
+                paymentRequest={paymentRequest}
+                onLoadPaymentData={paymentRequest => {
+                    console.log("load payment data", paymentRequest);
+                }}
+                style={{ width: buttonWidth, height: buttonHeight }}
+            />
             {address ? existAddress() : <></>}
             <div>
                 {/* <div style={{ display: "flex", width: "100vw", height: "100vh", padding: "20px" }}> */}
@@ -457,7 +461,7 @@ const Payment = () => {
                         <h3>סך הכל</h3>
                         {/* {setTotalAmount(amount)} */}
                         {/* <h4>{amount} ש"ח</h4> */}
-                        
+
                         <div className="flex justify-content-center align-items-center" style={{ height: '200px', border: '2px solid #e0e0e0', borderRadius: '8px' }}>
                             {/* <Button label="לשלם עכשיו" icon="pi pi-credit-card" onClick={goToPayment} className="p-button-success p-button-rounded" style={{ width: '150px' }} /> */}
                         </div>
@@ -468,10 +472,10 @@ const Payment = () => {
                         <div className="flex justify-content-end">
 
                             <h2> המוצרים שנבחרו</h2>
-                            <br/>
+                            <br />
 
                         </div>
-                        <div> {products.map(product=> product.title)} </div>
+                        <div> {products.map(product => product.title)} </div>
 
                         <div style={{ width: "65%", marginLeft: "auto" }}>
                             {/* <DataView value={basket} listTemplate={listTemplate} layout={layout} header={header()} /> */}

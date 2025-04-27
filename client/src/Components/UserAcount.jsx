@@ -4,10 +4,12 @@ import { clearToken } from '../store/tokenSlice';
 import { Button } from 'primereact/button';
 import { useNavigate } from 'react-router-dom';
 import { clearBasket } from '../store/basketSlice';
+import UserAcountNavbar from './UserAcountNavbar';
+import { clearUserDeliveries } from '../store/userDeliveriesSlice';
 
 
 
-const UserAccont =()=> {
+const UserAcount =()=> {
     const {userDetails} = useSelector((state) => state.userDetails);
     const dispatch = useDispatch();
     const navigate = useNavigate()
@@ -16,6 +18,7 @@ const UserAccont =()=> {
         dispatch(clearToken())
         dispatch(clearUserDetails())
         dispatch(clearBasket())
+        dispatch(clearUserDeliveries())
         navigate("/")       
     }
     return(
@@ -25,7 +28,8 @@ const UserAccont =()=> {
         <h1> hello {userDetails.username}</h1>
         <Button type="submit" label="ליציאה מהפרופיל" className="mt-2" onClick={signOut}/>
         </div>
+        <UserAcountNavbar/>
 </>
     )
 }
-export default UserAccont
+export default UserAcount

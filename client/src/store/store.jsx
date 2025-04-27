@@ -12,6 +12,7 @@ import companiesSlice from "./companySlice";
 import userDetailsSlice from "./userDetailsSlice";
 import miniCenteralSlice from "./air-conditioner/miniCenteralsSlice";
 import multiIndoorUnitsSlice from "./air-conditioner/multiIndoorUnitsSlice";
+import userDeliveriesSlice from "./userDeliveriesSlice";
 
 // חיבור הסלאייסים עם rootReducer
 const rootReducer = combineReducers({
@@ -21,14 +22,15 @@ const rootReducer = combineReducers({
   companies: companiesSlice,
   userDetails: userDetailsSlice,
   miniCenterals: miniCenteralSlice,
-  multiIndoorUnits: multiIndoorUnitsSlice
+  multiIndoorUnits: multiIndoorUnitsSlice,
+  userDeliveries: userDeliveriesSlice
 });
 
 // הגדרת persist
 const persistConfig = {
   key: "root",
   storage, // נשמור את המידע ב-sessionStorage. אפשר להחליף ל-localStorage אם רוצים
-  whitelist: ["token", "basket", "userDetails", "company", "overheads", "miniCenterals", "multiIndoorUnits"], // רק את אלה שברצונך לשמור
+  whitelist: ["token", "basket", "userDetails", "company", "overheads", "miniCenterals", "multiIndoorUnits", "userDeliveries"], // רק את אלה שברצונך לשמור
 };
 
 // שימוש ב-persistReducer
