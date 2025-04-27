@@ -66,7 +66,45 @@ const Basket = () => {
             console.error(e)
         }
     }
-
+    const updateShoppingBagProductAmount = async (productDetails,amount )=> {
+        try {
+            const headers = {
+                'Authorization': `Bearer ${token}`
+            }
+            const data = {
+                product_id : productDetails._id,
+                amount: amount
+            }
+            console.log(productDetails);
+            const res = await axios.put('http://localhost:8000/api/user/shoppingBag', data,{ headers })
+            if (res.status === 200) {
+                console.log(res.data);
+                const updatedBasket = basket.map(item => {
+                    // אם ה-ID של המוצר בפריט הנוכחי תואם ל-ID שהתקבל מהשרת
+                    if (item.product._id === res.data.product_id) {
+                        // החזר אובייקט חדש עם הכמות המעודכנת
+                        return { ...item, amount: res.data.amount };
+                    }
+                    // אחרת, החזר את הפריט כמו שהוא
+                    return item;
+                });
+    
+                dispatch(setBasket(updatedBasket));
+                console.log(basket);
+                // const unUpdatedshoppingBags = basket.filter(product=> product.product._id != res.data.product_id)        
+                // const updateShoppingBag = basket.find(product=> {
+                //     console.log({product_id_in_basket: product.product._id, product_id_from_server: res.data.product_id});
+                //     return  product.product._id === res.data.product_id})
+                // console.log([updateShoppingBag]);
+                // const updatedProduct = { ...updateShoppingBag, amount: res.data.amount };
+                // dispatch(setBasket([...unUpdatedshoppingBags,updatedProduct]))
+                // console.log("res.data", res.data);
+            }
+        }
+        catch (e) {
+            console.error(e)
+        }
+    }
     const goToPayment = () => {
         const navigationData = {
             products: selectedItems,
@@ -109,42 +147,39 @@ const Basket = () => {
 
         return (
             <div className="col-12" key={productDetails._id}>
-                <div className={classNames('flex flex-column xl:flex-row xl:align-items-start p-4 gap-4', { 'border-top-1 surface-border': index !== 0 })}>
-                    <Checkbox inputId={productDetails._id} checked={isSelected} onChange={() => handleSelectionChange(productDetails)} />
-                    <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`${productDetails.imagepath}`} alt={productDetails.title} />
-                    <div className="flex flex-column sm:flex-row justify-content-between align-items-center xl:align-items-start flex-1 gap-4">
-                        <div className="flex flex-column align-items-center sm:align-items-start gap-3">
-                            <Link to={`/overheads/overhead/${productDetails._id}`}><div className="text-2xl font-bold text-900">{productDetails.title}</div></Link>
-                            <div className="flex align-items-center gap-3">
-                                <Tag value={getSeverityText(productDetails)} severity={getSeverity(productDetails.stock)}></Tag>
-                            </div>
+            <div className={classNames('flex flex-column xl:flex-row xl:align-items-start p-4 gap-4', { 'border-top-1 surface-border': index !== 0 })}>
+                <Checkbox inputId={productDetails._id} checked={isSelected} onChange={() => handleSelectionChange(productDetails)} />
+                <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`${productDetails.imagepath}`} alt={productDetails.title} />
+                <div className="flex flex-column sm:flex-row justify-content-between align-items-center xl:align-items-start flex-1 gap-4">
+                    <div className="flex flex-column align-items-center sm:align-items-start gap-3">
+                        <Link to={`/overheads/overhead/${productDetails._id}`}><div className="text-2xl font-bold text-900">{productDetails.title}</div></Link>
+                        <div className="flex align-items-center gap-3">
+                            <Tag value={getSeverityText(productDetails)} severity={getSeverity(productDetails.stock)}></Tag>
                         </div>
-                        <div className="card flex justify-content-center">
-                        </div>
-                        <div className="flex sm:flex-column align-items-center sm:align-items-end gap-3 sm:gap-2">
-                            <span className="text-2xl font-semibold">₪{productDetails.price}</span>
-                            <h2>amount : {productInBasket.amount}</h2>
-                            <InputNumber
-                                value={productInBasket.amount}
-                                onValueChange={(e) => {
-                                    const updatedBasket = basket.map(item =>
-                                        item._id === productInBasket._id ? { ...item, amount: e.value } : item
-                                    );
-                                    dispatch(setBasket(updatedBasket));
-                                }}
-                                showButtons
-                                className="p-inputnumber-sm"
-                                inputStyle={{ padding: '0.5rem', textAlign: 'center', width: 'auto' }}
-                                decrementButtonClassName="p-button-sm p-button-primary"
-                                incrementButtonClassName="p-button-sm p-button-primary"
-                                incrementButtonIcon="pi pi-plus"
-                                decrementButtonIcon="pi pi-minus"
-                            />
-                            {/* <Button icon="pi pi-shopping-cart" className="p-button-rounded" disabled={getSeverity(productDetails.stock) === "danger"} onClick={() => deleteShoppingBag(productDetails)}> להסרה מהעגלה </Button> */}
-                        </div>
+                    </div>
+                    <div className="card flex justify-content-center">
+                    </div>
+                    <div className="flex sm:flex-column align-items-center sm:align-items-end gap-3 sm:gap-2">
+                        <span className="text-2xl font-semibold">₪{productDetails.price}</span>
+                        <h2>amount : {productInBasket?.amount}</h2> {/* השתמש באופרטור אופציונלי כדי למנוע שגיאות אם productInBasket לא מוגדר */}
+                        <InputNumber
+                            value={productInBasket?.amount}
+                            onValueChange={(e) => {
+                                updateShoppingBagProductAmount(productDetails, e.value);
+                            }}
+                            showButtons
+                            className="p-inputnumber-sm"
+                            inputStyle={{ padding: '0.5rem', textAlign: 'center', width: 'auto' }}
+                            decrementButtonClassName="p-button-sm p-button-primary"
+                            incrementButtonClassName="p-button-sm p-button-primary"
+                            incrementButtonIcon="pi pi-plus"
+                            decrementButtonIcon="pi pi-minus"
+                        />
+                        {/* <Button icon="pi pi-shopping-cart" className="p-button-rounded" disabled={getSeverity(productDetails.stock) === "danger"} onClick={() => deleteShoppingBag(productDetails)}> להסרה מהעגלה </Button> */}
                     </div>
                 </div>
             </div>
+        </div>
         );
     };
     const listTemplate = (products, layout) => {

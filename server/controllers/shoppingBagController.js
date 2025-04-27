@@ -18,7 +18,7 @@ const createShoppingBag = async (req, res) => {
         user_id: user_id,
         product_id: product_id,
     }).lean()
-    console.log("duplicate", duplicate)
+    // console.log("duplicate", duplicate)
     if (duplicate) {
         return res.status(409).json({ message: "already exist in the basket" })
     }
@@ -57,23 +57,26 @@ const readShoppingBagByUserId = async (req, res) => {
     console.log(userShoppingBags);
     return res.status(200).json(userShoppingBags)
 }
+
 const updateShoppingBagAmount = async (req, res) => {
-    const { _id, amount } = req.body
-    if (!_id) {
+    const { product_id, amount } = req.body
+    console.log(product_id, amount);
+    if (!product_id) {
         return res.status(400).json({ message: "error on updating" })
     }
     if (!amount) {
         return res.status(400).json({ message: "nothing changed" })
     }
-    const shoppingBag = await ShoppingBag.findById(_id).exec()
+    const shoppingBag = await ShoppingBag.findOne({product_id : product_id}).exec()
+    console.log(shoppingBag);
     if (!shoppingBag) {
         return res.status(400).json({ message: "not fount in shopping bag" })
     }
     shoppingBag.amount = amount
 
     const updatedShoppingBag = await shoppingBag.save()
-
-    return res.status(201).json(updatedShoppingBag)
+    
+    return res.status(200).json({product_id , amount})
 
 }
 const deleteShoppingBag = async (req, res) => {
