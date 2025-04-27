@@ -4,13 +4,13 @@ const createDelivery = async (req, res) => {
     const user_id = req.user._id
     const { address, purchase, status} = req.body
     console.log( address, purchase, status)
-    if (!user_id || !address.length || !purchase.length ) {
+    if (!user_id || !address || !purchase.length ) {
         return res.status(400).json({ message: "user_id, address and purchase are required" })
     }
     const delivery = await Delivery.create({ user_id, address, purchase, status})
     if (delivery) {
-        const deliveries = await Delivery.find().lean()
-        return res.status(201).json(deliveries)
+        // const deliveries = await Delivery.find().lean()
+        return res.status(201).json(delivery)
     }
     else {   
         return res.status(400).json({ message: "invalid delivery" })
@@ -44,17 +44,21 @@ const updateDelivery = async (req, res) => {
     if (!products) {
         return res.status(400).json({ message: "nothing changed" })
     }
-    const delivery = await Delivery.findById(_id).exec()
-    if (!delivery) {
-        return res.status(400).json({ message: "no such delivery" })
+    if(status === "waiting to be delivered"){
+        const delivery = await Delivery.findById(_id).exec()
+        if (!delivery) {
+            return res.status(400).json({ message: "no such delivery" })
+        }
+        delivery.address = address?address:delivery.address
+        delivery.purchase = purchase?purchase:delivery.purchase
+        delivery.status = status?status:delivery.status
+    
+        const updateddelivery = await delivery.save()
+        const deliveries = await Delivery.find().lean()
+        return res.status(200).json(deliveries)
     }
-    delivery.address = address?address:delivery.address
-    delivery.purchase = purchase?purchase:delivery.purchase
-    delivery.status = status?status:delivery.status
-
-    const updateddelivery = await delivery.save()
-    const deliveries = await Delivery.find().lean()
-    return res.status(200).json(deliveries)  
+    return res.status(404).json({message: "unable to update" })
+      
 }
 
 const deleteDelivery = async (req,res)=> {

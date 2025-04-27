@@ -148,6 +148,7 @@ const Payment = () => {
             const res = await axios.post("http://localhost:8000/api/delivery", details, { headers });
             console.log("res",res);
             if(res.status === 201){
+
                 alert("the deleviry created in the system")
                 navigate('/')
             }
@@ -162,15 +163,15 @@ const Payment = () => {
     const createPurchase = async (paymentType) => {
         // setProducts(selectedItems)
         if(selectedItems){
-        const purchase = {
-            products: selectedItems,
+        const data = {
+            products: products,
             paymentType: paymentType
         }
         try {
             const headers = {
                 'Authorization': `Bearer ${token}`
             };
-            const res = await axios.post("http://localhost:8000/api/user/purchase", purchase, { headers });
+            const res = await axios.post("http://localhost:8000/api/user/purchase", data, { headers });
             if (res.status === 201) {
                 console.log("to the function");
                 updateProductsStock(selectedItems)

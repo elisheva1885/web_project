@@ -44,10 +44,18 @@ const readShoppingBagByUserId = async (req, res) => {
         switch (shoppingBag.type) {
             case "overhead":
                 const overhead = await Overhead.findOne({ _id: shoppingBag.product_id }).populate("company").lean()
-                return { product: overhead, amount: shoppingBag.amount };
+                if (overhead.stock > shoppingBag.amount) {
+                    return { product: overhead, amount: shoppingBag.amount };
+                }
+                //delete from the basket
+                break;
             case "miniCenteral":
                 const miniCenteral = await MiniCenteral.findOne({ _id: shoppingBag.product_id }).populate("company").lean()
-                return { product: miniCenteral, amount: shoppingBag.amount };
+                if (miniCenteral.stock > shoppingBag.amount) {
+                    return { product: miniCenteral, amount: shoppingBag.amount };
+                }
+                //delete from the basket
+                break;
             default:
                 break;
         }
@@ -67,16 +75,17 @@ const updateShoppingBagAmount = async (req, res) => {
     if (!amount) {
         return res.status(400).json({ message: "nothing changed" })
     }
-    const shoppingBag = await ShoppingBag.findOne({product_id : product_id}).exec()
+    const shoppingBag = await ShoppingBag.findOne({ product_id: product_id }).exec()
     console.log(shoppingBag);
     if (!shoppingBag) {
         return res.status(400).json({ message: "not fount in shopping bag" })
     }
+
     shoppingBag.amount = amount
 
     const updatedShoppingBag = await shoppingBag.save()
-    
-    return res.status(200).json({product_id , amount})
+
+    return res.status(200).json({ product_id, amount })
 
 }
 const deleteShoppingBag = async (req, res) => {

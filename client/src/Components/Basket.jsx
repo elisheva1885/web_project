@@ -17,6 +17,8 @@ const Basket = () => {
     const { token } = useSelector((state) => state.token);
     const [layout, setLayout] = useState('list');
     const [selectedItems, setSelectedItems] = useState([]);
+    const [shoppingBags, setShoppingBags] = useState([]);
+
     const [amount, setAmount] = useState(1);
     const [quantities, setQuantities] = useState({});
 
@@ -59,6 +61,7 @@ const Basket = () => {
             const res = await axios.get('http://localhost:8000/api/user/shoppingBag', { headers })
             if (res.status === 200) {
                 dispatch(setBasket(res.data))
+                setShoppingBags(res.data)
                 console.log("res.data", res.data);
             }
         }
@@ -91,14 +94,6 @@ const Basket = () => {
     
                 dispatch(setBasket(updatedBasket));
                 console.log(basket);
-                // const unUpdatedshoppingBags = basket.filter(product=> product.product._id != res.data.product_id)        
-                // const updateShoppingBag = basket.find(product=> {
-                //     console.log({product_id_in_basket: product.product._id, product_id_from_server: res.data.product_id});
-                //     return  product.product._id === res.data.product_id})
-                // console.log([updateShoppingBag]);
-                // const updatedProduct = { ...updateShoppingBag, amount: res.data.amount };
-                // dispatch(setBasket([...unUpdatedshoppingBags,updatedProduct]))
-                // console.log("res.data", res.data);
             }
         }
         catch (e) {
@@ -186,6 +181,7 @@ const Basket = () => {
         if (!basket) {
             return <h1>basket is empty</h1>
         }
+        console.log(basket);
         return <div className="grid grid-nogutter">{basket.map((product, index) => listItem(product, index))}</div>;
     };
 
