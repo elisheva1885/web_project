@@ -19,6 +19,7 @@ const Basket = () => {
     const [selectedItems, setSelectedItems] = useState([]);
     const [shoppingBags, setShoppingBags] = useState([]);
     const [errorStates, setErrorStates] = useState({}); // To track errors
+    const [sum, setSum] = useState(1);
 
     const [amount, setAmount] = useState(1);
     const [quantities, setQuantities] = useState({});
@@ -26,10 +27,12 @@ const Basket = () => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
 
-    let sum = 0;
-    if (basket) {
-        selectedItems.map(item => sum += item.price)
-    }
+    // // let sum = 0;
+    // if (basket) {
+    //     console.log(selectedItems);
+    //     selectedItems.map(item => sum += item.price)
+    // }
+
     console.log(basket);
     //     const updatedItems = selectedItems.map(item => ({
     //   ...item,
@@ -70,42 +73,48 @@ const Basket = () => {
             console.error(e)
         }
     }
-    const updateShoppingBagProductAmount = async (productDetails, amount) => {
+    const updateShoppingBagProductAmount = async (productDetails, newAmount) => {
         try {
             const headers = {
                 'Authorization': `Bearer ${token}`
-            }
+            };
             const data = {
                 product_id: productDetails._id,
-                amount: amount
-            }
-            console.log(productDetails);
-            const res = await axios.put('http://localhost:8000/api/user/shoppingBag', data, { headers })
+                amount: newAmount
+            };
+    
+            const res = await axios.put('http://localhost:8000/api/user/shoppingBag', data, { headers });
+    
             if (res.status === 200) {
-                console.log(res.data.updatedShoppingBag);
                 const updatedBasket = basket.map(item => {
-                    // אם ה-ID של המוצר בפריט הנוכחי תואם ל-ID שהתקבל מהשרת
+                    if (!item) return item;
                     if (item.product._id === res.data.updatedShoppingBag.product_id) {
-                        // החזר אובייקט חדש עם הכמות המעודכנת
                         return { ...item, amount: res.data.updatedShoppingBag.amount };
                     }
-                    // אחרת, החזר את הפריט כמו שהוא
                     return item;
                 });
-
+    
                 dispatch(setBasket(updatedBasket));
-                console.log("updated basket", basket);
-                setErrorStates(prevState => ({ ...prevState, [productDetails._id]: false }));
-
+    
+                // גם לעדכן את selectedItems
+                const updatedSelectedItems = selectedItems.map(item => {
+                    if (item.product._id === res.data.updatedShoppingBag.product_id) {
+                        return { ...item, amount: res.data.updatedShoppingBag.amount };
+                    }
+                    return item;
+                });
+    
+                setSelectedItems(updatedSelectedItems);
+    
+                // חישוב מחדש של הסכום
+                const totalSum = updatedSelectedItems.reduce((sum, item) => sum + (item.product.price * item.amount), 0);
+                setSum(totalSum);
+    
             }
+        } catch (e) {
+            console.error(e);
         }
-        catch (e) {
-            console.log(e);
-            // alert(e.message)
-            setErrorStates(prevState => ({ ...prevState, [productDetails._id]: true })); // Set error state for this product
-
-        }
-    }
+    };
     const goToPayment = () => {
         const navigationData = {
             products: selectedItems,
@@ -130,26 +139,34 @@ const Basket = () => {
     };
 
     const listItem = (productInBasket, index) => {
-        const productDetails = productInBasket.product;
+        const productDetails = productInBasket?.product;
         if (!productDetails || productDetails.stock <= 0) {
             return null; // אל תרנדר פריטים ללא פרטים או שאזלו מהמלאי
         }
 
-        const isSelected = selectedItems.some(item => item._id === productDetails._id);
+        const isSelected = selectedItems.some(item => item.product._id === productDetails._id);
 
-        const handleSelectionChange = (product) => {
-            const alreadySelected = selectedItems.some(item => item._id === product._id);
+        const handleSelectionChange = (productInBasket) => {
+            const alreadySelected = selectedItems.some(item => item.product._id === productInBasket.product._id);
+            let updatedSelectedItems;
+        
             if (alreadySelected) {
-                setSelectedItems(selectedItems.filter(item => item._id !== product._id));
+                updatedSelectedItems = selectedItems.filter(item => item.product._id !== productInBasket.product._id);
             } else {
-                setSelectedItems([...selectedItems, product]);
+                updatedSelectedItems = [...selectedItems, productInBasket];
             }
+        
+            setSelectedItems(updatedSelectedItems);
+        
+            const totalSum = updatedSelectedItems.reduce((sum, item) => sum + (item.product.price * item.amount), 0);
+            setSum(totalSum);
         };
+        
 
         return (
             <div className="col-12" key={productDetails._id}>
                 <div className={classNames('flex flex-column xl:flex-row xl:align-items-start p-4 gap-4', { 'border-top-1 surface-border': index !== 0 })}>
-                    <Checkbox inputId={productDetails._id} checked={isSelected} onChange={() => handleSelectionChange(productDetails)} disabled={errorStates[productDetails._id] || false}
+                    <Checkbox inputId={productDetails._id} checked={isSelected} onChange={() => handleSelectionChange(productInBasket)} disabled={errorStates[productDetails._id] || false}
                     />
                     {errorStates[productDetails._id] && <h3>אין מספיק במלאי <br /> באפשרותך להוריד מהכמות</h3>}
 
@@ -223,7 +240,7 @@ const Basket = () => {
         if (token) {
             // קריאה ל-API רק אם יש טוקן
             getShoppingBag();
-            sum = 0;
+            setSum(0)
         }
         else {
             alert("to save thing in your basket you need to register")
