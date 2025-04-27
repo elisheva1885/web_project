@@ -7,13 +7,13 @@ const Overhead = require("../models/airconditioners/Overhead")
 const createShoppingBag = async (req, res) => {
     const user_id = req.user._id
 
-    console.log("user", user_id);
+    // console.log("user", user_id);
     const { product_id, type, amount } = req.body
     // console.log(product_id,type, amount)
     if (!user_id || !product_id || !type) {
         return res.status(400).json({ message: "all details are required" })
     }
-    console.log("user, pro", user_id, product_id)
+    // console.log("user, pro", user_id, product_id)
     const duplicate = await ShoppingBag.findOne({
         user_id: user_id,
         product_id: product_id,
@@ -30,7 +30,7 @@ const createShoppingBag = async (req, res) => {
 }
 
 const readShoppingBagByUserId = async (req, res) => {
-    console.log("readShoppingBagByUserId");
+    // console.log("readShoppingBagByUserId");
     const user_id = req.user._id
     if (!user_id) {
         return res.status(400).json({ message: "reqired" })
@@ -40,7 +40,7 @@ const readShoppingBagByUserId = async (req, res) => {
         return res.status(400).json({ message: "shopping bag is empty" })
     }
     const promises = shoppingBags.map(async (shoppingBag) => {
-        console.log(shoppingBag.type)
+        // console.log(shoppingBag.type)
         switch (shoppingBag.type) {
             case "overhead":
                 const overhead = await Overhead.findOne({ _id: shoppingBag.product_id }).populate("company").lean()
@@ -62,13 +62,13 @@ const readShoppingBagByUserId = async (req, res) => {
     });
     const results = await Promise.all(promises)
     const userShoppingBags = results.filter(result => result !== null).flat(); //filter null values and flatten the array.
-    console.log(userShoppingBags);
+    // console.log(userShoppingBags);
     return res.status(200).json(userShoppingBags)
 }
 
 const updateShoppingBagAmount = async (req, res) => {
     const { product_id, amount } = req.body
-    console.log(product_id, amount);
+    // console.log(product_id, amount);
     if (!product_id) {
         return res.status(400).json({ message: "error on updating" })
     }
@@ -76,37 +76,81 @@ const updateShoppingBagAmount = async (req, res) => {
         return res.status(400).json({ message: "nothing changed" })
     }
     const shoppingBag = await ShoppingBag.findOne({ product_id: product_id }).exec()
-    console.log(shoppingBag);
+    // console.log("sh",shoppingBag);
     if (!shoppingBag) {
         return res.status(400).json({ message: "not fount in shopping bag" })
     }
+    // console.log(shoppingBag);
+    const response = await getProductByIdAndType(shoppingBag.product_id,shoppingBag.type  ,amount)
+    // console.log("respone",response);
+    if(response.message==="Ok"){
+        console.log(shoppingBag.amount);
+        shoppingBag.amount = amount
+        console.log(amount);
+        const updatedShoppingBag = await shoppingBag.save()
+        console.log(updatedShoppingBag);
 
-    shoppingBag.amount = amount
+        return res.status(200).json({ updatedShoppingBag })
+    }
+    else{
+        return res.status(400).json({message: res.message})
+    }
+}
 
-    const updatedShoppingBag = await shoppingBag.save()
-
-    return res.status(200).json({ product_id, amount })
+const checkProductStock = async (product , amount)=>{
+    const res =  await getProductByIdAndType(product._id, product.type)
+    // console.log("the res in check", res);
+    // return res.then((result) => {
+    //     console.log(result); // Logs the resolved value (e.g., {message: "Ok"} or {message: "not enough..."})
+    // })
+    // .catch((error) => {
+    //     console.error("Error:", error);
+    // });
 
 }
+
+const getProductByIdAndType = async (_id, type, amount)=>{
+    switch (type) {
+        case "overhead":
+            const overhead = await Overhead.findById({ _id: _id }).populate("company").lean()
+            if (overhead.stock < amount) {
+                return {message:`not enough, there is only ${overhead.stock} in the stock`};
+            }
+            return {message : `Ok`}
+            //delete from the basket
+            break;
+        case "miniCenteral":
+            const miniCenteral = await MiniCenteral.findById({ _id:_id}).populate("company").lean()
+            if (miniCenteral.stock < amount) {
+                return {message:`not enough, there is only ${miniCenteral.stock} in the stock`};
+            }
+            return {message : `Ok`}
+            //delete from the basket
+            break;
+        default:
+            break;
+    }
+}
+
+
+
 const deleteShoppingBag = async (req, res) => {
-
     const { product_id } = req.body
-
     const user_id = req.user._id
-    console.log(user_id);
+    // console.log(user_id);
     const shoppingBagByProduct = await ShoppingBag.findOne({ product_id: product_id }).exec()
     if (!shoppingBagByProduct) {
         return res.status(404).json({ message: "no such product" })
     }
-    console.log(shoppingBagByProduct);
+    // console.log(shoppingBagByProduct);
     const _id = shoppingBagByProduct._id
-    console.log(_id);
+    // console.log(_id);
     const shoppingBag = await ShoppingBag.findById(_id).exec()
 
     if (!shoppingBag) {
         return res.status(404).json({ message: "not fount in shopping bag" })
     }
-    console.log(shoppingBag)
+    // console.log(shoppingBag)
 
     const result = await shoppingBag.deleteOne()
 
