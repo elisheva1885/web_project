@@ -18,6 +18,7 @@ const Basket = () => {
     const [layout, setLayout] = useState('list');
     const [selectedItems, setSelectedItems] = useState([]);
     const [shoppingBags, setShoppingBags] = useState([]);
+    const [errorStates, setErrorStates] = useState({}); // To track errors
 
     const [amount, setAmount] = useState(1);
     const [quantities, setQuantities] = useState({});
@@ -69,35 +70,40 @@ const Basket = () => {
             console.error(e)
         }
     }
-    const updateShoppingBagProductAmount = async (productDetails,amount )=> {
+    const updateShoppingBagProductAmount = async (productDetails, amount) => {
         try {
             const headers = {
                 'Authorization': `Bearer ${token}`
             }
             const data = {
-                product_id : productDetails._id,
+                product_id: productDetails._id,
                 amount: amount
             }
             console.log(productDetails);
-            const res = await axios.put('http://localhost:8000/api/user/shoppingBag', data,{ headers })
+            const res = await axios.put('http://localhost:8000/api/user/shoppingBag', data, { headers })
             if (res.status === 200) {
-                console.log(res.data);
+                console.log(res.data.updatedShoppingBag);
                 const updatedBasket = basket.map(item => {
                     // אם ה-ID של המוצר בפריט הנוכחי תואם ל-ID שהתקבל מהשרת
-                    if (item.product._id === res.data.product_id) {
+                    if (item.product._id === res.data.updatedShoppingBag.product_id) {
                         // החזר אובייקט חדש עם הכמות המעודכנת
-                        return { ...item, amount: res.data.amount };
+                        return { ...item, amount: res.data.updatedShoppingBag.amount };
                     }
                     // אחרת, החזר את הפריט כמו שהוא
                     return item;
                 });
-    
+
                 dispatch(setBasket(updatedBasket));
-                console.log(basket);
+                console.log("updated basket", basket);
+                setErrorStates(prevState => ({ ...prevState, [productDetails._id]: false }));
+
             }
         }
         catch (e) {
-            console.error(e)
+            console.log(e);
+            // alert(e.message)
+            setErrorStates(prevState => ({ ...prevState, [productDetails._id]: true })); // Set error state for this product
+
         }
     }
     const goToPayment = () => {
@@ -142,39 +148,60 @@ const Basket = () => {
 
         return (
             <div className="col-12" key={productDetails._id}>
-            <div className={classNames('flex flex-column xl:flex-row xl:align-items-start p-4 gap-4', { 'border-top-1 surface-border': index !== 0 })}>
-                <Checkbox inputId={productDetails._id} checked={isSelected} onChange={() => handleSelectionChange(productDetails)} />
-                <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`${productDetails.imagepath}`} alt={productDetails.title} />
-                <div className="flex flex-column sm:flex-row justify-content-between align-items-center xl:align-items-start flex-1 gap-4">
-                    <div className="flex flex-column align-items-center sm:align-items-start gap-3">
-                        <Link to={`/overheads/overhead/${productDetails._id}`}><div className="text-2xl font-bold text-900">{productDetails.title}</div></Link>
-                        <div className="flex align-items-center gap-3">
-                            <Tag value={getSeverityText(productDetails)} severity={getSeverity(productDetails.stock)}></Tag>
+                <div className={classNames('flex flex-column xl:flex-row xl:align-items-start p-4 gap-4', { 'border-top-1 surface-border': index !== 0 })}>
+                    <Checkbox inputId={productDetails._id} checked={isSelected} onChange={() => handleSelectionChange(productDetails)} disabled={errorStates[productDetails._id] || false}
+                    />
+                    {errorStates[productDetails._id] && <h3>אין מספיק במלאי <br /> באפשרותך להוריד מהכמות</h3>}
+
+                    <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`${productDetails.imagepath}`} alt={productDetails.title} />
+                    <div className="flex flex-column sm:flex-row justify-content-between align-items-center xl:align-items-start flex-1 gap-4">
+                        <div className="flex flex-column align-items-center sm:align-items-start gap-3">
+                            <Link to={`/overheads/overhead/${productDetails._id}`}><div className="text-2xl font-bold text-900">{productDetails.title}</div></Link>
+                            <div className="flex align-items-center gap-3">
+                                <Tag value={getSeverityText(productDetails)} severity={getSeverity(productDetails.stock)}></Tag>
+                            </div>
                         </div>
-                    </div>
-                    <div className="card flex justify-content-center">
-                    </div>
-                    <div className="flex sm:flex-column align-items-center sm:align-items-end gap-3 sm:gap-2">
-                        <span className="text-2xl font-semibold">₪{productDetails.price}</span>
-                        <h2>amount : {productInBasket?.amount}</h2> {/* השתמש באופרטור אופציונלי כדי למנוע שגיאות אם productInBasket לא מוגדר */}
-                        <InputNumber
-                            value={productInBasket?.amount}
-                            onValueChange={(e) => {
-                                updateShoppingBagProductAmount(productDetails, e.value);
-                            }}
-                            showButtons
-                            className="p-inputnumber-sm"
-                            inputStyle={{ padding: '0.5rem', textAlign: 'center', width: 'auto' }}
-                            decrementButtonClassName="p-button-sm p-button-primary"
-                            incrementButtonClassName="p-button-sm p-button-primary"
-                            incrementButtonIcon="pi pi-plus"
-                            decrementButtonIcon="pi pi-minus"
-                        />
-                        {/* <Button icon="pi pi-shopping-cart" className="p-button-rounded" disabled={getSeverity(productDetails.stock) === "danger"} onClick={() => deleteShoppingBag(productDetails)}> להסרה מהעגלה </Button> */}
+                        <div className="card flex justify-content-center">
+                        </div>
+                        <div className="flex sm:flex-column align-items-center sm:align-items-end gap-3 sm:gap-2">
+                            <span className="text-2xl font-semibold">₪{productDetails.price}</span>
+                            <h2>amount : {productInBasket?.amount}</h2> {/* השתמש באופרטור אופציונלי כדי למנוע שגיאות אם productInBasket לא מוגדר */}
+                            {/* <InputNumber
+                                value={productInBasket?.amount}
+                                onValueChange={(e) => {
+                                    updateShoppingBagProductAmount(productDetails, e.value);
+                                }}
+                                showButtons
+                                className="p-inputnumber-sm"
+                                inputStyle={{ padding: '0.5rem', textAlign: 'center', width: 'auto' }}
+                                decrementButtonClassName="p-button-sm p-button-primary"
+                                incrementButtonClassName="p-button-sm p-button-primary"
+                                incrementButtonIcon="pi pi-plus"
+                                decrementButtonIcon="pi pi-minus"
+                                min={1} // Ensures only positive values
+                            /> */}
+                            {console.log("amount", productInBasket)}
+                            {console.log("amonnt", productInBasket.amount)}
+                            <InputNumber
+                                value={productInBasket?.amount}
+                                onValueChange={(e) => {
+                                    updateShoppingBagProductAmount(productDetails, e.value);
+                                }}
+                                showButtons
+                                className="p-inputnumber-sm"
+                                inputStyle={{ padding: '0.5rem', textAlign: 'center', width: 'auto' }}
+                                decrementButtonClassName="p-button-sm p-button-primary"
+                                incrementButtonClassName="p-button-sm p-button-primary"
+                                incrementButtonIcon="pi pi-plus"
+                                decrementButtonIcon="pi pi-minus"
+                                // disabled={errorStates[productDetails._id] || false}
+                                min={1}
+                            />
+                            {/* <Button icon="pi pi-shopping-cart" className="p-button-rounded" disabled={getSeverity(productDetails.stock) === "danger"} onClick={() => deleteShoppingBag(productDetails)}> להסרה מהעגלה </Button> */}
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
         );
     };
     const listTemplate = (products, layout) => {
