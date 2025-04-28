@@ -123,6 +123,9 @@ const Basket = () => {
         };
         navigate('/basket/payment', { state: navigationData })
     }
+    useEffect(() => {
+        getShoppingBag()
+    }, [])
     const getSeverity = (stock) => {
         if (stock >= 50) return 'success';
         else if (stock > 0) return 'warning';
@@ -141,7 +144,7 @@ const Basket = () => {
 
     const listItem = (productInBasket, index) => {
         const productDetails = productInBasket?.product;
-        if (!productDetails || productDetails.stock <= 0) {
+        if (!productDetails ) {
             return null; // אל תרנדר פריטים ללא פרטים או שאזלו מהמלאי
         }
 
@@ -212,7 +215,7 @@ const Basket = () => {
                                 incrementButtonClassName="p-button-sm p-button-primary"
                                 incrementButtonIcon="pi pi-plus"
                                 decrementButtonIcon="pi pi-minus"
-                                // disabled={errorStates[productDetails._id] || false}
+                                disabled={productDetails.stock===0}
                                 min={1}
                             />
                             {/* <Button icon="pi pi-shopping-cart" className="p-button-rounded" disabled={getSeverity(productDetails.stock) === "danger"} onClick={() => deleteShoppingBag(productDetails)}> להסרה מהעגלה </Button> */}
