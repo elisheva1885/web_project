@@ -11,7 +11,7 @@ router.get("/overhead/:_id", overheadController.readOverheadById)
 router.get("/:title", overheadController.readOverheadByTitle)
 router.put("/", officialVerify, overheadController.updateOverhead)
 router.put("/price",officialVerify, overheadController.updatOverheadPrice)
-router.put("/stock",officialVerify, overheadController.updateOverheadStock)
+router.put("/stock", overheadController.updateOverheadStock)
 
 router.delete("/", overheadController.deleteOverhead)
 

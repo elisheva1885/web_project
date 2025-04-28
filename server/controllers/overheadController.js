@@ -86,14 +86,18 @@ const updateOverhead = async (req, res) => {
 }
 
 const updateOverheadStock = async (req,res) => {
+
+    console.log("in the function");
     const { _id, amount} = req.body
+    console.log( "the DB of the function ",_id, amount);
+
     if(!_id){
         return res.status(400).json({message: "all details are required"})
     }
     if(!amount){
         return res.status(204).json({message: "the stock didn't change"})
     }
-    const overhead = await Overhead.findById(_id).populate("company").exec()
+    const overhead = await Overhead.find({_id:_id}).populate("company").exec()
     overhead.stock= overhead.stock- amount
     const updated = await overhead.save()
     res.status(200).json(overhead)

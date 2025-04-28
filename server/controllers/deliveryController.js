@@ -6,7 +6,7 @@ const Purchase = require("../models/Purchase")
 const createDelivery = async (req, res) => {
     const user_id = req.user._id
     const { address, purchase, status} = req.body
-    // console.log("createDelivery", address, purchase, status)
+    console.log("createDelivery", address, purchase, status)
     // if (!user_id || !address || !purchase.length ) {
     if (!user_id || !address || !purchase ) {
         return res.status(400).json({ message: "user_id, address and purchase are required" })

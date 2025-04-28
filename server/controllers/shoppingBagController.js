@@ -45,14 +45,14 @@ const readShoppingBagByUserId = async (req, res) => {
             case "overhead":
                 const overhead = await Overhead.findOne({ _id: shoppingBag.product_id }).populate("company").lean()
                 if (overhead.stock >= shoppingBag.amount) {
-                    return { product: overhead, amount: shoppingBag.amount };
+                    return { product: overhead, amount: shoppingBag.amount, type: shoppingBag.type ,shoppingBagId: shoppingBag._id};
                 }
                 //delete from the basket
                 break;
             case "miniCenteral":
                 const miniCenteral = await MiniCenteral.findOne({ _id: shoppingBag.product_id }).populate("company").lean()
                 if (miniCenteral.stock >= shoppingBag.amount) {
-                    return { product: miniCenteral, amount: shoppingBag.amount };
+                    return { product: miniCenteral, amount: shoppingBag.amount , type: shoppingBag.type,shoppingBagId: shoppingBag._id};
                 }
                 //delete from the basket
                 break;
