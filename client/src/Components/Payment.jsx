@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { Dialog } from 'primereact/dialog';
@@ -41,7 +40,7 @@ const Payment = () => {
 
     const location = useLocation();
     const { products } = location.state || {}; // Access the type from state
-    // console.log(products);
+    console.log("Products from payment ",products);
     const paymentRequest = {
         apiVersion: 2,
         apiVersionMinor: 0,
@@ -92,42 +91,44 @@ const Payment = () => {
     };
 
     const updateProductsStock = async (products) => {
-        console.log(" aa  ", products);
+        console.log(" inside update function  ", products);
+        
         try {
             const headers = {
                 'Authorization': `Bearer ${token}`
             };
-            const updateRequests = products.map(product => {
-                console.log("product", product);
-                try {
-                    const data = {
-                        _id: product._id,
-                        amount: 1
-                    };
-                    console.log(data);
-                    return axios.put("http://localhost:8000/api/air-conditioner/overhead/stock", data, { headers });
-                }
-                catch (e) {
-                    alert("error")
-                }
-            });
+            const updateRequests = null
+            // const updateRequests = products.map(product => {
+            //     console.log("product", product);
+            //     try {
+            //         const data = {
+            //             _id: product._id,
+            //             amount: 1
+            //         };
+            //         console.log(data);
+            //         return axios.put(`http://localhost:8000/api/air-conditioner/${product.type}/stock`, data, { headers });
+            //     }
+            //     catch (e) {
+            //         alert("error")
+            //     }
+            // });
 
-            const responses = await Promise.all(updateRequests);
-            console.log(responses);
+            // const responses = await Promise.all(updateRequests);
+            // console.log(responses);
+            // const updatedOverheads = responses
+            //     .filter(res => res.status === 200)
+            //     .map(res => res.data);
+            // console.log(updatedOverheads);
+            // if (updatedOverheads.length > 0) {
+            //     dispatch(setOverheads(overheads => {
+            //         const existingMap = new Map(overheads.map(item => [item._id, item]));
+            //         updatedOverheads.forEach(item => {
+            //             existingMap.set(item._id, item); // מחליף אם כבר קיים
+            //         });
+            //         return Array.from(existingMap.values());
+            //     }));
+            // }
 
-            const updatedOverheads = responses
-                .filter(res => res.status === 200)
-                .map(res => res.data);
-            console.log(updatedOverheads);
-            if (updatedOverheads.length > 0) {
-                dispatch(setOverheads(overheads => {
-                    const existingMap = new Map(overheads.map(item => [item._id, item]));
-                    updatedOverheads.forEach(item => {
-                        existingMap.set(item._id, item); // מחליף אם כבר קיים
-                    });
-                    return Array.from(existingMap.values());
-                }));
-            }
         } catch (error) {
             if (error.response?.status === 400) {
                 alert("All details are required");
@@ -139,12 +140,15 @@ const Payment = () => {
     const createDelivery = async () => {
         const details = {
             address: address ? address : newAddress,
-            purchase:  selectedItems.map(item => item._id)
+            // purchase:  products.map(product => product.product._id)
+            purchase:  purchase
+
         }
         try {
             const headers = {
                 'Authorization': `Bearer ${token}`
             };
+            console.log("details",details);
             const res = await axios.post("http://localhost:8000/api/delivery", details, { headers });
             console.log("res", res);
             if (res.status === 201) {
@@ -167,7 +171,8 @@ const Payment = () => {
         // setProducts(selectedItems)
         if (selectedItems) {
             const data = {
-                products: products,
+                
+                products: products.map(product=> {return product.shoppingBagId}),
                 paymentType: paymentType
             }
             try {
@@ -177,8 +182,9 @@ const Payment = () => {
                 const res = await axios.post("http://localhost:8000/api/user/purchase", data, { headers });
                 if (res.status === 201) {
                     console.log("to the function");
-                    updateProductsStock(selectedItems)
+                    // updateProductsStock(selectedItems)
                     setPurcase(res.data);
+                    console.log(res.data);
                     alert("ההזמנה הושלמה")
                     // setProducts([])
                     createDelivery()
@@ -475,7 +481,7 @@ const Payment = () => {
                             <br />
 
                         </div>
-                        <div> {products.map(product => product.title)} </div>
+                        <div> {products.map(product => product.product.title)} </div>
 
                         <div style={{ width: "65%", marginLeft: "auto" }}>
                             {/* <DataView value={basket} listTemplate={listTemplate} layout={layout} header={header()} /> */}

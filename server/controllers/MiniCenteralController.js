@@ -98,14 +98,17 @@ const deleteMiniCenteral = async (req,res)=> {
 }
 
 const updatMiniCenteralStock = async (req,res) => {
+    console.log("in the function");
+
     const { _id, amount} = req.body
+    console.log( _id, amount);
     if(!_id){
         return res.status(400).json({message: "all details are required"})
     }
     if(!amount){
         return res.status(204).json({message: "the stock didn't change"})
     }
-    const miniCenteral = await MiniCenteral.findById(_id).populate("company").exec()
+    const miniCenteral = await MiniCenteral.find({_id:_id}).populate("company").exec()
     miniCenteral.stock= miniCenteral.stock- amount
     const updated = await miniCenteral.save()
     res.status(200).json(miniCenteral)

@@ -7,6 +7,7 @@ import { setOverheads } from '../store/air-conditioner/overHeadsSlice';
 import { setCompanies } from '../store/companySlice';
 import { setMiniCenterals } from '../store/air-conditioner/miniCenteralsSlice';
 import { setMultiIndoorUnits } from '../store/air-conditioner/multiIndoorUnitsSlice';
+import { setBasket } from '../store/basketSlice';
 
 
 const Home = () => {
@@ -14,7 +15,7 @@ const Home = () => {
     const navigate = useNavigate();
     const {overheads} = useSelector((state) => state.overheads)
     const {miniCenterals} = useSelector((state) => state.miniCenterals)
-
+    const {token} = useSelector((state) => state.token)
     const {companies} = useSelector((state) => state.companies)
     const {userDetails} = useSelector((state) => state.userDetails);
     const {basket} = useSelector((state) => state.basket);
@@ -87,6 +88,25 @@ const Home = () => {
         }
     }
 
+
+    const getShoppingBag = async () => {
+        try {
+            const headers = {
+                'Authorization': `Bearer ${token}`
+            }
+            const res = await axios.get('http://localhost:8000/api/user/shoppingBag', { headers })
+            if (res.status === 200) {
+                console.log("res.data ",res.data);
+                dispatch(setBasket(res.data))
+                // setShoppingBags(res.data)
+                // console.log("res.data", res.data);
+            }
+        }
+        catch (e) {
+            console.error(e)
+        }
+    }
+
     const getMultiIndoorUnit = async () => {
         try {
             // const headers = {
@@ -140,6 +160,7 @@ const Home = () => {
         getCompanies()
         getMiniCenterals()
         getMultiIndoorUnit()
+        getShoppingBag()
     }, [])
 
     return (

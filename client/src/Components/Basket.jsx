@@ -50,7 +50,7 @@ const Basket = () => {
                 data: product_id
             });
             if (res.status === 200) {
-                console.log("Item removed", res.data);
+                // console.log("Item removed", res.data);
             }
         } catch (e) {
             console.error(e);
@@ -64,9 +64,10 @@ const Basket = () => {
             }
             const res = await axios.get('http://localhost:8000/api/user/shoppingBag', { headers })
             if (res.status === 200) {
+                console.log("res.data ",res.data);
                 dispatch(setBasket(res.data))
                 setShoppingBags(res.data)
-                console.log("res.data", res.data);
+                // console.log("res.data", res.data);
             }
         }
         catch (e) {
@@ -197,8 +198,8 @@ const Basket = () => {
                                 decrementButtonIcon="pi pi-minus"
                                 min={1} // Ensures only positive values
                             /> */}
-                            {console.log("amount", productInBasket)}
-                            {console.log("amonnt", productInBasket.amount)}
+                            {/* {console.log("amount", productInBasket)}
+                            {console.log("amonnt", productInBasket.amount)} */}
                             <InputNumber
                                 value={productInBasket?.amount}
                                 onValueChange={(e) => {
@@ -237,17 +238,17 @@ const Basket = () => {
     //     );
     // };
     useEffect(() => {
-        if (token) {
-            // קריאה ל-API רק אם יש טוקן
-            getShoppingBag();
+        // if (token) {
+        //     // קריאה ל-API רק אם יש טוקן
+        //     getShoppingBag();
             setSum(0)
-        }
-        else {
-            alert("to save thing in your basket you need to register")
-            navigate("/register")
-        }
+        // }
+        // else {
+        //     alert("to save thing in your basket you need to register")
+        //     navigate("/register")
+        // }
 
-    }, [token]);
+    }, []);
 
     return (
         <div style={{ paddingTop: '60px' }}>

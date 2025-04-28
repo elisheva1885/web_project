@@ -41,21 +41,7 @@ const Login  =() => {
         clearUserDeliveries()
     }
 
-    const getShoppingBag = async () => {
-        try {
-            const headers = {
-                'Authorization': `Bearer ${token.token}`
-            }
-            const res = await axios.get('http://localhost:8000/api/user/shoppingBag',{headers})
-            if (res.status === 200) {
-                dispatch(setBasket(res.data))
-                console.log("res.data",res.data);
-            }
-        }
-        catch (e) {
-            console.error(e)
-        }
-    }
+  
 
     const onSubmit = async (data) => {
         setFormData(data);

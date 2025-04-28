@@ -1,9 +1,27 @@
 const Purchase = require("../models/Purchase")
+const mongoose = require('mongoose')
 
 const createPurchase = async (req, res) => {
     const user_id = req.user._id
     const { products , paymentType} = req.body
-    // console.log(req.body)
+    console.log("the products", products);
+    // const transformedProducts = products.map(product => {
+    //     if (mongoose.Types.ObjectId.isValid(product.product._id)) {
+    //       product.product._id = new mongoose.Types.ObjectId(product.product._id); // Convert to ObjectId
+    //     } else {
+    //       console.error(`Invalid ObjectId: ${product.product._id}`); // Handle invalid ObjectId
+    //     }
+    //     return product; // Return the updated product object
+    //   });
+      
+    //   console.log(transformedProducts); // Logs the updated products array
+        // if (mongoose.Types.ObjectId.isValid(product.product._id)) {
+        //   product.product._id = new mongoose.Types.ObjectId(product.product._id); // Convert only if valid
+        // } else {
+        //   throw new Error(`Invalid ObjectId: ${product.product}`); // Handle invalid ObjectId
+        // }
+        // return product;
+    //   });
     if (!user_id || !products.length || !paymentType) {
         return res.status(400).json({ message: "all details are required" })
     }
@@ -11,6 +29,7 @@ const createPurchase = async (req, res) => {
     const purchase = await Purchase.create({user_id, products,paymentType})
     if (purchase) {
         // const purchases = await Purchase.find().lean()
+        console.log("here", purchase);
         return res.status(201).json(purchase)
     }
     else {   
