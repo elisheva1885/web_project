@@ -138,11 +138,15 @@ const Payment = () => {
         }
     };
     const createDelivery = async (purchase) => {
+        if(!address && !newAddress.length){
+            alert('Insert address details')
+        }
         const details = {
             address: address ? address : newAddress,
             // purchase:  products.map(product => product.product._id)
             purchase: purchase
         }
+        
         try {
             const headers = {
                 'Authorization': `Bearer ${token}`

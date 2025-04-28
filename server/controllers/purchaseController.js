@@ -29,29 +29,28 @@ const createPurchase = async (req, res) => {
     if (!user_id || !products?.length || !paymentType) {
         return res.status(400).json({ message: "all details are required" })
     }
-    try{
-        const result = checkProductsStock(products)
-        console.log("result", result);
+    
+        const result = await checkProductsStock(products)
+        console.log("result in the main", result);
+        if(result.status===200){
+        const purchase = await Purchase.create({user_id, products,paymentType})
+        if (purchase) {
+            // const purchases = await Purchase.find().lean()
+            // console.log("here", purchase);
+            return res.status(201).json(purchase)
+        }
+        else {   
+            return res.status(400).json({ message: "invalid purchase" })
+        }
     }
-    catch(e){
-        console.log("error", e);
+    else{
+        return res.status(result.status).json({message: result.message})
     }
-    // const purchase = await Purchase.create({user_id, products,paymentType})
-    // if (purchase) {
-    //     // const purchases = await Purchase.find().lean()
-    //     // console.log("here", purchase);
-    //     return res.status(201).json(purchase)
-    // }
-    // else {   
-    //     return res.status(400).json({ message: "invalid purchase" })
-    // }
+    
 }
 
 
-const checkProductsStock = async (products)=>{
-    // products.map(product=>
-    //     // await shoppingBagController.getProductByIdAndType(product.product._id, product.type, product.amount)
-    // )   
+const checkProductsStock = async (products)=>{  
     try {
         const results = await Promise.all(
           products.map(async (product) => {
@@ -62,21 +61,21 @@ const checkProductsStock = async (products)=>{
               productDetails.type,
               productDetails.amount
             );
-            if (result.message !== 'Ok') {
-              throw new Error(`${productDetails} is out of stock from ${productDetails.type}`);
+            if (result.status == 400) {
+              return {status:400,message:`${productDetails} is out of stock from ${productDetails.type}`};
             }
-
-            return { status: 'Ok', product: productDetails };
+            if(result.status===200){
+                return { status: 200 ,message:'Ok',  product: productDetails };
+            }
           })
         );
         console.log(results);
         return {status:200, message: 'All products are in stock', results };
       } catch (error) {
         console.error('Error checking stock:', error.message);
-        return {status:400, message: error.message };
+        return {status:error.status, message: error.message };
       }
 } 
-
 
 const changeProductStockByIdAndType = async (_id, type, amount)=>{
     switch (type) {
@@ -85,16 +84,15 @@ const changeProductStockByIdAndType = async (_id, type, amount)=>{
             if(overhead){
                 if (overhead.stock < amount) {
                     console.log("in error");
-                    return {message:`not enough, there is only ${overhead.stock} in the stock`};
+                    return {status:400,message:`not enough, there is only ${overhead.stock} in the stock`};
                 }
                 overhead.stock = overhead.stock - amount
                 const updatedOverhead = await overhead.save()
-                return {message : `Ok`}
+                return {status:200, message : `Ok`}
             }
             else{
-                return {message: `not found`}
+                return {status:404,message: `not found`}
             }
-            
             //delete from the basket
             break;
         case "miniCenteral":
@@ -105,10 +103,10 @@ const changeProductStockByIdAndType = async (_id, type, amount)=>{
                 }
                 miniCenteral.stock = miniCenteral.stock - amount
                 const updatedMiniCenteral = await miniCenteral.save()
-                return {message : `Ok`}
+                return { status:200,message : `Ok`}
             }
             else{
-                return {message: `not found`}
+                return {status:404,message: `not found`}
             }
             
             //delete from the basket

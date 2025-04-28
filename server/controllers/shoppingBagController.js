@@ -67,6 +67,7 @@ const readShoppingBagByUserId = async (req, res) => {
 }
 
 const updateShoppingBagAmount = async (req, res) => {
+    const user_id = req.user._id
     const { product_id, amount } = req.body
     // console.log(product_id, amount);
     if (!product_id) {
@@ -75,7 +76,7 @@ const updateShoppingBagAmount = async (req, res) => {
     if (!amount) {
         return res.status(400).json({ message: "nothing changed" })
     }
-    const shoppingBag = await ShoppingBag.findOne({ product_id: product_id }).exec()
+    const shoppingBag = await ShoppingBag.findOne({ product_id: product_id, user_id:user_id }).exec()
     // console.log("sh",shoppingBag);
     if (!shoppingBag) {
         return res.status(400).json({ message: "not fount in shopping bag" })
@@ -83,48 +84,47 @@ const updateShoppingBagAmount = async (req, res) => {
     // console.log(shoppingBag);
     const response = await checkProductStockByIdAndType(shoppingBag.product_id,shoppingBag.type ,amount)
     // console.log("respone",response);
-    if(response.message==="Ok"){
-        console.log(shoppingBag.amount);
+    if(response.status===200){
+        // console.log(shoppingBag.amount);
         shoppingBag.amount = amount
-        console.log(amount);
+        // console.log(amount);
         const updatedShoppingBag = await shoppingBag.save()
-        console.log(updatedShoppingBag);
-
+        // console.log("update",updatedShoppingBag);
         return res.status(200).json({ updatedShoppingBag })
     }
     else{
-        return res.status(400).json({message: res.message})
+        return res.status(response.status).json({message: response.message})
     }
 }
 
-const checkProductStock = async (product , amount)=>{
-    const res =  await getProductByIdAndType(product._id, product.type)
-    // console.log("the res in check", res);
-    // return res.then((result) => {
-    //     console.log(result); // Logs the resolved value (e.g., {message: "Ok"} or {message: "not enough..."})
-    // })
-    // .catch((error) => {
-    //     console.error("Error:", error);
-    // });
+// const checkProductStock = async (product , amount)=>{
+//     const res =  await getProductByIdAndType(product._id, product.type)
+//     // console.log("the res in check", res);
+//     // return res.then((result) => {
+//     //     console.log(result); // Logs the resolved value (e.g., {message: "Ok"} or {message: "not enough..."})
+//     // })
+//     // .catch((error) => {
+//     //     console.error("Error:", error);
+//     // });
 
-}
+// }
 
 const checkProductStockByIdAndType = async (_id, type, amount)=>{
     switch (type) {
         case "overhead":
             const overhead = await Overhead.findById({ _id: _id }).populate("company").lean()
             if (overhead.stock < amount) {
-                return {message:`not enough, there is only ${overhead.stock} in the stock`};
+                return {status: 400 ,message:`not enough, there is only ${overhead.stock} in the stock`};
             }
-            return {message : `Ok`}
+            return {status:200,message : `Ok`}
             //delete from the basket
             break;
         case "miniCenteral":
             const miniCenteral = await MiniCenteral.findById({ _id:_id}).populate("company").lean()
             if (miniCenteral.stock < amount) {
-                return {message:`not enough, there is only ${miniCenteral.stock} in the stock`};
+                return { status:400 , message:`not enough, there is only ${miniCenteral.stock} in the stock`};
             }
-            return {message : `Ok`}
+            return {status:200, message : `Ok`}
             //delete from the basket
             break;
         default:
