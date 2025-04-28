@@ -55,7 +55,7 @@ const Overheads = () => {
     };
 
     const addToBasket = async (product) => {
-        alert("shoping")
+        // alert("shoping")
         const shoppingBagDetails = {
             product_id: product._id,
             type: "overhead",
@@ -66,11 +66,15 @@ const Overheads = () => {
                 'Authorization': `Bearer ${token}`
             }
             const res = await axios.post('http://localhost:8000/api/user/shoppingBag', shoppingBagDetails, { headers })
-            if (res.status === 200) {
+            if (res.status === 201) {
                 alert("im here")
-                dispatch(setBasket(basket.push(res.data)))
+                dispatch(setBasket([...basket, res.data]))
+                alert(` המוצר נוסף לעגלה`)
                 console.log("res.data", res.data);
                 console.log("useState", shoppingBags);
+            }
+            if(res.status==200){
+                alert(` המוצר נוסף לעגלה`)
             }
             if (res.status === 409) {
                 // updateAmount(product)

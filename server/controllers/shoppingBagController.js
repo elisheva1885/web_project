@@ -17,10 +17,14 @@ const createShoppingBag = async (req, res) => {
     const duplicate = await ShoppingBag.findOne({
         user_id: user_id,
         product_id: product_id,
-    }).lean()
+    }).exec()
     // console.log("duplicate", duplicate)
     if (duplicate) {
-        return res.status(409).json({ message: "already exist in the basket" })
+        console.log("duplicate product ",duplicate);
+        duplicate.amount++
+        const updatedShoppingBag = await duplicate.save()
+        return res.status(200).json({message:"update amount"})
+        // return res.status(409).json({ message: "already exist in the basket" })
     }
 
     const shoppingBag = await ShoppingBag.create({ user_id, product_id, type, amount })
@@ -44,14 +48,14 @@ const readShoppingBagByUserId = async (req, res) => {
         switch (shoppingBag.type) {
             case "overhead":
                 const overhead = await Overhead.findOne({ _id: shoppingBag.product_id }).populate("company").lean()
-                if (overhead.stock >= shoppingBag.amount) {
+                if (overhead.stock >= 0) {
                     return { product: overhead, amount: shoppingBag.amount, type: shoppingBag.type ,shoppingBagId: shoppingBag._id};
                 }
                 //delete from the basket
                 break;
             case "miniCenteral":
                 const miniCenteral = await MiniCenteral.findOne({ _id: shoppingBag.product_id }).populate("company").lean()
-                if (miniCenteral.stock >= shoppingBag.amount) {
+                if (miniCenteral.stock >= 0) {
                     return { product: miniCenteral, amount: shoppingBag.amount , type: shoppingBag.type,shoppingBagId: shoppingBag._id};
                 }
                 //delete from the basket
@@ -156,7 +160,7 @@ const deleteShoppingBag = async (req, res) => {
 
     // readShoppingBagByUserId()
     // return res.status(200).json({shoppingBags})
-    return res.status(200).json({ message: "deled successfully" })
+    return res.status(200).json(result)
 
 }
 

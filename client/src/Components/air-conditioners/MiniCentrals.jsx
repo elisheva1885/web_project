@@ -53,7 +53,7 @@ const MiniCenterals = () => {
     };
 
     const addToBasket = async (product) => {
-        alert("shoping")
+        // alert("shoping")
         const shoppingBagDetails = {
             product_id: product._id,
             type: "miniCenteral"
@@ -63,14 +63,15 @@ const MiniCenterals = () => {
                 'Authorization': `Bearer ${token}`
             }
             const res = await axios.post('http://localhost:8000/api/user/shoppingBag', shoppingBagDetails, { headers },)
-            if (res.status === 200) {
-                alert("in here")
+            if (res.status === 201) {
                 dispatch(setBasket([...basket, res.data]))
                 console.log("res.data", res.data);
                 console.log("useState", shoppingBags);
+                alert(` המוצר נוסף לעגלה`)
+
             }
-            if (res.status === 409) {
-                // updateAmount(product)
+            if(res.status==200){
+                alert(` המוצר נוסף לעגלה`)
             }
         }
         catch (e) {
@@ -249,78 +250,6 @@ const MiniCenterals = () => {
         }
     };
 
-    // const listItem = (product, index) => {
-    //     return (
-    //         <>
-    //             <div className="col-12" key={product._id}>
-    //                 <div className={classNames('flex flex-column xl:flex-row xl:align-items-start p-4 gap-4', { 'border-top-1 surface-border': index !== 0 })}>
-    //                     <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`/${product?.company?.imagePath}`} />
-    //                     <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`${product.imagepath}`} />
-    //                     <div className="flex flex-column sm:flex-row justify-content-between align-items-center xl:align-items-start flex-1 gap-4">
-    //                         <div className="flex flex-column align-items-center sm:align-items-start gap-3">
-    //                             {/* <Link to={{pathName:`/MiniCenterals/${product.title}` , state: {product:product} }}><div className="text-2xl font-bold text-900" style={{}} >{product.title}</div></Link> */}
-    //                             <Link to={`/MiniCenterals/MiniCenteral/${product._id}` } params={{ product: product }}><div className="text-2xl font-bold text-900" style={{}} >{product.title}</div></Link>
-    //                             <p>{product.imagepath}</p>
-    //                             <div className="flex align-items-center gap-3">
-    //                                 <Tag value={getSeverityText(product)} severity={getSeverity(product.stock)}></Tag>
-    //                             </div>
-    //                         </div>
-    //                         <div className="flex sm:flex-column align-items-center sm:align-items-end gap-3 sm:gap-2">
-    //                             <span className="text-2xl font-semibold">₪{product.price}</span>
-    //                             <Button icon="pi pi-shopping-cart" className="p-button-rounded" disabled={getSeverity(product.stock) === "danger"} onClick={()=>addToBasket(product)}></Button>
-    //                         </div>
-    //                     </div>
-    //                 </div>
-    //             </div>
-    //         </>
-    //     );
-    // };
-
-    // const gridItem = (product, index) => {
-    //     return (
-    //         <>
-    //         <div className="col-12 sm:col-6 lg:col-12 xl:col-4 p-2" key={product._id}>
-    //             <div className="p-4 border-1 surface-border surface-card border-round">
-    //                 <div className="flex flex-wrap align-items-center justify-content-between gap-2">
-    //                     {/* <img className="w-9 shadow-2 border-round" src={`${product.company.imagePath}`} /> */}
-    //                     <div className="flex align-items-center gap-2">
-    //                         <Link to={"/MiniCenterals/MiniCenteral"}><div className="text-2xl font-bold text-900" style={{}}>{product.title}</div></Link>
-    //                     </div>
-    //                 </div>
-    //                 <div className="flex flex-column align-items-center gap-3 py-5">
-    //                     <img className="w-9 shadow-2 border-round" src={`${product.imagepath}`} />
-    //                 </div>
-    //                 <Tag value={getSeverityText(product)} severity={getSeverity(product.stock)}></Tag>
-
-    //                 <div className="flex align-items-center justify-content-between">
-    //                     <span className="text-2xl font-semibold">₪{product.price}</span>
-    //                     <Button icon="pi pi-shopping-cart" className="p-button-rounded" disabled={getSeverity(product.stock) === "danger"} onClick={()=>addToBasket(product)}></Button>
-    //                 </div>
-    //             </div>
-    //         </div>
-    //         <div className="col-12 sm:col-6 lg:col-12 xl:col-4 p-2" key={product._id}>
-    //         <div className={classNames('p-4 border-1 surface-border surface-card border-roun', { 'border-top-1 surface-border': index !== 0 })}>
-    //             <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`/${product?.company?.imagePath}`} />
-    //             <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`${product.imagepath}`} />
-    //             <div className="flex flex-column sm:flex-row justify-content-between align-items-center xl:align-items-start flex-1 gap-4">
-    //                 <div className="flex flex-column align-items-center sm:align-items-start gap-3">
-    //                     {/* <Link to={{pathName:`/MiniCenterals/${product.title}` , state: {product:product} }}><div className="text-2xl font-bold text-900" style={{}} >{product.title}</div></Link> */}
-    //                     <Link to={`/MiniCenterals/MiniCenteral/${product._id}` } params={{ product: product }}><div className="text-2xl font-bold text-900" style={{}} >{product.title}</div></Link>
-    //                     <p>{product.imagepath}</p>
-    //                     <div className="flex align-items-center gap-3">
-    //                         <Tag value={getSeverityText(product)} severity={getSeverity(product.stock)}></Tag>
-    //                     </div>
-    //                 </div>
-    //                 <div className="flex sm:flex-column align-items-center sm:align-items-end gap-3 sm:gap-2">
-    //                     <span className="text-2xl font-semibold">₪{product.price}</span>
-    //                     <Button icon="pi pi-shopping-cart" className="p-button-rounded" disabled={getSeverity(product.stock) === "danger"} onClick={()=>addToBasket(product)}></Button>
-    //                 </div>
-    //             </div>
-    //         </div>
-    //     </div>
-    //     </>
-    //     );
-    // };
     const gridItem = (product) => {
         return (
             <div className="col-12 sm:col-6 lg:col-3 p-3" key={product._id}>

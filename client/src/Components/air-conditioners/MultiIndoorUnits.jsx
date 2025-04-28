@@ -18,6 +18,7 @@ import SideFillter from '../SideFillter';
 import UpdateOverhead from './updateOvearhead';
 import { Controller, useForm } from 'react-hook-form';
 import { Dialog } from 'primereact/dialog';
+import { setMultiIndoorUnits } from '../../store/air-conditioner/multiIndoorUnitsSlice';
 
 
 const Overhead = lazy(() => import('./Overhead'));
@@ -97,7 +98,7 @@ const MultiIndoorUnits = () => {
             });
             if (res.status === 200) {
                 const updatedOverheads = multiIndoorUnits.filter(multiIndoorUnit => multiIndoorUnit._id != product._id)
-                dispatch(setOverheads(updatedOverheads))
+                dispatch(setMultiIndoorUnits(updatedOverheads))
             }
         } catch (e) {
             console.log(e);
@@ -129,7 +130,7 @@ const MultiIndoorUnits = () => {
             if (res.status === 200) {
                 alert(`${selectedProduct.title} price updated`)
                 const unUpdatedOverheads = multiIndoorUnits.filter(multiIndoorUnit => multiIndoorUnit._id != res.data._id)
-                dispatch(setOverheads([...unUpdatedOverheads, res.data]))
+                dispatch(setMultiIndoorUnits([...unUpdatedOverheads, res.data]))
                 setPriceVisible(false);
             }
         }
@@ -202,12 +203,12 @@ const MultiIndoorUnits = () => {
     //     }
     // }
 
-    const getOverheadByTitle = async (c) => {
+    const getMultiIndoorUnitByTitle = async (c) => {
         try {
             setValue(c.target.value)
             const res = await axios.get(`http://localhost:8000/api/air-conditioner/multiIndoorUnit/${c.target.value}`)
             if (res.status === 200) {
-                dispatch(setOverheads(res.data))
+                dispatch(setMultiIndoorUnits(res.data))
             }
         }
         catch (e) {
@@ -317,12 +318,12 @@ const MultiIndoorUnits = () => {
     //     );
     // };
 
-    const UpdateOverhead = async (o) => {
+    const UpdateMultiIndoorUnit = async (m) => {
         const navigationData = {
-            type: o,
+            type: m,
             // You can add any other data you may want to send
         };
-        console.log(o);
+        console.log("mmmmmmmm",m);
         navigate('/multiIndoorUnits/multiIndoorUnit/update', { state: navigationData })
         // dispatch(setOverheads(res.data))
     }
@@ -354,7 +355,7 @@ const MultiIndoorUnits = () => {
 
                         <Tag value={getSeverityText(product)} severity={getSeverity(product.stock)} />
                         <span className="text-lg font-medium text-primary">₪{product.price}</span>
-                        {userDetails?.role === 'official' || userDetails?.role === 'admin' ? <Button onClick={() => UpdateOverhead(product)}><i className="pi pi-pencil" style={{ fontSize: '1rem' }}></i></Button> : <></>}
+                        {userDetails?.role === 'official' || userDetails?.role === 'admin' ? <Button onClick={() => UpdateMultiIndoorUnit(product)}><i className="pi pi-pencil" style={{ fontSize: '1rem' }}></i></Button> : <></>}
                         {userDetails?.role === 'official' || userDetails?.role === 'admin' ? (<Button onClick={() => openPriceUpdateDialog(product)}><i className="pi pi-pencil" style={{ fontSize: '1rem' }}> עדכון מחיר </i> </Button>) : <></>}
                         {/* {userDetails?.role === 'official' || userDetails?.role === 'admin' ? <Button onClick={() => openStockUpdateDialog(product)}><i className="pi pi-pencil" style={{ fontSize: '1rem' }}> עדכון מלאי </i></Button> : <></>} */}
 
@@ -456,7 +457,7 @@ const MultiIndoorUnits = () => {
                 <div className="flex justify-content-end">
                     <IconField iconPosition="left">
                         <InputIcon className="pi pi-search" />
-                        <InputText placeholder="Search by name" onChange={(c) => getOverheadByTitle(c)} value={value} />
+                        <InputText placeholder="Search by name" onChange={(c) => getMultiIndoorUnitByTitle(c)} value={value} />
                     </IconField>
                 </div>
                 <DataView value={multiIndoorUnits} listTemplate={listTemplate} layout={layout} />

@@ -50,7 +50,8 @@ const Basket = () => {
                 data: product_id
             });
             if (res.status === 200) {
-                // console.log("Item removed", res.data);
+                const updatedBasket = basket.filter(itemInBasket => itemInBasket.product._id != product._id)
+                dispatch(setBasket(updatedBasket))
             }
         } catch (e) {
             console.error(e);
@@ -170,9 +171,8 @@ const Basket = () => {
         return (
             <div className="col-12" key={productDetails._id}>
                 <div className={classNames('flex flex-column xl:flex-row xl:align-items-start p-4 gap-4', { 'border-top-1 surface-border': index !== 0 })}>
-                    <Checkbox inputId={productDetails._id} checked={isSelected} onChange={() => handleSelectionChange(productInBasket)} disabled={errorStates[productDetails._id] || false}
-                    />
-                    {errorStates[productDetails._id] && <h3>אין מספיק במלאי <br /> באפשרותך להוריד מהכמות</h3>}
+                    <Checkbox inputId={productDetails._id} checked={isSelected} onChange={() => handleSelectionChange(productInBasket)} disabled={productDetails.stock===0} />
+                    {productDetails.stock===0 && <> <h3>אזל מהמלאי <br/> המוצר יהיה ניתן לרכישה בעדכון המלאי </h3>   </>}
 
                     <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`${productDetails.imagepath}`} alt={productDetails.title} />
                     <div className="flex flex-column sm:flex-row justify-content-between align-items-center xl:align-items-start flex-1 gap-4">
@@ -187,22 +187,6 @@ const Basket = () => {
                         <div className="flex sm:flex-column align-items-center sm:align-items-end gap-3 sm:gap-2">
                             <span className="text-2xl font-semibold">₪{productDetails.price}</span>
                             <h2>amount : {productInBasket?.amount}</h2> {/* השתמש באופרטור אופציונלי כדי למנוע שגיאות אם productInBasket לא מוגדר */}
-                            {/* <InputNumber
-                                value={productInBasket?.amount}
-                                onValueChange={(e) => {
-                                    updateShoppingBagProductAmount(productDetails, e.value);
-                                }}
-                                showButtons
-                                className="p-inputnumber-sm"
-                                inputStyle={{ padding: '0.5rem', textAlign: 'center', width: 'auto' }}
-                                decrementButtonClassName="p-button-sm p-button-primary"
-                                incrementButtonClassName="p-button-sm p-button-primary"
-                                incrementButtonIcon="pi pi-plus"
-                                decrementButtonIcon="pi pi-minus"
-                                min={1} // Ensures only positive values
-                            /> */}
-                            {/* {console.log("amount", productInBasket)}
-                            {console.log("amonnt", productInBasket.amount)} */}
                             <InputNumber
                                 value={productInBasket?.amount}
                                 onValueChange={(e) => {
@@ -218,7 +202,7 @@ const Basket = () => {
                                 disabled={productDetails.stock===0}
                                 min={1}
                             />
-                            {/* <Button icon="pi pi-shopping-cart" className="p-button-rounded" disabled={getSeverity(productDetails.stock) === "danger"} onClick={() => deleteShoppingBag(productDetails)}> להסרה מהעגלה </Button> */}
+                            <Button icon="pi pi-shopping-cart" className="p-button-rounded" disabled={getSeverity(productDetails.stock) === "danger"} onClick={() => deleteShoppingBag(productDetails)}> להסרה מהעגלה </Button>
                         </div>
                     </div>
                 </div>
