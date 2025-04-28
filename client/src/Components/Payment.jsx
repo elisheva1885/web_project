@@ -28,7 +28,7 @@ const Payment = () => {
     const { basket } = useSelector((state) => state.basket);
     const [layout, setLayout] = useState('list');
     const [selectedItems, setSelectedItems] = useState([]);
-    const [purchase, setPurcase] = useState([])
+    const [purchase, setPurcase] = useState(null)
     // const [products, setProducts] = useState([])
     const [visible, setVisible] = useState(false);
     const [formDisabled, setFromDisabled] = useState(false);
@@ -142,7 +142,6 @@ const Payment = () => {
             address: address ? address : newAddress,
             // purchase:  products.map(product => product.product._id)
             purchase:  purchase
-
         }
         try {
             const headers = {
@@ -169,9 +168,8 @@ const Payment = () => {
     }
     const createPurchase = async (paymentType) => {
         // setProducts(selectedItems)
-        if (selectedItems) {
-            const data = {
-                
+        // if (selectedItems) {
+            const data = {  
                 products: products.map(product=> {return product.shoppingBagId}),
                 paymentType: paymentType
             }
@@ -185,10 +183,8 @@ const Payment = () => {
                     // updateProductsStock(selectedItems)
                     setPurcase(res.data);
                     console.log(res.data);
-                    alert("ההזמנה הושלמה")
-                    // setProducts([])
                     createDelivery()
-
+                    alert("ההזמנה הושלמה")
                 }
             } catch (error) {
                 console.log(error);
@@ -196,7 +192,7 @@ const Payment = () => {
                     alert("Error");
                 }
             }
-        }
+        // }
     }
     const onSubmit = (data) => {
         createAddress(data)

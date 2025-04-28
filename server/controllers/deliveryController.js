@@ -6,17 +6,20 @@ const Purchase = require("../models/Purchase")
 const createDelivery = async (req, res) => {
     const user_id = req.user._id
     const { address, purchase, status} = req.body
-    console.log("createDelivery", address, purchase, status)
-    // if (!user_id || !address || !purchase.length ) {
+    // console.log("createDelivery", address, purchase, status)
     if (!user_id || !address || !purchase ) {
         return res.status(400).json({ message: "user_id, address and purchase are required" })
     }
+    if (!purchase || typeof purchase !== "string" || purchase.length !== 24) {
+        console.error("Invalid purchase ObjectId:", purchase);
+        return res.status(400).json({ message: "invalid purchase id" });
+    }
     const delivery=null;
     if (!status){
-        delivery = await Delivery.create({ user_id, address, purchases})
+        delivery = await Delivery.create({ user_id, address, purchase})
     }
     else{
-        delivery = await Delivery.create({ user_id, address, purchases, status})
+        delivery = await Delivery.create({ user_id, address, purchase, status})
     }
     if (delivery) {
         // const deliveries = await Delivery.find().lean()
@@ -58,7 +61,7 @@ const readDeliveriesByUserName = async (req,res) => {
     if (!user) {
         return res.status(401).json({ message: "user anauthorized" })
     }
-    const deliveries = await Delivery.find({ user_id: user._id }).populate('address').populate('purchases').lean()
+    const deliveries = await Delivery.find({ user_id: user._id }).populate('address').populate('purchase').lean()
     if(!deliveries)
         return res.status(404).json({ message: "no deliveries for this user" })
     return res.status(200).json(deliveries)

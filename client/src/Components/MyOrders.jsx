@@ -8,8 +8,9 @@ import { classNames } from 'primereact/utils';
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import { setUserDeliveries } from '../store/userDeliveriesSlice';
+import MyOrders2 from './MyOrders2';
 
-const MyOrders = ()=>{
+const MyOrders = () => {
 
     const sortData = (data) => {
         if (!data) {
@@ -19,7 +20,7 @@ const MyOrders = ()=>{
             return new Date(b.createdAt) - new Date(a.createdAt);
         });
     };
-    
+
     const filterData = (data) => {
         if (!data) {
             return [];
@@ -28,30 +29,30 @@ const MyOrders = ()=>{
     };
 
     const dispatch = useDispatch();
-    const {userOrders} = useSelector((state) => state.userDeliveries);
-    const {userDetails} = useSelector((state) => state.userDetails);
-    const {token} = useSelector((state) => state.token);
+    const { userOrders } = useSelector((state) => state.userDeliveries);
+    const { userDetails } = useSelector((state) => state.userDetails);
+    const { token } = useSelector((state) => state.token);
     const [orders, setOrders] = useState([]);
-    
-    
-    const getUserDeliveries = async ()=>{
-        console.log("getUserDeliveries: ",userDetails.username)
+
+
+    const getUserDeliveries = async () => {
+        console.log("getUserDeliveries: ", userDetails.username)
         const username = userDetails.username;
         const headers = {
             'Authorization': `Bearer ${token}`
         }
         try {
-            const res = await axios.get(`http://localhost:8000/api/delivery/${username}`,{headers})
+            const res = await axios.get(`http://localhost:8000/api/delivery/${username}`, { headers })
             if (res.status === 200) {
-                console.log("res.data",res.data)
+                console.log("res.data", res.data)
                 dispatch(setUserDeliveries(res.data))
             }
         } catch (error) {
-            if(error.status===404){
+            if (error.status === 404) {
                 alert("not found")
             }
             console.error(error)
-            if(error.status===401){
+            if (error.status === 401) {
                 alert("Unauthorized")
             }
         }
@@ -107,9 +108,12 @@ const MyOrders = ()=>{
     }, [userOrders])
 
     return (
-        <div className="card">
-        <DataView value={orders} listTemplate={listTemplate} />
-    </div>
+        //     <div className="card">
+        //     <DataView value={orders} listTemplate={listTemplate} />
+        // </div>
+        <>
+        <MyOrders2 deliveries={orders} />
+        </>
     )
 }
 
