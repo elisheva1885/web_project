@@ -8,7 +8,7 @@ const MiniCenteral = require("../models/airconditioners/MiniCenteral");
 const createPurchase = async (req, res) => {
     const user_id = req.user._id
     const { products , paymentType} = req.body
-    console.log("the products", products);
+    console.log("createPurchase the products", products);
     // const transformedProducts = products.map(product => {
     //     if (mongoose.Types.ObjectId.isValid(product.product._id)) {
     //       product.product._id = new mongoose.Types.ObjectId(product.product._id); // Convert to ObjectId
@@ -26,7 +26,7 @@ const createPurchase = async (req, res) => {
         // }
         // return product;
     //   });
-    if (!user_id || !products.length || !paymentType) {
+    if (!user_id || !products?.length || !paymentType) {
         return res.status(400).json({ message: "all details are required" })
     }
     try{
