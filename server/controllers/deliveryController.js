@@ -1,4 +1,7 @@
 const Delivery = require("../models/Delivery")
+const User = require("../models/User")
+const Address = require("../models/Address")
+const Purchase = require("../models/Purchase")
 
 const createDelivery = async (req, res) => {
     const user_id = req.user._id
@@ -8,7 +11,13 @@ const createDelivery = async (req, res) => {
     if (!user_id || !address || !purchase ) {
         return res.status(400).json({ message: "user_id, address and purchase are required" })
     }
-    const delivery = await Delivery.create({ user_id, address, purchase, status})
+    const delivery=null;
+    if (!status){
+        delivery = await Delivery.create({ user_id, address, purchases})
+    }
+    else{
+        delivery = await Delivery.create({ user_id, address, purchases, status})
+    }
     if (delivery) {
         // const deliveries = await Delivery.find().lean()
         // console.log("createDelivery")
@@ -38,20 +47,20 @@ const readDeliveries = async (req, res) => {
 //     return res.status(200).json(deliveries)
 // }
 
-//not working - return 404 :(
 const readDeliveriesByUserName = async (req,res) => {
-    console.log("readDeliveriesByUserName")
     const {username} = req.params
+    console.log("username ",username)
     if (!username) {
         return res.status(400).json({ message: "user required" })
     }
     const user = await User.findOne({ username: username });
+    console.log("user ",user)
     if (!user) {
         return res.status(401).json({ message: "user anauthorized" })
     }
-    const deliveries = await Delivery.find({ user_id: user._id }).populate('address').populate('purchase').lean()
+    const deliveries = await Delivery.find({ user_id: user._id }).populate('address').populate('purchases').lean()
     if(!deliveries)
-        return res.status(404).json({ message: "no delivery for this user" })
+        return res.status(404).json({ message: "no deliveries for this user" })
     return res.status(200).json(deliveries)
 }
 
