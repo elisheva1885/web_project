@@ -137,7 +137,7 @@ const Payment = () => {
             }
         }
     };
-    const createDelivery = async () => {
+    const createDelivery = async (purchase) => {
         const details = {
             address: address ? address : newAddress,
             // purchase:  products.map(product => product.product._id)
@@ -168,8 +168,14 @@ const Payment = () => {
     }
     const createPurchase = async (paymentType) => {
         // setProducts(selectedItems)
+<<<<<<< HEAD
         // if (selectedItems) {
             const data = {  
+=======
+        if (products) {
+            console.log(products);
+            const data = {
+>>>>>>> 56e75178561009b49f56f8b8c2996ef30753c13d
                 products: products.map(product=> {return product.shoppingBagId}),
                 paymentType: paymentType
             }
@@ -179,12 +185,19 @@ const Payment = () => {
                 };
                 const res = await axios.post("http://localhost:8000/api/user/purchase", data, { headers });
                 if (res.status === 201) {
-                    console.log("to the function");
+                    // console.log("to the function");
                     // updateProductsStock(selectedItems)
                     setPurcase(res.data);
                     console.log(res.data);
+<<<<<<< HEAD
                     createDelivery()
                     alert("ההזמנה הושלמה")
+=======
+                    alert("ההזמנה הושלמה")
+                    // setProducts([])
+                    createDelivery(res.data)
+
+>>>>>>> 56e75178561009b49f56f8b8c2996ef30753c13d
                 }
             } catch (error) {
                 console.log(error);

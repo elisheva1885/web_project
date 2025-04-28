@@ -81,7 +81,7 @@ const updateShoppingBagAmount = async (req, res) => {
         return res.status(400).json({ message: "not fount in shopping bag" })
     }
     // console.log(shoppingBag);
-    const response = await getProductByIdAndType(shoppingBag.product_id,shoppingBag.type  ,amount)
+    const response = await checkProductStockByIdAndType(shoppingBag.product_id,shoppingBag.type ,amount)
     // console.log("respone",response);
     if(response.message==="Ok"){
         console.log(shoppingBag.amount);
@@ -109,7 +109,7 @@ const checkProductStock = async (product , amount)=>{
 
 }
 
-const getProductByIdAndType = async (_id, type, amount)=>{
+const checkProductStockByIdAndType = async (_id, type, amount)=>{
     switch (type) {
         case "overhead":
             const overhead = await Overhead.findById({ _id: _id }).populate("company").lean()
@@ -160,4 +160,4 @@ const deleteShoppingBag = async (req, res) => {
 
 }
 
-module.exports = { createShoppingBag, readShoppingBagByUserId, updateShoppingBagAmount, deleteShoppingBag }
+module.exports = { createShoppingBag, readShoppingBagByUserId, updateShoppingBagAmount, deleteShoppingBag, checkProductStockByIdAndType }
