@@ -30,21 +30,21 @@ const MyOrders = ()=>{
     const dispatch = useDispatch();
     const {userOrders} = useSelector((state) => state.userDeliveries);
     const {userDetails} = useSelector((state) => state.userDetails);
-    // const username = userDetails.username;
+    const {token} = useSelector((state) => state.token);
     const [orders, setOrders] = useState([]);
-    // sortData(userOrders)
-    // filterData(userOrders)
-    // setOrders(userOrders)
     
-
     
     const getUserDeliveries = async ()=>{
         console.log("getUserDeliveries: ",userDetails.username)
         const username = userDetails.username;
+        const headers = {
+            'Authorization': `Bearer ${token}`
+        }
         try {
-            const res = await axios.get(`/api/delivery/${username}`)
+            const res = await axios.get(`http://localhost:8000/api/delivery/${username}`,{headers})
             if (res.status === 200) {
-                dispatch(setUserDeliveries(res.data.userDeliveries))
+                console.log("res.data",res.data)
+                dispatch(setUserDeliveries(res.data))
             }
         } catch (error) {
             if(error.status===404){
