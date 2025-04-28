@@ -139,7 +139,7 @@ const Payment = () => {
     const createDelivery = async () => {
         const details = {
             address: address ? address : newAddress,
-            purchase:  selectedItems.map(item => item._id)
+            purchases:  selectedItems.map(item => item._id)
         }
         try {
             const headers = {
