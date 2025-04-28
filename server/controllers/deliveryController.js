@@ -38,17 +38,17 @@ const readDeliveries = async (req, res) => {
     return res.status(200).json(deliveries)
 }
 
-// const readDeliveriesByUserId = async (req,res) => {
-//     const user_id = req.user._id
-//     if (!user_id) {
-//         return res.status(400).json({ message: "user required" })
-//     }
-//     const deliveries = await Delivery.findById(user_id).lean()
+const readDeliveriesByUserId = async (req,res) => {
+    const user_id = req.user._id
+    if (!user_id) {
+        return res.status(400).json({ message: "user required" })
+    }
+    const deliveries = await Delivery.find({ user_id: user_id }).populate('address').populate('purchase').lean()
 
-//     if(!deliveries)
-//         return res.status(404).json({ message: "no delivery for this user" })
-//     return res.status(200).json(deliveries)
-// }
+    if(!deliveries)
+        return res.status(404).json({ message: "no delivery for this user" })
+    return res.status(200).json(deliveries)
+}
 
 const readDeliveriesByUserName = async (req,res) => {
     const {username} = req.params
@@ -106,4 +106,4 @@ const deleteDelivery = async (req,res)=> {
 
 }
 
-module.exports = {createDelivery, readDeliveries, readDeliveriesByUserName, updateDelivery, deleteDelivery}
+module.exports = {createDelivery, readDeliveries, readDeliveriesByUserId, updateDelivery, deleteDelivery}
