@@ -4,6 +4,7 @@ import axios from 'axios';
 import AddMiniCentral from './AddMiniCentral';
 import AddOverhead from './AddOverhead';
 import AddMultiIndoorUnit from './AddMultiIndoorUnit';
+import AddMultiOutdoorUnits from './AddMultiOutdoorUnits';
 
 const Add_AirConditioner = () => {
     const location = useLocation();
@@ -16,6 +17,8 @@ const Add_AirConditioner = () => {
             return <AddMiniCentral/>
         case "MultiIndoorUnit":
             return <AddMultiIndoorUnit/>
+        case "MultiOutdoorUnit":
+            return <AddMultiOutdoorUnits/>
         default:
             break;
     }

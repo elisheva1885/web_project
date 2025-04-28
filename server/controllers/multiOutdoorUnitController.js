@@ -78,7 +78,9 @@ const updateMultiOutdoorUnit = async (req, res) => {
 
 const deleteMultiOutdoorUnit = async (req,res)=> {
     const {_id} = req.body
+    console.log(_id);
     const multiOutdoorUnit = await MultiOutdoorUnit.findById(_id).exec()
+    console.log(multiOutdoorUnit);
     if(!multiOutdoorUnit){
         return res.status(400).json({ message: "multiOutdoorUnit not found" })
     }

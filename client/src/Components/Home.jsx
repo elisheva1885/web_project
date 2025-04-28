@@ -8,6 +8,7 @@ import { setCompanies } from '../store/companySlice';
 import { setMiniCenterals } from '../store/air-conditioner/miniCenteralsSlice';
 import { setMultiIndoorUnits } from '../store/air-conditioner/multiIndoorUnitsSlice';
 import { setBasket } from '../store/basketSlice';
+import { setMultiOutdoorUnits } from '../store/air-conditioner/multiOutdoorUnitsSlice';
 
 
 const Home = () => {
@@ -26,8 +27,8 @@ const Home = () => {
         const acTypes = [
             { id: 1, name: 'מזגן עילי', imageUrl: '/overheads/back.jpg' },
             { id: 2, name: 'מזגן מיני מרכזי', imageUrl: '/overheads/back.jpg' },
-            { id: 3, name: 'מערכת VRF', imageUrl: '/overheads/back.jpg' },
-            { id: 4, name: 'מולטי', imageUrl: '/overheads/back.jpg' },
+            { id: 3, name: 'מעבי מולטי', imageUrl: '/overheads/back.jpg' },
+            { id: 4, name: 'מאייד מולטי' , imageUrl: '/overheads/back.jpg' },
         ];
 
         const goToACDetail = (id) => {
@@ -39,7 +40,7 @@ const Home = () => {
                     navigate('/miniCenterals')                    
                     break;
                 case 3:
-                    navigate('/miniVrfs')                    
+                    navigate('/multiOutdoorUnits')                    
                     break;
                 case 4:
                     navigate('/multiIndoorUnits')                    
@@ -124,6 +125,23 @@ const Home = () => {
         }
     }
 
+    const getMultiOutdoorUnit = async () => {
+        try {
+            // const headers = {
+            //     'Authorization': `Bearer ${token}`
+            // }
+            // const res = await axios.get('http://localhost:8000/api/air-conditioner/overhead',{headers})
+            const res = await axios.get('http://localhost:8000/api/air-conditioner/multiOutdoorUnit')
+            if (res.status === 200) {
+                dispatch(setMultiOutdoorUnits(res.data));
+                // console.log(overheads);
+            }
+        }
+        catch (e) {
+            console.error(e)
+        }
+    }
+
     const getMiniCenterals = async () => {
         try {
             // const headers = {
@@ -161,6 +179,7 @@ const Home = () => {
         getMiniCenterals()
         getMultiIndoorUnit()
         getShoppingBag()
+        getMultiOutdoorUnit()
     }, [])
 
     return (

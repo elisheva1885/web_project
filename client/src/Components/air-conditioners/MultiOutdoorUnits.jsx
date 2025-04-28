@@ -18,20 +18,20 @@ import SideFillter from '../SideFillter';
 import UpdateOverhead from './updateOvearhead';
 import { Controller, useForm } from 'react-hook-form';
 import { Dialog } from 'primereact/dialog';
-import { setMultiIndoorUnits } from '../../store/air-conditioner/multiIndoorUnitsSlice';
+import { setMultiOutdoorUnits } from '../../store/air-conditioner/multiOutdoorUnitsSlice';
 
 
 const Overhead = lazy(() => import('./Overhead'));
 
 
-const MultiIndoorUnits = () => {
+const MultiOutdoorUnits = () => {
 
     const { token } = useSelector((state) => state.token)
     const { companies } = useSelector((state) => state.companies)
     const { basket } = useSelector((state) => state.basket)
     const { userDetails } = useSelector((state) => state.userDetails);
 
-    const { multiIndoorUnits } = useSelector((state) => state.multiIndoorUnits);
+    const { multiOutdoorUnits } = useSelector((state) => state.multiOutdoorUnits);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [value, setValue] = useState('')
     const [shoppingBags, setShoppingBags] = useState([])
@@ -46,21 +46,20 @@ const MultiIndoorUnits = () => {
     const priceValue = watch('price');
     const stockValue = watch('stock');
 
-    console.log("multiIndoorUnits",multiIndoorUnits);
+    console.log("multiOutdoorUnits",multiOutdoorUnits);
 
-    const goToAddMultiIndoorUnit = (type) => {
+    const goToAddMultiOutdoorUnit = (m) => {
         const navigationData = {
-            type: type,
+            type: m,
             // You can add any other data you may want to send
         };
         navigate('/air_conditioner/add', { state: navigationData });
     };
 
     const addToBasket = async (product) => {
-        alert("shoping")
         const shoppingBagDetails = {
             product_id: product._id,
-            type: "multiIndoorUnit",
+            type: "multiOutdoorUnit",
             amount: 1
         }
         try {
@@ -71,8 +70,6 @@ const MultiIndoorUnits = () => {
             if (res.status === 201) {
                 dispatch(setBasket([...basket, res.data]))
                 alert(` המוצר נוסף לעגלה`)
-                console.log("res.data", res.data);
-                console.log("useState", shoppingBags);
             }
             if(res.status==200){
                 alert(` המוצר נוסף לעגלה`)
@@ -84,7 +81,7 @@ const MultiIndoorUnits = () => {
 
     }
 
-    const deleteMultiIndoorUnit = async (product) => {
+    const deleteMultiOutdoorUnit = async (product) => {
         try {
             const headers = {
                 'Authorization': `Bearer ${token}`
@@ -92,13 +89,13 @@ const MultiIndoorUnits = () => {
             const _id = {
                 _id: product._id
             };
-            const res = await axios.delete('http://localhost:8000/api/air-conditioner/multiIndoorUnit', {
+            const res = await axios.delete('http://localhost:8000/api/air-conditioner/multiOutdoorUnit', {
                 headers: headers,
                 data: _id
             });
             if (res.status === 200) {
-                const updatedOverheads = multiIndoorUnits.filter(multiIndoorUnit => multiIndoorUnit._id != product._id)
-                dispatch(setMultiIndoorUnits(updatedOverheads))
+                const updatedOverheads = multiOutdoorUnits.filter(multiOutdoorUnit => multiOutdoorUnit._id != product._id)
+                dispatch(setMultiOutdoorUnits(updatedOverheads))
             }
         } catch (e) {
             console.log(e);
@@ -125,12 +122,12 @@ const MultiIndoorUnits = () => {
                 price: priceValue
             }
             console.log(details);
-            const res = await axios.put(`http://localhost:8000/api/air-conditioner/multiIndoorUnit/price`, details, { headers });
+            const res = await axios.put(`http://localhost:8000/api/air-conditioner/multiOutdoorUnit/price`, details, { headers });
             console.log(res);
             if (res.status === 200) {
                 alert(`${selectedProduct.title} price updated`)
-                const unUpdatedOverheads = multiIndoorUnits.filter(multiIndoorUnit => multiIndoorUnit._id != res.data._id)
-                dispatch(setMultiIndoorUnits([...unUpdatedOverheads, res.data]))
+                const unUpdatedOverheads = multiOutdoorUnits.filter(multiOutdoorUnit => multiOutdoorUnit._id != res.data._id)
+                dispatch(setMultiOutdoorUnits([...unUpdatedOverheads, res.data]))
                 setPriceVisible(false);
             }
         }
@@ -149,11 +146,11 @@ const MultiIndoorUnits = () => {
     //             _id: selectedProduct._id,
     //             stock: stockValue
     //         }
-    //         const res = await axios.put(`http://localhost:8000/api/air-conditioner/multiIndoorUnit/stock`, details, { headers });
+    //         const res = await axios.put(`http://localhost:8000/api/air-conditioner/multiOutdoorUnit/stock`, details, { headers });
     //         console.log(res);
     //         if (res.status === 200) {
     //             alert(`${selectedProduct.title} stock updated`)
-    //             const unUpdatedOverheads = multiIndoorUnits.filter(multiIndoorUnit => multiIndoorUnit._id != res.data._id)
+    //             const unUpdatedOverheads = multiOutdoorUnits.filter(multiOutdoorUnit => multiOutdoorUnit._id != res.data._id)
     //             dispatch(setOverheads([...unUpdatedOverheads, res.data]))
     //             setStockVisible(false);
     //         }
@@ -186,29 +183,12 @@ const MultiIndoorUnits = () => {
         })
     }
 
-    // const getOverheads = async () => {
-    //     try {
-    //         const headers = {
-    //             'Authorization': `Bearer ${token}`
-    //         }
-    //         console.log(headers);
-    //         const res = await axios.get('http://localhost:8000/api/air-conditioner/multiIndoorUnit',{headers})
-    //         if (res.status === 200) {
-    //             sortData(res.data)
-    //             setOverheads(res.data)
-    //         }
-    //     }
-    //     catch (e) {
-    //         console.error(e)
-    //     }
-    // }
-
-    const getMultiIndoorUnitByTitle = async (c) => {
+    const getMultiOutdoorUnitByTitle = async (c) => {
         try {
             setValue(c.target.value)
-            const res = await axios.get(`http://localhost:8000/api/air-conditioner/multiIndoorUnit/${c.target.value}`)
+            const res = await axios.get(`http://localhost:8000/api/air-conditioner/multiOutdoorUnit/${c.target.value}`)
             if (res.status === 200) {
-                dispatch(setMultiIndoorUnits(res.data))
+                dispatch(setMultiOutdoorUnits(res.data))
             }
         }
         catch (e) {
@@ -254,8 +234,8 @@ const MultiIndoorUnits = () => {
     //                     <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`${product.imagepath}`} />
     //                     <div className="flex flex-column sm:flex-row justify-content-between align-items-center xl:align-items-start flex-1 gap-4">
     //                         <div className="flex flex-column align-items-center sm:align-items-start gap-3">
-    //                             {/* <Link to={{pathName:`/multiIndoorUnits/${product.title}` , state: {product:product} }}><div className="text-2xl font-bold text-900" style={{}} >{product.title}</div></Link> */}
-    //                             <Link to={`/multiIndoorUnits/multiIndoorUnit/${product._id}` } params={{ product: product }}><div className="text-2xl font-bold text-900" style={{}} >{product.title}</div></Link>
+    //                             {/* <Link to={{pathName:`/multiOutdoorUnits/${product.title}` , state: {product:product} }}><div className="text-2xl font-bold text-900" style={{}} >{product.title}</div></Link> */}
+    //                             <Link to={`/multiOutdoorUnits/multiOutdoorUnit/${product._id}` } params={{ product: product }}><div className="text-2xl font-bold text-900" style={{}} >{product.title}</div></Link>
     //                             <p>{product.imagepath}</p>
     //                             <div className="flex align-items-center gap-3">
     //                                 <Tag value={getSeverityText(product)} severity={getSeverity(product.stock)}></Tag>
@@ -280,7 +260,7 @@ const MultiIndoorUnits = () => {
     //                 <div className="flex flex-wrap align-items-center justify-content-between gap-2">
     //                     {/* <img className="w-9 shadow-2 border-round" src={`${product.company.imagePath}`} /> */}
     //                     <div className="flex align-items-center gap-2">
-    //                         <Link to={"/multiIndoorUnits/multiIndoorUnit"}><div className="text-2xl font-bold text-900" style={{}}>{product.title}</div></Link>
+    //                         <Link to={"/multiOutdoorUnits/multiOutdoorUnit"}><div className="text-2xl font-bold text-900" style={{}}>{product.title}</div></Link>
     //                     </div>
     //                 </div>
     //                 <div className="flex flex-column align-items-center gap-3 py-5">
@@ -300,8 +280,8 @@ const MultiIndoorUnits = () => {
     //             <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`${product.imagepath}`} />
     //             <div className="flex flex-column sm:flex-row justify-content-between align-items-center xl:align-items-start flex-1 gap-4">
     //                 <div className="flex flex-column align-items-center sm:align-items-start gap-3">
-    //                     {/* <Link to={{pathName:`/multiIndoorUnits/${product.title}` , state: {product:product} }}><div className="text-2xl font-bold text-900" style={{}} >{product.title}</div></Link> */}
-    //                     <Link to={`/multiIndoorUnits/multiIndoorUnit/${product._id}` } params={{ product: product }}><div className="text-2xl font-bold text-900" style={{}} >{product.title}</div></Link>
+    //                     {/* <Link to={{pathName:`/multiOutdoorUnits/${product.title}` , state: {product:product} }}><div className="text-2xl font-bold text-900" style={{}} >{product.title}</div></Link> */}
+    //                     <Link to={`/multiOutdoorUnits/multiOutdoorUnit/${product._id}` } params={{ product: product }}><div className="text-2xl font-bold text-900" style={{}} >{product.title}</div></Link>
     //                     <p>{product.imagepath}</p>
     //                     <div className="flex align-items-center gap-3">
     //                         <Tag value={getSeverityText(product)} severity={getSeverity(product.stock)}></Tag>
@@ -318,13 +298,13 @@ const MultiIndoorUnits = () => {
     //     );
     // };
 
-    const UpdateMultiIndoorUnit = async (m) => {
+    const UpdateMultiOutdoorUnit = async (m) => {
         const navigationData = {
             type: m,
             // You can add any other data you may want to send
         };
         console.log("mmmmmmmm",m);
-        navigate('/multiIndoorUnits/multiIndoorUnit/update', { state: navigationData })
+        navigate('/multiOutdoorUnits/multiOutdoorUnit/update', { state: navigationData })
         // dispatch(setOverheads(res.data))
     }
 
@@ -349,18 +329,18 @@ const MultiIndoorUnits = () => {
 
                     {/* פרטי המוצר */}
                     <div className="flex flex-column align-items-center text-center gap-2">
-                        <Link to={`/multiIndoorUnits/multiIndoorUnit/${product._id}`}>
+                        <Link to={`/multiOutdoorUnits/multiOutdoorUnit/${product._id}`}>
                             <div className="text-xl font-bold text-900">{product.title}</div>
                         </Link>
 
                         <Tag value={getSeverityText(product)} severity={getSeverity(product.stock)} />
                         <span className="text-lg font-medium text-primary">₪{product.price}</span>
-                        {userDetails?.role === 'official' || userDetails?.role === 'admin' ? <Button onClick={() => UpdateMultiIndoorUnit(product)}><i className="pi pi-pencil" style={{ fontSize: '1rem' }}></i></Button> : <></>}
+                        {userDetails?.role === 'official' || userDetails?.role === 'admin' ? <Button onClick={() => UpdateMultiOutdoorUnit(product)}><i className="pi pi-pencil" style={{ fontSize: '1rem' }}></i></Button> : <></>}
                         {userDetails?.role === 'official' || userDetails?.role === 'admin' ? (<Button onClick={() => openPriceUpdateDialog(product)}><i className="pi pi-pencil" style={{ fontSize: '1rem' }}> עדכון מחיר </i> </Button>) : <></>}
                         {/* {userDetails?.role === 'official' || userDetails?.role === 'admin' ? <Button onClick={() => openStockUpdateDialog(product)}><i className="pi pi-pencil" style={{ fontSize: '1rem' }}> עדכון מלאי </i></Button> : <></>} */}
 
                         {userDetails?.role === 'admin' && (
-                            <Button icon="pi pi-trash" className="p-button-rounded p-button-danger p-button-sm" onClick={() => deleteMultiIndoorUnit(product)} tooltip="מחק" tooltipOptions={{ position: 'bottom' }} />
+                            <Button icon="pi pi-trash" className="p-button-rounded p-button-danger p-button-sm" onClick={() => deleteMultiOutdoorUnit(product)} tooltip="מחק" tooltipOptions={{ position: 'bottom' }} />
                         )}
                     </div>
                     <Button
@@ -385,10 +365,10 @@ const MultiIndoorUnits = () => {
     };
 
     const listTemplate = (products, layout) => {
-        if (!Array.isArray(multiIndoorUnits) || multiIndoorUnits.length === 0) {
-            return <h1>No multiIndoorUnits available</h1>; // Fallback UI          
+        if (!Array.isArray(multiOutdoorUnits) || multiOutdoorUnits.length === 0) {
+            return <h1>No multiOutdoorUnits available</h1>; // Fallback UI          
         }
-        return <div className="grid grid-nogutter">{multiIndoorUnits.map((product, index) => itemTemplate(product, layout, index))}</div>;
+        return <div className="grid grid-nogutter">{multiOutdoorUnits.map((product, index) => itemTemplate(product, layout, index))}</div>;
     };
 
     // const header = () => {
@@ -401,40 +381,40 @@ const MultiIndoorUnits = () => {
     // };
 
     const filterOverheads = (filters) => {
-        // Filter multiIndoorUnits based on selected criteria
-        let filteredOverheads = multiIndoorUnits;
+        // Filter multiOutdoorUnits based on selected criteria
+        let filteredOverheads = multiOutdoorUnits;
         console.log(filteredOverheads)
 
         // Example filter logic
         if (filters.companies.length > 0) {
-            filteredOverheads = filteredOverheads.filter(multiIndoorUnit =>
-                filters.companies.includes(multiIndoorUnit.company.name)
+            filteredOverheads = filteredOverheads.filter(multiOutdoorUnit =>
+                filters.companies.includes(multiOutdoorUnit.company.name)
             );
         }
         if (filters.shabbatMode) {
-            filteredOverheads = filteredOverheads.filter(multiIndoorUnit => multiIndoorUnit.isShabbatCompatible);
+            filteredOverheads = filteredOverheads.filter(multiOutdoorUnit => multiOutdoorUnit.isShabbatCompatible);
         }
         if (filters.wifi) {
-            filteredOverheads = filteredOverheads.filter(multiIndoorUnit => multiIndoorUnit.hasWifi);
+            filteredOverheads = filteredOverheads.filter(multiOutdoorUnit => multiOutdoorUnit.hasWifi);
         }
         if (filters.priceRange) {
-            filteredOverheads = filteredOverheads.filter(multiIndoorUnit =>
-                multiIndoorUnit?.price >= filters.priceRange[0] && multiIndoorUnit.price <= filters.priceRange[1]
+            filteredOverheads = filteredOverheads.filter(multiOutdoorUnit =>
+                multiOutdoorUnit?.price >= filters.priceRange[0] && multiOutdoorUnit.price <= filters.priceRange[1]
             );
         }
         if (filters.btuHeating) {
-            filteredOverheads = filteredOverheads.filter(multiIndoorUnit =>
-                multiIndoorUnit?.btuHeating >= filters.btuHeating
+            filteredOverheads = filteredOverheads.filter(multiOutdoorUnit =>
+                multiOutdoorUnit?.btuHeating >= filters.btuHeating
             );
         }
         if (filters.btuCooling) {
-            filteredOverheads = filteredOverheads.filter(multiIndoorUnit =>
-                multiIndoorUnit?.btuCooling >= filters.btuCooling
+            filteredOverheads = filteredOverheads.filter(multiOutdoorUnit =>
+                multiOutdoorUnit?.btuCooling >= filters.btuCooling
             );
         }
         if (filters.energyRating) {
-            filteredOverheads = filteredOverheads.filter(multiIndoorUnit =>
-                multiIndoorUnit?.energyRating === filters.energyRating
+            filteredOverheads = filteredOverheads.filter(multiOutdoorUnit =>
+                multiOutdoorUnit?.energyRating === filters.energyRating
             );
         }
         console.log(filterOverheads)
@@ -451,16 +431,16 @@ const MultiIndoorUnits = () => {
 
     return (
         <>
-            {userDetails.role === 'admin' ? <Button onClick={() => goToAddMultiIndoorUnit("MultiIndoorUnit")}>add multiIndoorUnit</Button> : <></>}
-            {/* {<Button onClick={ ()=>goToAddOverhead("Overhead")}>add multiIndoorUnit</Button>} */}
+            {userDetails.role === 'admin' ? <Button onClick={() => goToAddMultiOutdoorUnit("MultiOutdoorUnit")}>add multiOutdoorUnit</Button> : <></>}
+            {/* {<Button onClick={ ()=>goToAddOverhead("Overhead")}>add multiOutdoorUnit</Button>} */}
             <div className="card">
                 <div className="flex justify-content-end">
                     <IconField iconPosition="left">
                         <InputIcon className="pi pi-search" />
-                        <InputText placeholder="Search by name" onChange={(c) => getMultiIndoorUnitByTitle(c)} value={value} />
+                        <InputText placeholder="Search by name" onChange={(c) => getMultiOutdoorUnitByTitle(c)} value={value} />
                     </IconField>
                 </div>
-                <DataView value={multiIndoorUnits} listTemplate={listTemplate} layout={layout} />
+                <DataView value={multiOutdoorUnits} listTemplate={listTemplate} layout={layout} />
             </div>
             <SideFillter onFilter={filterOverheads} />
 
@@ -522,4 +502,4 @@ const MultiIndoorUnits = () => {
     )
 }
 
-export default MultiIndoorUnits
+export default MultiOutdoorUnits
