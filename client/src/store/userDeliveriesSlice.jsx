@@ -1,35 +1,25 @@
-import { createSlice } from "@reduxjs/toolkit"
+import { createSlice } from "@reduxjs/toolkit";
 
 const initVal = {
-    userDeliveries:{
-        user_id:null,
-        address:null,
-        purchase:null,
-        status:null,
-    }
-}
+    userDeliveries: [] // Array of delivery objects
+};
 
 const userDeliveriesSlice = createSlice({
-    name:"userDeliveries",
-    initialState:initVal,
-    reducers:{
-        setUserDeliveries:(state,action)=>{
-            state.userDeliveries.user_id=action.payload.user_id
-            state.userDeliveries.address=action.payload.address
-            state.userDeliveries.purchase=action.payload.purchase
-            state.userDeliveries.status=action.payload.status
-            console.log("in state:",state);
-
+    name: "userDeliveries",
+    initialState: initVal,
+    reducers: {
+        setUserDeliveries: (state, action) => {
+            // Add a new delivery object to the array
+            state.userDeliveries = [...state.userDeliveries, action.payload];
+            console.log("userDeliveriesSlice", state.userDeliveries);
         },
-        clearUserDeliveries(state) {
-            state.userDeliveries.user_id=null
-            state.userDeliveries.address=null
-            state.userDeliveries.purchase=null
-            state.userDeliveries.status=null
+        clearUserDeliveries: (state) => {
+            // Clear all deliveries by resetting the array
+            state.userDeliveries = [];
             console.log("cleared userDeliveries");
         }
     }
-})
+});
 
-export const {setUserDeliveries,clearUserDeliveries} = userDeliveriesSlice.actions
-export default userDeliveriesSlice.reducer
+export const { setUserDeliveries, clearUserDeliveries } = userDeliveriesSlice.actions;
+export default userDeliveriesSlice.reducer;

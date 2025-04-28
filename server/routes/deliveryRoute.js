@@ -7,7 +7,7 @@ const veriftyJWT = require("../middleware/verifyJWT")
 
 router.post("/",veriftyJWT, deliveryController.createDelivery)
 router.get("/",veriftyJWT, deliveryController.readDeliveries)
-router.get("/:username",veriftyJWT, deliveryController.readDeliveriesByUserName)
+router.get("/:id",veriftyJWT, deliveryController.readDeliveriesByUserId)
 router.put("/",veriftyJWT, deliveryController.updateDelivery)
 router.delete("/",veriftyJWT, deliveryController.deleteDelivery)
 

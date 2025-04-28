@@ -58,7 +58,7 @@ const Login  =() => {
                 dispatch(setUserDetails({username:res.data.username,role:res.data.role}))
                 setShowMessage(true);
                 // getShoppingBag();
-                // goToHome()
+                goToHome()
             }
         }
 

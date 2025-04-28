@@ -6,7 +6,7 @@ import { Image } from "primereact/image";
 import { Divider } from "primereact/divider";
 
 const MyOrders2=({deliveries}) =>{
-
+  console.log("deliveries",deliveries)
   // Render a single delivery card
   const renderDelivery = (delivery) => {
     const orderDate = new Date(delivery.createdAt).toLocaleDateString();

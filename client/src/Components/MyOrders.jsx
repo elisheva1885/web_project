@@ -16,36 +16,41 @@ const MyOrders = () => {
         if (!data) {
             return [];
         }
-        return data.sort((a, b) => {
+        data.sort((a, b) => {
             return new Date(b.createdAt) - new Date(a.createdAt);
         });
+        console.log("sorted",data)
+        return data
     };
 
     const filterData = (data) => {
+        console.log("before filter",data)
         if (!data) {
             return [];
         }
-        return data.filter(delivery => delivery.status !== "recieved");
+        data.filter(delivery => delivery.status !== "recieved");
+        console.log("filtered",data)
+        return data
     };
 
     const dispatch = useDispatch();
-    const { userOrders } = useSelector((state) => state.userDeliveries);
+    const { userDeliveries } = useSelector((state) => state.userDeliveries);
     const { userDetails } = useSelector((state) => state.userDetails);
     const { token } = useSelector((state) => state.token);
     const [orders, setOrders] = useState([]);
 
 
     const getUserDeliveries = async () => {
-        console.log("getUserDeliveries: ", userDetails.username)
-        const username = userDetails.username;
         const headers = {
             'Authorization': `Bearer ${token}`
         }
         try {
-            const res = await axios.get(`http://localhost:8000/api/delivery/${username}`, { headers })
+            const res = await axios.get(`http://localhost:8000/api/delivery/byid`, { headers })
             if (res.status === 200) {
-                console.log("res.data", res.data)
+                console.log("UserDeliveries from server type:", res.data)
                 dispatch(setUserDeliveries(res.data))
+                console.log("userDeliveries", userDeliveries)
+                setOrders(res.data)
             }
         } catch (error) {
             if (error.status === 404) {
@@ -56,6 +61,10 @@ const MyOrders = () => {
                 alert("Unauthorized")
             }
         }
+        const filteredOrders = filterData(orders)
+        const sortedOrders = sortData(filteredOrders)
+        setOrders(sortedOrders)
+        console.log("setOrders",orders)
     }
 
     const itemTemplate = (product, index) => {
@@ -97,15 +106,12 @@ const MyOrders = () => {
 
     useEffect(() => {
         getUserDeliveries()
+        console.log("useEffect MyOrders")
     }, []);
 
-    useEffect(() => {
-        console.log("useEffect MyOrders")
-        const filteredOrders = filterData(userOrders)
-        const sortedOrders = sortData(filteredOrders)
-        setOrders(sortedOrders)
-        console.log(orders)
-    }, [userOrders])
+    // useEffect(() => {
+
+    // }, [userOrders])
 
     return (
         //     <div className="card">
