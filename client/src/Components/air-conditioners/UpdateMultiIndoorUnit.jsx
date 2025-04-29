@@ -8,7 +8,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { setMultiIndoorUnits } from '../../store/air-conditioner/multiIndoorUnitsSlice'; // חשוב שתעדכני גם את הסלייס
 
-const UpdateMultiIndoorUnits = () => {
+const UpdateMultiIndoorUnit = () => {
     const location = useLocation();
     const m = location.state?.type || {}; // שליפת היחידה לעדכון מה-state
     const { token } = useSelector((state) => state.token);
@@ -258,4 +258,4 @@ const UpdateMultiIndoorUnits = () => {
     );
 };
 
-export default UpdateMultiIndoorUnits;
+export default UpdateMultiIndoorUnit;

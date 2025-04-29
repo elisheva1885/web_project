@@ -1,5 +1,7 @@
 const ShoppingBag = require("../models/ShoppingBag");
 const MiniCenteral = require("../models/airconditioners/MiniCenteral");
+const MultiIndoorUnit = require("../models/airconditioners/MultiIndoorUnit");
+const MultiOutdoorUnit = require("../models/airconditioners/MultiOutdoorUnit");
 const Overhead = require("../models/airconditioners/Overhead")
 
 
@@ -20,13 +22,13 @@ const createShoppingBag = async (req, res) => {
     }).exec()
     // console.log("duplicate", duplicate)
     if (duplicate) {
-        console.log("duplicate product ",duplicate);
+        console.log("duplicate product ", duplicate);
         duplicate.amount++
         const updatedShoppingBag = await duplicate.save()
-        return res.status(200).json({message:"update amount"})
+        return res.status(200).json({ message: "update amount" })
         // return res.status(409).json({ message: "already exist in the basket" })
     }
-
+    
     const shoppingBag = await ShoppingBag.create({ user_id, product_id, type, amount })
     if (shoppingBag) {
         return res.status(201).json(shoppingBag)
@@ -46,20 +48,31 @@ const readShoppingBagByUserId = async (req, res) => {
     const promises = shoppingBags.map(async (shoppingBag) => {
         // console.log(shoppingBag.type)
         switch (shoppingBag.type) {
-            case "overhead":
+            case "Overhead":
                 const overhead = await Overhead.findOne({ _id: shoppingBag.product_id }).populate("company").lean()
                 if (overhead.stock >= 0) {
-                    return { product: overhead, amount: shoppingBag.amount, type: shoppingBag.type ,shoppingBagId: shoppingBag._id};
+                    return { product: overhead, amount: shoppingBag.amount, type: shoppingBag.type, shoppingBagId: shoppingBag._id };
                 }
-                //delete from the basket
-                break;
-            case "miniCenteral":
+                return res.status(400).json({ message: "inValid stock amount" })
+
+            case "MiniCenteral":
                 const miniCenteral = await MiniCenteral.findOne({ _id: shoppingBag.product_id }).populate("company").lean()
-                if (miniCenteral.stock >= 0) {
-                    return { product: miniCenteral, amount: shoppingBag.amount , type: shoppingBag.type,shoppingBagId: shoppingBag._id};
+                if (miniCenteral) {
+                    return { product: miniCenteral, amount: shoppingBag.amount, type: shoppingBag.type, shoppingBagId: shoppingBag._id };
                 }
-                //delete from the basket
-                break;
+                return res.status(400).json({ message: "inValid stock amount" })
+            case "MultiOutdoorUnit":
+                const multiOutdoorUnit = await MultiOutdoorUnit.findOne({ _id: shoppingBag.product_id }).populate("company").lean()
+                if (multiOutdoorUnit) {
+                    return { product: multiOutdoorUnit, amount: shoppingBag.amount, type: shoppingBag.type, shoppingBagId: shoppingBag._id };
+                }
+                return res.status(400).json({ message: "inValid stock amount" })
+            case "MultiIndoorUnit":
+                const multiIndoorUnit = await MultiIndoorUnit.findOne({ _id: shoppingBag.product_id }).populate("company").lean()
+                if (multiIndoorUnit) {
+                    return { product: multiIndoorUnit, amount: shoppingBag.amount, type: shoppingBag.type, shoppingBagId: shoppingBag._id };
+                }
+                return res.status(400).json({ message: "inValid stock amount" })
             default:
                 break;
         }
@@ -80,15 +93,16 @@ const updateShoppingBagAmount = async (req, res) => {
     if (!amount) {
         return res.status(400).json({ message: "nothing changed" })
     }
-    const shoppingBag = await ShoppingBag.findOne({ product_id: product_id, user_id:user_id }).exec()
+    const shoppingBag = await ShoppingBag.findOne({ product_id: product_id, user_id: user_id }).exec()
     // console.log("sh",shoppingBag);
     if (!shoppingBag) {
         return res.status(400).json({ message: "not fount in shopping bag" })
     }
     // console.log(shoppingBag);
-    const response = await checkProductStockByIdAndType(shoppingBag.product_id,shoppingBag.type ,amount)
+    const response = await checkProductStockByIdAndType(shoppingBag.product_id, shoppingBag.type, amount)
+    console.log(response);
     // console.log("respone",response);
-    if(response.status===200){
+    if (response.status === 200) {
         // console.log(shoppingBag.amount);
         shoppingBag.amount = amount
         // console.log(amount);
@@ -96,8 +110,8 @@ const updateShoppingBagAmount = async (req, res) => {
         // console.log("update",updatedShoppingBag);
         return res.status(200).json({ updatedShoppingBag })
     }
-    else{
-        return res.status(response.status).json({message: response.message})
+    else {
+        return res.status(response.status).json({ message: response.message })
     }
 }
 
@@ -113,24 +127,35 @@ const updateShoppingBagAmount = async (req, res) => {
 
 // }
 
-const checkProductStockByIdAndType = async (_id, type, amount)=>{
+const checkProductStockByIdAndType = async (_id, type, amount) => {
     switch (type) {
-        case "overhead":
+        case "Overhead":
             const overhead = await Overhead.findById({ _id: _id }).populate("company").lean()
             if (overhead.stock < amount) {
-                return {status: 400 ,message:`not enough, there is only ${overhead.stock} in the stock`};
+                return { status: 400, message: `not enough, there is only ${overhead.stock} in the stock` };
             }
-            return {status:200,message : `Ok`}
+            return { status: 200, message: `Ok` }
             //delete from the basket
             break;
-        case "miniCenteral":
-            const miniCenteral = await MiniCenteral.findById({ _id:_id}).populate("company").lean()
+        case "MiniCenteral":
+            const miniCenteral = await MiniCenteral.findById({ _id: _id }).populate("company").lean()
             if (miniCenteral.stock < amount) {
-                return { status:400 , message:`not enough, there is only ${miniCenteral.stock} in the stock`};
+                return { status: 400, message: `not enough, there is only ${miniCenteral.stock} in the stock` };
             }
-            return {status:200, message : `Ok`}
-            //delete from the basket
-            break;
+            return { status: 200, message: `Ok` }
+        case "MultiIndoorUnit":
+            const multiIndoorUnit = await MultiIndoorUnit.findById({ _id: _id }).populate("company").lean()
+            if (multiIndoorUnit.stock < amount) {
+                return { status: 400, message: `not enough, there is only ${multiIndoorUnit.stock} in the stock` };
+            }
+            return { status: 200, message: `Ok` }
+        case "MultiOutdoorUnit":
+            const multiOutdoorUnit = await MultiOutdoorUnit.findById({ _id: _id }).populate("company").lean()
+            if (multiOutdoorUnit.stock < amount) {
+                return { status: 400, message: `not enough, there is only ${multiOutdoorUnit.stock} in the stock` };
+            }
+            return { status: 200, message: `Ok` }
+        //delete from the basket
         default:
             break;
     }
