@@ -262,9 +262,12 @@ const styles = {
       flex: '0.3', // Adjusted flex for tighter layout
     },
     tableCellValue: {
-      padding: '6px', // Slightly reduced padding to bring the value closer to the label
-      textAlign: 'left',
-      flex: '0.5', // Adjusted flex for tighter layout
+      padding: '6px', // Keep the padding reduced as needed
+      textAlign: 'center', // Center the text horizontally
+      display: 'flex', // Use flexbox for centering
+      // alignItems: 'center', // Center content vertically
+      // justifyContent: 'center', // Center content horizontally
+      flex: '0.4',
     },
     featureCheck: {
       color: '#28a745',
