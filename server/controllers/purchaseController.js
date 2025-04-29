@@ -80,42 +80,50 @@ const checkProductsStock = async (products)=>{
 } 
 
 const changeProductStockByIdAndType = async (_id, type, amount)=>{
-    switch (type) {
-        case "overhead":
-            const overhead = await Overhead.findById({ _id: _id }).populate("company").exec()
-            if(overhead){
-                if (overhead.stock < amount) {
-                    console.log("in error");
-                    return {status:400,message:`not enough, there is only ${overhead.stock} in the stock`};
-                }
-                overhead.stock = overhead.stock - amount
-                const updatedOverhead = await overhead.save()
-                return {status:200, message : `Ok`}
-            }
-            else{
-                return {status:404,message: `not found`}
-            }
-            //delete from the basket
-            break;
-        case "miniCenteral":
-            const miniCenteral = await MiniCenteral.findById({ _id:_id}).populate("company").exec()
-            if(miniCenteral){
-                if (miniCenteral.stock < amount) {
-                    return {message:`not enough, there is only ${miniCenteral.stock} in the stock`};
-                }
-                miniCenteral.stock = miniCenteral.stock - amount
-                const updatedMiniCenteral = await miniCenteral.save()
-                return { status:200,message : `Ok`}
-            }
-            else{
-                return {status:404,message: `not found`}
-            }
-            
-            //delete from the basket
-            break;
-        default:
-            break;
+    const Model = mongoose.model(type);
+    const airConditioner = await Model.findOne({ _id: _id }).populate("company").exec()
+    if (airConditioner.stock < amount) {
+        return { status: 400, message: `not enough, there is only ${airConditioner.stock} in the stock` };
     }
+    airConditioner.stock = airConditioner.stock - amount
+    const updatedAirConditioner = await airConditioner.save()
+    return { status: 200, message: `Ok` }
+    // switch (type) {
+    //     case "overhead":
+    //         const overhead = await Overhead.findById({ _id: _id }).populate("company").exec()
+    //         if(overhead){
+    //             if (overhead.stock < amount) {
+    //                 console.log("in error");
+    //                 return {status:400,message:`not enough, there is only ${overhead.stock} in the stock`};
+    //             }
+    //             overhead.stock = overhead.stock - amount
+    //             const updatedOverhead = await overhead.save()
+    //             return {status:200, message : `Ok`}
+    //         }
+    //         else{
+    //             return {status:404,message: `not found`}
+    //         }
+    //         //delete from the basket
+    //         break;
+    //     case "miniCenteral":
+    //         const miniCenteral = await MiniCenteral.findById({ _id:_id}).populate("company").exec()
+    //         if(miniCenteral){
+    //             if (miniCenteral.stock < amount) {
+    //                 return {message:`not enough, there is only ${miniCenteral.stock} in the stock`};
+    //             }
+    //             miniCenteral.stock = miniCenteral.stock - amount
+    //             const updatedMiniCenteral = await miniCenteral.save()
+    //             return { status:200,message : `Ok`}
+    //         }
+    //         else{
+    //             return {status:404,message: `not found`}
+    //         }
+            
+    //         //delete from the basket
+    //         break;
+    //     default:
+    //         break;
+    // }
 }
 
 

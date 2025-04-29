@@ -3,6 +3,7 @@ const MiniCenteral = require("../models/airconditioners/MiniCenteral");
 const MultiIndoorUnit = require("../models/airconditioners/MultiIndoorUnit");
 const MultiOutdoorUnit = require("../models/airconditioners/MultiOutdoorUnit");
 const Overhead = require("../models/airconditioners/Overhead")
+const mongoose = require('mongoose');
 
 
 //לבדוק בפוסטמן
@@ -47,36 +48,42 @@ const readShoppingBagByUserId = async (req, res) => {
     }
     const promises = shoppingBags.map(async (shoppingBag) => {
         // console.log(shoppingBag.type)
-        switch (shoppingBag.type) {
-            case "Overhead":
-                const overhead = await Overhead.findOne({ _id: shoppingBag.product_id }).populate("company").lean()
-                if (overhead.stock >= 0) {
-                    return { product: overhead, amount: shoppingBag.amount, type: shoppingBag.type, shoppingBagId: shoppingBag._id };
+        // switch (shoppingBag.type) {
+            const Model = mongoose.model(shoppingBag.type);
+            const airConditioner = await Model.findOne({ _id: shoppingBag.product_id }).populate("company").lean()
+                 if (airConditioner.stock >= 0) {
+                    return { product: airConditioner, amount: shoppingBag.amount, type: shoppingBag.type, shoppingBagId: shoppingBag._id };
                 }
-                return res.status(400).json({ message: "inValid stock amount" })
+            // case "Overhead":
+            //     const overhead = await Overhead.findOne({ _id: shoppingBag.product_id }).populate("company").lean()
+            //     if (overhead.stock >= 0) {
+            //         return { product: overhead, amount: shoppingBag.amount, type: shoppingBag.type, shoppingBagId: shoppingBag._id };
+            //     }
+            //     return res.status(400).json({ message: "inValid stock amount" })
 
-            case "MiniCenteral":
-                const miniCenteral = await MiniCenteral.findOne({ _id: shoppingBag.product_id }).populate("company").lean()
-                if (miniCenteral) {
-                    return { product: miniCenteral, amount: shoppingBag.amount, type: shoppingBag.type, shoppingBagId: shoppingBag._id };
-                }
-                return res.status(400).json({ message: "inValid stock amount" })
-            case "MultiOutdoorUnit":
-                const multiOutdoorUnit = await MultiOutdoorUnit.findOne({ _id: shoppingBag.product_id }).populate("company").lean()
-                if (multiOutdoorUnit) {
-                    return { product: multiOutdoorUnit, amount: shoppingBag.amount, type: shoppingBag.type, shoppingBagId: shoppingBag._id };
-                }
-                return res.status(400).json({ message: "inValid stock amount" })
-            case "MultiIndoorUnit":
-                const multiIndoorUnit = await MultiIndoorUnit.findOne({ _id: shoppingBag.product_id }).populate("company").lean()
-                if (multiIndoorUnit) {
-                    return { product: multiIndoorUnit, amount: shoppingBag.amount, type: shoppingBag.type, shoppingBagId: shoppingBag._id };
-                }
-                return res.status(400).json({ message: "inValid stock amount" })
-            default:
-                break;
+            // case "MiniCenteral":
+            //     const miniCenteral = await MiniCenteral.findOne({ _id: shoppingBag.product_id }).populate("company").lean()
+            //     if (miniCenteral) {
+            //         return { product: miniCenteral, amount: shoppingBag.amount, type: shoppingBag.type, shoppingBagId: shoppingBag._id };
+            //     }
+            //     return res.status(400).json({ message: "inValid stock amount" })
+            // case "MultiOutdoorUnit":
+            //     const multiOutdoorUnit = await MultiOutdoorUnit.findOne({ _id: shoppingBag.product_id }).populate("company").lean()
+            //     if (multiOutdoorUnit) {
+            //         return { product: multiOutdoorUnit, amount: shoppingBag.amount, type: shoppingBag.type, shoppingBagId: shoppingBag._id };
+            //     }
+            //     return res.status(400).json({ message: "inValid stock amount" })
+            // case "MultiIndoorUnit":
+            //     const multiIndoorUnit = await MultiIndoorUnit.findOne({ _id: shoppingBag.product_id }).populate("company").lean()
+            //     if (multiIndoorUnit) {
+            //         return { product: multiIndoorUnit, amount: shoppingBag.amount, type: shoppingBag.type, shoppingBagId: shoppingBag._id };
+            //     }
+            //     return res.status(400).json({ message: "inValid stock amount" })
+            // default:
+            //     break;
         }
-    });
+    // }
+    );
     const results = await Promise.all(promises)
     const userShoppingBags = results.filter(result => result !== null).flat(); //filter null values and flatten the array.
     // console.log(userShoppingBags);
@@ -128,37 +135,45 @@ const updateShoppingBagAmount = async (req, res) => {
 // }
 
 const checkProductStockByIdAndType = async (_id, type, amount) => {
-    switch (type) {
-        case "Overhead":
-            const overhead = await Overhead.findById({ _id: _id }).populate("company").lean()
-            if (overhead.stock < amount) {
-                return { status: 400, message: `not enough, there is only ${overhead.stock} in the stock` };
-            }
-            return { status: 200, message: `Ok` }
-            //delete from the basket
-            break;
-        case "MiniCenteral":
-            const miniCenteral = await MiniCenteral.findById({ _id: _id }).populate("company").lean()
-            if (miniCenteral.stock < amount) {
-                return { status: 400, message: `not enough, there is only ${miniCenteral.stock} in the stock` };
-            }
-            return { status: 200, message: `Ok` }
-        case "MultiIndoorUnit":
-            const multiIndoorUnit = await MultiIndoorUnit.findById({ _id: _id }).populate("company").lean()
-            if (multiIndoorUnit.stock < amount) {
-                return { status: 400, message: `not enough, there is only ${multiIndoorUnit.stock} in the stock` };
-            }
-            return { status: 200, message: `Ok` }
-        case "MultiOutdoorUnit":
-            const multiOutdoorUnit = await MultiOutdoorUnit.findById({ _id: _id }).populate("company").lean()
-            if (multiOutdoorUnit.stock < amount) {
-                return { status: 400, message: `not enough, there is only ${multiOutdoorUnit.stock} in the stock` };
-            }
-            return { status: 200, message: `Ok` }
-        //delete from the basket
-        default:
-            break;
+    console.log(type);
+
+    const Model = mongoose.model(type);
+    const airConditioner = await Model.findOne({ _id: _id }).populate("company").lean()
+    if (airConditioner.stock < amount) {
+        return { status: 400, message: `not enough, there is only ${airConditioner.stock} in the stock` };
     }
+    return { status: 200, message: `Ok` }
+    // switch (type) {
+    //     case "Overhead":
+    //         const overhead = await Overhead.findById({ _id: _id }).populate("company").lean()
+    //         if (overhead.stock < amount) {
+    //             return { status: 400, message: `not enough, there is only ${overhead.stock} in the stock` };
+    //         }
+    //         return { status: 200, message: `Ok` }
+    //         //delete from the basket
+    //         break;
+    //     case "MiniCenteral":
+    //         const miniCenteral = await MiniCenteral.findById({ _id: _id }).populate("company").lean()
+    //         if (miniCenteral.stock < amount) {
+    //             return { status: 400, message: `not enough, there is only ${miniCenteral.stock} in the stock` };
+    //         }
+    //         return { status: 200, message: `Ok` }
+    //     case "MultiIndoorUnit":
+    //         const multiIndoorUnit = await MultiIndoorUnit.findById({ _id: _id }).populate("company").lean()
+    //         if (multiIndoorUnit.stock < amount) {
+    //             return { status: 400, message: `not enough, there is only ${multiIndoorUnit.stock} in the stock` };
+    //         }
+    //         return { status: 200, message: `Ok` }
+    //     case "MultiOutdoorUnit":
+    //         const multiOutdoorUnit = await MultiOutdoorUnit.findById({ _id: _id }).populate("company").lean()
+    //         if (multiOutdoorUnit.stock < amount) {
+    //             return { status: 400, message: `not enough, there is only ${multiOutdoorUnit.stock} in the stock` };
+    //         }
+    //         return { status: 200, message: `Ok` }
+    //     //delete from the basket
+    //     default:
+    //         break;
+    // }
 }
 
 

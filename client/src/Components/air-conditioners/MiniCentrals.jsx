@@ -271,7 +271,7 @@ const MiniCenterals = () => {
 
                     {/* פרטי המוצר */}
                     <div className="flex flex-column align-items-center text-center gap-2">
-                        <Link to={`/miniCenterals/miniCenteral/${product._id}`}>
+                        <Link to={`miniCenterals/miniCenteral/${product._id}`}>
                             <div className="text-xl font-bold text-900">{product.title}</div>
                         </Link>
 

@@ -1,105 +1,157 @@
-import { useParams } from 'react-router-dom';
+import React, { useParams } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { Stepper } from 'primereact/stepper';
 import { StepperPanel } from 'primereact/stepperpanel';
 import { Button } from 'primereact/button';
 import { Divider } from 'primereact/divider';
+import { setBasket } from '../../store/basketSlice';
+import { useDispatch, useSelector } from 'react-redux';
 
 const MiniCenteral = () => {
-    const { product } = useParams();
+    const { product: productId } = useParams();
     const stepperRef = useRef(null);
     const [miniCenteral, setMiniCenteral] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const dispatch = useDispatch();
+    const { basket } = useSelector((state) => state.basket);
+    const { token } = useSelector((state) => state.token);
 
-    const getMiniCenteralById = async (_id) => {
-        try {
-            console.log(_id);
-            const res = await axios.get(`http://localhost:8000/api/air-conditioner/miniCenterals/miniCenteral/${_id}`);
-            if (res.status === 200) {
-                setMiniCenteral(res.data);
+    const addToBasket = async () => {
+        if (!token) {
+            alert('כדי להוסיף לסל חובה להכינס לאיזור האישי');
+        } else {
+            const shoppingBagDetails = {
+                product_id: miniCenteral._id,
+                type: "MiniCenteral",
+                amount: 1
+            };
+            try {
+                const headers = {
+                    'Authorization': `Bearer ${token}`
+                };
+                const res = await axios.post('http://localhost:8000/api/user/shoppingBag', shoppingBagDetails, { headers });
+                if (res.status === 201 || res.status === 200) {
+                    dispatch(setBasket([...basket, res.data]));
+                    alert('המוצר נוסף לעגלה');
+                }
+            } catch (e) {
+                console.error(e);
             }
-        } catch (e) {
-            console.error(e);
         }
     };
-    const Row = ({ label, value }) => (
-        <tr className="border-b">
-            <td className="p-2 font-semibold">{label}</td>
-            <td className="p-2">{value}</td>
-        </tr>
-    );
-    
-    const Feature = ({ label, value, isBoolean = true }) => (
-        <tr className="border-b">
-            <td className="p-2 font-semibold">{label}</td>
-            <td className="p-2">
-                {isBoolean ? (value ? <span className="text-green-500 pi pi-check" /> : <span className="text-red-500 pi pi-times" />) : value}
-            </td>
-        </tr>
-    );
+
+    const getMiniCenteralById = async (_id) => {
+        setLoading(true);
+        setError(null);
+        try {
+            console.log(_id);
+            const res = await axios(`http://localhost:8000/api/air-conditioner/miniCenteral/miniCenteral/${_id}`);
+            if (!res.status===200) {
+                throw new Error(`HTTP error! status: ${res.status}`);
+            }
+            const data = await res.data;
+            setMiniCenteral(data);
+        } catch (e) {
+            setError(e.message);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        console.log(product);
-        getMiniCenteralById(product);
-    }, [product]);
+        getMiniCenteralById(productId);
+    }, [productId]);
 
-    if (!miniCenteral) return <p>Loading...</p>;
+    if (loading) {
+        return <p style={styles.loading}>טוען פרטי מוצר...</p>;
+    }
+
+    if (error) {
+        return <p style={styles.error}>שגיאה בטעינת המוצר: {error}</p>;
+    }
+
+    if (!miniCenteral) {
+        return null;
+    }
 
     return (
-        <div className="p-4 md:p-6 lg:p-8 bg-white surface-card text-gray-800">
-            <div className="grid md:grid-cols-2 gap-6">
-                <div className="flex flex-col items-center md:items-start gap-4">
-                    <img className="w-full max-w-md rounded-xl shadow-2" src={`/miniCenterals/${miniCenteral.imagepath}`} alt="product" />
-                    <img className="w-28" src={`/${miniCenteral.company?.imagePath}`} alt="brand" />
-                </div>
-
-                <div className="flex flex-col gap-3">
-                    <h1 className="text-3xl font-bold text-primary">{miniCenteral.title}</h1>
-                    <p className="text-lg text-gray-600">{miniCenteral.describe}</p>
-                    <Divider />
-                    <div className="flex items-center gap-2">
-                        <img src="/BTU_cool.png" alt="cool" className="w-6 h-6" />
-                        <img src="/BTU_heat.png" alt="heat" className="w-6 h-6" />
-                    </div>
-                    <h2 className="text-2xl font-semibold text-green-700">₪{miniCenteral.price}</h2>
-
-                    <Button label="הוספה לסל" icon="pi pi-shopping-cart" className="w-fit mt-4" severity="primary" />
-                </div>
+        <div style={styles.container}>
+            <div style={styles.imageContainer}>
+                <img src={`/miniCenterals/${miniCenteral.imagepath}`} alt={miniCenteral.title} style={styles.productImage} />
+                {miniCenteral.company?.imagePath && (
+                    <img src={`/${miniCenteral.company.imagePath}`} alt={miniCenteral.company.name} style={styles.companyImage} />
+                )}
             </div>
 
-            <Divider className="my-6" />
+            <div style={styles.detailsContainer}>
+                <h1 style={styles.title}>{miniCenteral.title}</h1>
+                <p style={styles.description}>{miniCenteral.describe}</p>
+                <div style={styles.featuresRow}>
+                    {miniCenteral.BTU_output?.cool && (
+                        <div style={styles.featureItem}>
+                            <img src="/BTU_cool.png" alt="cool" style={styles.featureIcon} />
+                            <span>{miniCenteral.BTU_output.cool}</span>
+                            <span style={styles.featureUnit}>BTU</span>
+                        </div>
+                    )}
+                    {miniCenteral.BTU_output?.heat && (
+                        <div style={styles.featureItem}>
+                            <img src="/BTU_heat.png" alt="heat" style={styles.featureIcon} />
+                            <span>{miniCenteral.BTU_output.heat}</span>
+                            <span style={styles.featureUnit}>BTU</span>
+                        </div>
+                    )}
+                    {miniCenteral.energy_rating?.cool && (
+                        <div style={styles.featureItem}>
+                            <span style={styles.energyRating}>{miniCenteral.energy_rating.cool}</span>
+                            <span>דירוג אנרגיה קירור</span>
+                        </div>
+                    )}
+                    {miniCenteral.energy_rating?.heat && (
+                        <div style={styles.featureItem}>
+                            <span style={styles.energyRating}>{miniCenteral.energy_rating.heat}</span>
+                            <span>דירוג אנרגיה חימום</span>
+                        </div>
+                    )}
+                </div>
+                <h2 style={styles.price}>₪{miniCenteral.price}</h2>
+                <button style={styles.addToCartButton} onClick={addToBasket}>הוספה לסל</button>
+            </div>
 
-            <div className="card">
-                <Stepper ref={stepperRef} style={{ direction: 'rtl' }}>
+            {/* Stepper for Tables */}
+            <div style={styles.stepperContainer}>
+                <Stepper ref={stepperRef} style={{ direction: 'rtl' }} activeIndex={0}>
                     <StepperPanel header="תפוקה ונתונים טכניים">
-                        <table className="w-full text-right border-collapse">
+                        <table style={{ ...styles.table, direction: 'rtl' }}>
                             <tbody>
-                                <Row label="תפוקת קירור (BTU)" value={miniCenteral.BTU_output?.cool} />
-                                <Row label="תפוקת חימום (BTU)" value={miniCenteral.BTU_output?.heat} />
-                                <Row label="דירוג אנרגטי קירור" value={miniCenteral.energy_rating?.cool} />
-                                <Row label="דירוג אנרגטי חימום" value={miniCenteral.energy_rating?.heat} />
-                                <Row label="זרם עבודה קירור" value={miniCenteral.working_current?.cool} />
-                                <Row label="זרם עבודה חימום" value={miniCenteral.working_current?.heat} />
-                                <Row label="קוטר חיבור צנרת א" value={miniCenteral.pipe_connection?.a} />
-                                <Row label="קוטר חיבור צנרת ב" value={miniCenteral.pipe_connection?.b} />
-                                <Row label="מידות פנימיות" value={`${miniCenteral.in_size?.width} x ${miniCenteral.in_size?.depth} x ${miniCenteral.in_size?.height}`} />
-                                <Row label="מידות חיצוניות" value={`${miniCenteral.out_size?.width} x ${miniCenteral.out_size?.depth} x ${miniCenteral.out_size?.height}`} />
-                                <Row label="זרימת אוויר" value={miniCenteral.air_flow} />
+                                <TableRow label="תפוקת קירור (BTU)" value={miniCenteral.BTU_output?.cool} />
+                                <TableRow label="תפוקת חימום (BTU)" value={miniCenteral.BTU_output?.heat} />
+                                <TableRow label="דירוג אנרגטי קירור" value={miniCenteral.energy_rating?.cool} />
+                                <TableRow label="דירוג אנרגטי חימום" value={miniCenteral.energy_rating?.heat} />
+                                <TableRow label="זרם עבודה קירור" value={miniCenteral.working_current?.cool} />
+                                <TableRow label="זרם עבודה חימום" value={miniCenteral.working_current?.heat} />
+                                <TableRow label="קוטר חיבור צנרת א" value={miniCenteral.pipe_connection?.a} />
+                                <TableRow label="קוטר חיבור צנרת ב" value={miniCenteral.pipe_connection?.b} />
+                                <TableRow label="מידות פנימיות" value={`${miniCenteral.in_size?.width} x ${miniCenteral.in_size?.depth} x ${miniCenteral.in_size?.height}`} />
+                                <TableRow label="מידות חיצוניות" value={`${miniCenteral.out_size?.width} x ${miniCenteral.out_size?.depth} x ${miniCenteral.out_size?.height}`} />
+                                <TableRow label="זרימת אוויר" value={miniCenteral.air_flow} />
                             </tbody>
                         </table>
                     </StepperPanel>
 
                     <StepperPanel header="מאפיינים">
-                        <table className="w-full text-right border-collapse">
+                        <table style={{ ...styles.table, direction: 'rtl' }}>
                             <tbody>
-                                <Feature label="מצב שקט" value={miniCenteral.quiet} />
-                                <Feature label="WiFi" value={miniCenteral.wifi} />
-                                <Feature label="מהירויות" value={miniCenteral.speeds} isBoolean={false} />
-                                <Feature label="תלת מימד" value={miniCenteral.air4d} />
-                                <Feature label="מצב לילה" value={miniCenteral.night_mode} />
-                                <Feature label="טיימר" value={miniCenteral.timer} />
-                                <Feature label="פיקוד שבת" value={miniCenteral.sabbath_command} />
-                                <Feature label="הדלקה וכיבוי אוטומטיים" value={miniCenteral.onof_auto} />
+                                <FeatureRow label="מצב שקט" value={miniCenteral.quiet} />
+                                <FeatureRow label="WiFi" value={miniCenteral.wifi} />
+                                <FeatureRow label="מהירויות" value={miniCenteral.speeds} isBoolean={false} />
+                                <FeatureRow label="תלת מימד" value={miniCenteral.air4d} />
+                                <FeatureRow label="מצב לילה" value={miniCenteral.night_mode} />
+                                <FeatureRow label="טיימר" value={miniCenteral.timer} />
+                                <FeatureRow label="פיקוד שבת" value={miniCenteral.sabbath_command} />
+                                <FeatureRow label="הדלקה וכיבוי אוטומטיים" value={miniCenteral.onof_auto} />
                             </tbody>
                         </table>
                     </StepperPanel>
@@ -109,6 +161,164 @@ const MiniCenteral = () => {
     );
 };
 
+const TableRow = ({ label, value }) => (
+    <tr style={styles.tableRow}>
+        <td style={styles.tableCellValue}>{value}</td>
+        <td style={styles.tableCellLabel}>{label}</td>
+    </tr>
+);
 
+const FeatureRow = ({ label, value, isBoolean = true }) => (
+    <tr style={styles.tableRow}>
+        <td style={styles.tableCellValue}>
+            {isBoolean ? (
+                value ? <span style={styles.featureCheck}>&#10004;</span> : <span style={styles.featureCross}>&#10006;</span>
+            ) : (
+                value
+            )}
+        </td>
+        <td style={styles.tableCellLabel}>{label}</td>
+    </tr>
+);
+
+const styles = {
+    container: {
+        display: 'flex',
+        flexDirection: 'column',
+        backgroundColor: '#fff',
+        borderRadius: '8px',
+        overflow: 'hidden',
+        boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
+        margin: '16px',
+        padding: '16px',
+    },
+    imageContainer: {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        padding: '16px',
+    },
+    productImage: {
+        maxWidth: '100%',
+        height: 'auto',
+        borderRadius: '4px',
+        marginBottom: '16px',
+    },
+    companyImage: {
+        width: '25%', // Increased width
+        height: 'auto', // Maintain aspect ratio
+        marginBottom: '8px', // Add some space below the logo if needed
+    },
+    detailsContainer: {
+        padding: '16px',
+        textAlign: 'right',
+        borderBottom: '1px solid #eee',
+        marginBottom: '16px',
+    },
+    title: {
+        fontSize: '1.75rem',
+        fontWeight: 'bold',
+        color: '#343a40',
+        marginBottom: '8px',
+    },
+    description: {
+        color: '#6c757d',
+        marginBottom: '16px',
+        lineHeight: '1.5',
+    },
+    featuresRow: {
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: '10px',
+        marginBottom: '16px',
+        justifyContent: 'flex-end',
+        alignItems: 'center',
+    },
+    featureItem: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '4px',
+        fontSize: '0.9rem',
+        color: '#495057',
+    },
+    featureIcon: {
+        width: '20px',
+        height: '20px',
+    },
+    featureUnit: {
+        marginLeft: '2px',
+    },
+    energyRating: {
+        backgroundColor: '#ffc107',
+        color: '#fff',
+        borderRadius: '4px',
+        padding: '2px 6px',
+        fontWeight: 'bold',
+    },
+    price: {
+        fontSize: '2rem',
+        fontWeight: 'bold',
+        color: '#28a745',
+        marginBottom: '16px',
+    },
+    addToCartButton: {
+        backgroundColor: '#007bff',
+        color: '#fff',
+        border: 'none',
+        borderRadius: '4px',
+        padding: '12px 24px',
+        cursor: 'pointer',
+        fontSize: '1.1rem',
+    },
+    stepperContainer: {
+        padding: '16px',
+    },
+    table: {
+        width: '100%',
+        borderCollapse: 'collapse',
+        marginBottom: '16px',
+    },
+    tableRow: {
+        borderBottom: '1px solid #eee',
+        display: 'flex',
+        flexDirection: 'row-reverse',
+        gap: '2px', // Reduced gap for tighter spacing
+    },
+    tableCellLabel: {
+        padding: '6px', // Slightly reduced padding to bring the label closer to the value
+        fontWeight: 'bold',
+        textAlign: 'right',
+        flex: '0.3', // Adjusted flex for tighter layout
+    },
+    tableCellValue: {
+        padding: '6px', // Keep the padding reduced as needed
+        textAlign: 'center', // Center the text horizontally
+        display: 'flex', // Use flexbox for centering
+        // alignItems: 'center', // Center content vertically
+        // justifyContent: 'center', // Center content horizontally
+        flex: '0.4',
+    },
+    featureCheck: {
+        color: '#28a745',
+        fontSize: '1rem',
+    },
+    featureCross: {
+        color: '#dc3545',
+        fontSize: '1rem',
+    },
+    loading: {
+        textAlign: 'center',
+        padding: '20px',
+        fontSize: '1rem',
+        color: '#6c757d',
+    },
+    error: {
+        textAlign: 'center',
+        padding: '20px',
+        fontSize: '1rem',
+        color: '#dc3545',
+    },
+
+};
 
 export default MiniCenteral;

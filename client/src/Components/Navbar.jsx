@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux';
 import { MegaMenu } from 'primereact/megamenu';
 import AdminRegister from './AdminRegister';
 import Payment from './Payment';
+import MiniCenteral from './air-conditioners/MiniCenteral';
 
 const About = lazy(() => import('./About'));
 const Branch = lazy(() => import('./Branch'));
@@ -138,7 +139,7 @@ const Navbar = () => {
                 <Route path='/multiIndoorUnits' element={<Suspense fallback="Loading..."><MultiIndoorUnits /></Suspense>}>        </Route>
                 <Route path='/multiOutdoorUnits' element={<Suspense fallback="Loading..."><MultiOutdoorUnits /></Suspense>}>        </Route>
                 <Route path={`/overheads/overhead/:product`} element={<Suspense fallback="Loading..."><Overhead /></Suspense>}></Route>
-                <Route path={`/miniCenterals/miniCenteral/:product`} element={<Suspense fallback="Loading..."><Overhead /></Suspense>}></Route>
+                <Route path={`/miniCenterals/miniCenteral/:product`} element={<Suspense fallback="Loading..."><MiniCenteral /></Suspense>}></Route>
                 <Route path='/multiIndoorUnits/multiIndoorUnit/update' element={<Suspense fallback="Loading..."><UpdateMultiIndoorUnit/></Suspense>}></Route>
                 <Route path='/overheads/overhead/update' element={<Suspense fallback="Loading..."><UpdateOverheadAC/></Suspense>}></Route>
                 {/* <Route path='/overheads/overhead/update' element={<Suspense fallback="Loading..."><UpdateOverheadAC/></Suspense>}></Route> */}

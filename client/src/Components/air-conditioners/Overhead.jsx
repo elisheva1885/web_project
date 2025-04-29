@@ -6,6 +6,9 @@ import { StepperPanel } from 'primereact/stepperpanel';
 import 'primereact/resources/themes/lara-light-indigo/theme.css'; 
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
+import { setBasket } from '../../store/basketSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import axios from 'axios';
 
 const Overhead = () => {
   const { product: productId } = useParams();
@@ -13,17 +16,50 @@ const Overhead = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const stepperRef = useRef(null);
+  const dispatch = useDispatch()
 
-  useEffect(() => {
-    const getOverhead = async () => {
+  const {basket} = useSelector((state)=> state.basket)
+  const {token} = useSelector((state)=> state.token)
+
+  const addToBasket = async () => {
+    if(!token){
+      alert('כדי להוסיף לסל חובה להכינס לאיזור האישי')
+
+    }
+    else{
+    const shoppingBagDetails = {
+        product_id: product._id,
+        type: "Overhead",
+        amount: 1
+    }
+    try {
+        const headers = {
+            'Authorization': `Bearer ${token}`
+        }
+        const res = await axios.post('http://localhost:8000/api/user/shoppingBag', shoppingBagDetails, { headers })
+        if (res.status === 201) {
+            dispatch(setBasket([...basket, res.data]))
+            alert(` המוצר נוסף לעגלה`)
+        }
+        if(res.status==200){
+            alert(` המוצר נוסף לעגלה`)
+        }
+    }
+    catch (e) {
+        console.error(e)
+    }
+  }
+}
+
+const getOverhead = async () => {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch(`http://localhost:8000/api/air-conditioner/overhead/overhead/${productId}`);
-        if (!res.ok) {
+        const res = await axios(`http://localhost:8000/api/air-conditioner/overhead/overhead/${productId}`);
+        if (!res.status===200) {
           throw new Error(`HTTP error! status: ${res.status}`);
         }
-        const data = await res.json();
+        const data = await res.data;
         setProduct(data);
       } catch (e) {
         setError(e.message);
@@ -31,6 +67,9 @@ const Overhead = () => {
         setLoading(false);
       }
     };
+
+  useEffect(() => {
+    
 
     getOverhead();
   }, [productId]);
@@ -89,7 +128,7 @@ const Overhead = () => {
           )}
         </div>
         <h2 style={styles.price}>₪{product.price}</h2>
-        <button style={styles.addToCartButton}>הוספה לסל</button>
+        <button style={styles.addToCartButton} onClick={addToBasket}>הוספה לסל</button>
       </div>
 
       {/* Stepper for Tables */}
