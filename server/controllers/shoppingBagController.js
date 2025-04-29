@@ -1,5 +1,7 @@
 const ShoppingBag = require("../models/ShoppingBag");
 const MiniCenteral = require("../models/airconditioners/MiniCenteral");
+const MultiIndoorUnit = require("../models/airconditioners/MultiIndoorUnit");
+const MultiOutdoorUnit = require("../models/airconditioners/MultiOutdoorUnit");
 const Overhead = require("../models/airconditioners/Overhead")
 
 
@@ -51,15 +53,27 @@ const readShoppingBagByUserId = async (req, res) => {
                 if (overhead.stock >= 0) {
                     return { product: overhead, amount: shoppingBag.amount, type: shoppingBag.type ,shoppingBagId: shoppingBag._id};
                 }
-                //delete from the basket
-                break;
+                return res.status(400).json({message: "inValid stock amount"})
+
             case "miniCenteral":
                 const miniCenteral = await MiniCenteral.findOne({ _id: shoppingBag.product_id }).populate("company").lean()
-                if (miniCenteral.stock >= 0) {
+                if (miniCenteral) {
                     return { product: miniCenteral, amount: shoppingBag.amount , type: shoppingBag.type,shoppingBagId: shoppingBag._id};
                 }
-                //delete from the basket
-                break;
+                return res.status(400).json({message: "inValid stock amount"})
+                case "multiOutdoorUnit":
+                    const multiOutdoorUnit = await MultiOutdoorUnit.findOne({ _id: shoppingBag.product_id }).populate("company").lean()
+                if (multiOutdoorUnit) {
+                    return { product: multiOutdoorUnit, amount: shoppingBag.amount , type: shoppingBag.type,shoppingBagId: shoppingBag._id};
+                }
+                return res.status(400).json({message: "inValid stock amount"})
+                case "multiIndoorUnit":
+                    const multiIndoorUnit = await MultiIndoorUnit.findOne({ _id: shoppingBag.product_id }).populate("company").lean()
+                if (multiIndoorUnit) {
+                    return { product: multiIndoorUnit, amount: shoppingBag.amount , type: shoppingBag.type,shoppingBagId: shoppingBag._id};
+                }
+                return res.status(400).json({message: "inValid stock amount"})
+
             default:
                 break;
         }
@@ -87,6 +101,7 @@ const updateShoppingBagAmount = async (req, res) => {
     }
     // console.log(shoppingBag);
     const response = await checkProductStockByIdAndType(shoppingBag.product_id,shoppingBag.type ,amount)
+    console.log(response);
     // console.log("respone",response);
     if(response.status===200){
         // console.log(shoppingBag.amount);

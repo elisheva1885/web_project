@@ -13,7 +13,7 @@ const shoppingBagSchema = new mongoose.Schema({
      },
      type:{
         type: String,
-        enum: ["overhead", "miniCenteral","miniVrf", "multi"],
+        enum: ["overhead", "miniCenteral","multiIndoorUnit", "multiOutdoorUnit"],
         required:true
      },
      amount:{
