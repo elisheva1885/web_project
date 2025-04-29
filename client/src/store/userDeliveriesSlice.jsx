@@ -10,7 +10,7 @@ const userDeliveriesSlice = createSlice({
     reducers: {
         setUserDeliveries: (state, action) => {
             // Add a new delivery object to the array
-            state.userDeliveries = [...state.userDeliveries, action.payload];
+            state.userDeliveries = action.payload;
             console.log("userDeliveriesSlice", state.userDeliveries);
         },
         clearUserDeliveries: (state) => {

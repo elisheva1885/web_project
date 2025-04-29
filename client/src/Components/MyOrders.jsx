@@ -9,33 +9,30 @@ import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import { setUserDeliveries } from '../store/userDeliveriesSlice';
 import MyOrders2 from './MyOrders2';
+import { Card } from "primereact/card";
+import { Timeline } from "primereact/timeline";
+import { Image } from "primereact/image";
+import { Divider } from "primereact/divider";
 
 const MyOrders = () => {
 
     const sortData = (data) => {
-        if (!data) {
+        if (!data || data.length === 0) {
             return [];
         }
-        data.sort((a, b) => {
-            return new Date(b.createdAt) - new Date(a.createdAt);
-        });
-        console.log("sorted",data)
-        return data
+        return data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // Return the sorted array
     };
 
     const filterData = (data) => {
-        console.log("before filter",data)
+        console.log("before filter", data)
         if (!data) {
             return [];
         }
-        data.filter(delivery => delivery.status !== "recieved");
-        console.log("filtered",data)
-        return data
+        return data.filter(delivery => delivery.status !== "recieved");
     };
 
     const dispatch = useDispatch();
     const { userDeliveries } = useSelector((state) => state.userDeliveries);
-    const { userDetails } = useSelector((state) => state.userDetails);
     const { token } = useSelector((state) => state.token);
     const [orders, setOrders] = useState([]);
 
@@ -47,79 +44,119 @@ const MyOrders = () => {
         try {
             const res = await axios.get(`http://localhost:8000/api/delivery/byid`, { headers })
             if (res.status === 200) {
-                console.log("UserDeliveries from server type:", res.data)
+                console.log("res.status === 200. UserDeliveries from server:", res.data)
                 dispatch(setUserDeliveries(res.data))
                 console.log("userDeliveries", userDeliveries)
-                setOrders(res.data)
+                // setOrders(res.data)
             }
         } catch (error) {
             if (error.status === 404) {
+                console.log("error 404:", error)
                 alert("not found")
             }
             console.error(error)
             if (error.status === 401) {
+                console.log("error 401:", error)
                 alert("Unauthorized")
             }
         }
-        const filteredOrders = filterData(orders)
+        const filteredOrders = filterData(userDeliveries)
         const sortedOrders = sortData(filteredOrders)
         setOrders(sortedOrders)
-        console.log("setOrders",orders)
+        console.log("sortedOrders", orders)
     }
 
-    const itemTemplate = (product, index) => {
+   
+    const renderDelivery = (delivery) => {
+        const orderDate = new Date(delivery.createdAt).toLocaleDateString();
+        const statusColors = {
+            "waiting to be delivered": "warning",
+            "on the way": "info",
+            arrived: "success",
+            recieved: "success",
+        };
+
         return (
-            <div className="col-12" key={product._id}>
-                <div className={classNames('flex flex-column xl:flex-row xl:align-items-start p-4 gap-4', { 'border-top-1 surface-border': index !== 0 })}>
-                    <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={'basket.jpg'} alt={product.address.city} />
-                    <div className="flex flex-column sm:flex-row justify-content-between align-items-center xl:align-items-start flex-1 gap-4">
-                        <div className="flex flex-column align-items-center sm:align-items-start gap-3">
-                            <div className="text-2xl font-bold text-900">{product.address.city}</div>
-                            {/* <Rating value={product.rating} readOnly cancel={false}></Rating> */}
-                            <div className="flex align-items-center gap-3">
-                                <span className="flex align-items-center gap-2">
-                                    <i className="pi pi-tag"></i>
-                                    <span className="font-semibold">{product.user_id}</span>
-                                </span>
-                                {/* <Tag value={product.status} severity={getSeverity(product)}></Tag> */}
+            <Card
+                key={delivery._id}
+                title={`Order Date: ${orderDate}`}
+                subTitle={`Status: `}
+                className="p-mb-3"
+            >
+                {/* Add status with a Tag */}
+                <Tag
+                    value={delivery.status}
+                    severity={statusColors[delivery.status]}
+                ></Tag>
+
+                <Divider />
+
+                {/* Render the list of air-conditioners */}
+                {/* <div className="p-grid">                   
+                    {delivery.purchase.products.map((shoppingBagItem) => {
+                        const product = shoppingBagItem.product || {}; // Fallback to an empty object
+                        console.log("product.imagepath:",product.imagepath)
+                        return (
+                            <div
+                                key={shoppingBagItem._id}
+                                className="p-col-12 p-md-4 p-lg-3"
+                                style={{ textAlign: "center" }}
+                            >
+                                <Image
+                                    src={product.imagepath || 'air-conditioner.png'} // Use a placeholder image if undefined
+                                    alt={product.title || 'No Title'}
+                                    width="100"
+                                    preview
+                                />
+                                <p>{product.title || 'No Title'}</p>
                             </div>
+                        );
+                    })}
+                </div> */}
+            <div className="p-grid">
+                {delivery.purchase.products.map((shoppingBagItem) => {
+                    const product = shoppingBagItem.product_id || {}; // product_id now dynamically resolves to the correct product type
+                    return (
+                        <div
+                            key={shoppingBagItem._id}
+                            className="p-col-12 p-md-4 p-lg-3"
+                            style={{ textAlign: "center" }}
+                        >
+                            <Image
+                                src={product.imagepath || 'placeholder.jpg'} // Use a placeholder image if undefined
+                                alt={product.title || 'No Title'}
+                                width="100"
+                                preview
+                            />
+                            <p>{product.title || 'No Title'}</p>
                         </div>
-                        <div className="flex sm:flex-column align-items-center sm:align-items-end gap-3 sm:gap-2">
-                            {/* <span className="text-2xl font-semibold">${product.price}</span> */}
-                            <Button icon="pi pi-shopping-cart" className="p-button-rounded" disabled={false}></Button>
-                        </div>
-                    </div>
-                </div>
+                    );
+                })}
             </div>
+            </Card>
         );
     };
 
-    const listTemplate = (items) => {
-        if (!items || items.length === 0) return null;
 
-        let list = items.map((product, index) => {
-            return itemTemplate(product, index);
-        });
-
-        return <div className="grid grid-nogutter">{list}</div>;
-    };
 
     useEffect(() => {
-        getUserDeliveries()
-        console.log("useEffect MyOrders")
-    }, []);
+        if (userDeliveries && userDeliveries.length > 0) {
+            const filteredOrders = filterData(userDeliveries);
+            const sortedOrders = sortData(filteredOrders);
+            setOrders(sortedOrders);
+        }
+    }, [userDeliveries]); // Dependency on userDeliveries
 
-    // useEffect(() => {
-
-    // }, [userOrders])
+    // Fetch deliveries when the component is mounted
+    useEffect(() => {
+        getUserDeliveries();
+    }, []); // Empty dependency array means this runs only once
 
     return (
-        //     <div className="card">
-        //     <DataView value={orders} listTemplate={listTemplate} />
-        // </div>
-        <>
-        <MyOrders2 deliveries={orders} />
-        </>
+        <div className="my-orders">
+            <h2>My Orders</h2>
+            {orders.map((delivery) => renderDelivery(delivery))}
+        </div>
     )
 }
 

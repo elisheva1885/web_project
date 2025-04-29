@@ -2,6 +2,11 @@ const Delivery = require("../models/Delivery")
 const User = require("../models/User")
 const Address = require("../models/Address")
 const Purchase = require("../models/Purchase")
+const ShoppingBag = require("../models/ShoppingBag")
+const Overhead = require("../models/airconditioners/Overhead")
+const MiniCenteral = require("../models/airconditioners/MiniCenteral")
+const MultiIndoorUnit = require("../models/airconditioners/MultiIndoorUnit")
+const MultiOutdoorUnit = require("../models/airconditioners/MultiOutdoorUnit")
 
 const createDelivery = async (req, res) => {
     const user_id = req.user._id
@@ -43,7 +48,18 @@ const readDeliveriesByUserId = async (req,res) => {
     if (!user_id) {
         return res.status(400).json({ message: "user required" })
     }
-    const deliveries = await Delivery.find({ user_id: user_id }).populate('address').populate('purchase').lean()
+    const deliveries = await Delivery.find({ user_id: user_id })
+    .populate({
+        path: 'purchase',
+        populate: {
+            path: 'products',
+            populate: {
+                path: 'product_id', // Populate the product details
+            },
+        },
+    })
+    .populate('address')
+    .lean()
 
     if(!deliveries)
         return res.status(404).json({ message: "no delivery for this user" })
