@@ -25,5 +25,12 @@ const shoppingBagSchema = new mongoose.Schema({
 }, {
     timestamps: true
 });
+// Middleware to normalize the 'type' field
+shoppingBagSchema.pre('save', function (next) {
+    if (this.type) {
+        this.type = this.type.charAt(0).toUpperCase() + this.type.slice(1).toLowerCase();
+    }
+    next();
+});
 
 module.exports = mongoose.model('ShoppingBag', shoppingBagSchema);

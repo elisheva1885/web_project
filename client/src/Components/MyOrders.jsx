@@ -92,29 +92,10 @@ const MyOrders = () => {
                 <Divider />
 
                 {/* Render the list of air-conditioners */}
-                {/* <div className="p-grid">                   
-                    {delivery.purchase.products.map((shoppingBagItem) => {
-                        const product = shoppingBagItem.product || {}; // Fallback to an empty object
-                        console.log("product.imagepath:",product.imagepath)
-                        return (
-                            <div
-                                key={shoppingBagItem._id}
-                                className="p-col-12 p-md-4 p-lg-3"
-                                style={{ textAlign: "center" }}
-                            >
-                                <Image
-                                    src={product.imagepath || 'air-conditioner.png'} // Use a placeholder image if undefined
-                                    alt={product.title || 'No Title'}
-                                    width="100"
-                                    preview
-                                />
-                                <p>{product.title || 'No Title'}</p>
-                            </div>
-                        );
-                    })}
-                </div> */}
+               
             <div className="p-grid">
                 {delivery.purchase.products.map((shoppingBagItem) => {
+                    shoppingBagItem.type = shoppingBagItem.type.charAt(0).toUpperCase() + shoppingBagItem.type.slice(1);
                     const product = shoppingBagItem.product_id || {}; // product_id now dynamically resolves to the correct product type
                     return (
                         <div

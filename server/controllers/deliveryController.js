@@ -11,7 +11,7 @@ const MultiOutdoorUnit = require("../models/airconditioners/MultiOutdoorUnit")
 const createDelivery = async (req, res) => {
     const user_id = req.user._id
     const { address, purchase, status} = req.body
-    // console.log("createDelivery", address, purchase, status)
+    console.log("createDelivery", address, purchase, status)
     if (!user_id || !address || !purchase ) {
         return res.status(400).json({ message: "user_id, address and purchase are required" })
     }
@@ -19,7 +19,7 @@ const createDelivery = async (req, res) => {
         console.error("Invalid purchase ObjectId:", purchase);
         return res.status(400).json({ message: "invalid purchase id" });
     }
-    const delivery=null;
+    let delivery=null;
     if (!status){
         delivery = await Delivery.create({ user_id, address, purchase})
     }

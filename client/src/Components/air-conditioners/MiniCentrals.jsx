@@ -56,7 +56,7 @@ const MiniCenterals = () => {
         // alert("shoping")
         const shoppingBagDetails = {
             product_id: product._id,
-            type: "miniCenteral"
+            type: "MiniCenteral"
         }
         try {
             const headers = {

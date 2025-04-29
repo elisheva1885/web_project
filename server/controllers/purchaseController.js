@@ -73,7 +73,9 @@ const checkProductsStock = async (products)=>{
         return {status:200, message: 'All products are in stock', results };
       } catch (error) {
         console.error('Error checking stock:', error.message);
-        return {status:error.status, message: error.message };
+        return {error:error, message: error.message };
+        // return {status:error.status, message: error.message };
+
       }
 } 
 

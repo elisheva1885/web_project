@@ -144,7 +144,7 @@ const Payment = () => {
         const details = {
             address: address ? address : newAddress,
             // purchase:  products.map(product => product.product._id)
-            purchase: purchase
+            purchase: purchase._id
         }
         
         try {
@@ -188,7 +188,7 @@ const Payment = () => {
                     // updateProductsStock(selectedItems)
                     setPurcase(res.data);
                     console.log(res.data);
-                    createDelivery()
+                    createDelivery(res.data)
                     alert("ההזמנה הושלמה")
                 }
             } catch (error) {

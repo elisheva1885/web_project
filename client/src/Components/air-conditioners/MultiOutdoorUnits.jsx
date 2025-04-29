@@ -59,7 +59,7 @@ const MultiOutdoorUnits = () => {
     const addToBasket = async (product) => {
         const shoppingBagDetails = {
             product_id: product._id,
-            type: "multiOutdoorUnit",
+            type: "MultiOutdoorUnit",
             amount: 1
         }
         try {

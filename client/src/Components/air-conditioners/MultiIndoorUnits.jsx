@@ -60,7 +60,7 @@ const MultiIndoorUnits = () => {
         alert("shoping")
         const shoppingBagDetails = {
             product_id: product._id,
-            type: "multiIndoorUnit",
+            type: "MultiIndoorUnit",
             amount: 1
         }
         try {
