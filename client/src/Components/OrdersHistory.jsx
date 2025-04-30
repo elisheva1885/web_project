@@ -1,89 +1,39 @@
-import React, { useState, useEffect } from 'react';
-import { Button } from 'primereact/button';
-import { DataView } from 'primereact/dataview';
-import { Dropdown } from 'primereact/dropdown';
-import { Rating } from 'primereact/rating';
-import { Tag } from 'primereact/tag';
-import { classNames } from 'primereact/utils';
-import { useDispatch, useSelector } from 'react-redux';
-import axios from 'axios';
-import { setUserDeliveries } from '../store/userDeliveriesSlice';
+import React, { useEffect, useState } from 'react';
 import { Card } from "primereact/card";
-import { Timeline } from "primereact/timeline";
-import { Image } from "primereact/image";
+import { Tag } from "primereact/tag";
 import { Divider } from "primereact/divider";
+import { Image } from "primereact/image";
+import { useSelector } from 'react-redux';
 
-const MyOrders = () => {
+const OrderHistory = () => {
+    const { userDeliveries } = useSelector((state) => state.userDeliveries);
+    const [historyOrders, setHistoryOrders] = useState([]);
 
-    const sortData = (data) => {
+    // Filters and sorts the order history based on "recieved" status
+    const filterAndSortHistory = (data) => {
         if (!data || data.length === 0) {
             return [];
         }
-        return data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // Return the sorted array
+        const filtered = data.filter((delivery) => delivery.status === "recieved");
+        return filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     };
 
-    const filterData = (data) => {
-        console.log("before filter", data)
-        if (!data) {
-            return [];
+    useEffect(() => {
+        if (userDeliveries && userDeliveries.length > 0) {
+            const sortedHistory = filterAndSortHistory(userDeliveries);
+            setHistoryOrders(sortedHistory);
         }
-        return data.filter(delivery => delivery.status !== "recieved");
-    };
-
-    const dispatch = useDispatch();
-    const { userDeliveries } = useSelector((state) => state.userDeliveries);
-    const { token } = useSelector((state) => state.token);
-    const [orders, setOrders] = useState([]);
-
-
-    const getUserDeliveries = async () => {
-        const headers = {
-            'Authorization': `Bearer ${token}`
-        }
-        try {
-            const res = await axios.get(`http://localhost:8000/api/delivery/byid`, { headers })
-            if (res.status === 200) {
-                console.log("res.status === 200. UserDeliveries from server:", res.data)
-                dispatch(setUserDeliveries(res.data))
-                console.log("userDeliveries", userDeliveries)
-                // setOrders(res.data)
-            }
-        } catch (error) {
-            if (error.status === 404) {
-                console.log("error 404:", error)
-                alert("not found")
-            }
-            console.error(error)
-            if (error.status === 401) {
-                console.log("error 401:", error)
-                alert("Unauthorized")
-            }
-        }
-        const filteredOrders = filterData(userDeliveries)
-        const sortedOrders = sortData(filteredOrders)
-        setOrders(sortedOrders)
-        console.log("sortedOrders", orders)
-    }
-
+    }, [userDeliveries]); // Dependency on userDeliveries
 
     const renderDelivery = (delivery) => {
         const orderDate = new Date(delivery.createdAt).toLocaleDateString();
         const statusColors = {
-            "waiting to be delivered": "warning",
-            "on the way": "info",
-            arrived: "success",
             recieved: "success",
         };
         const statusIcons = {
-            "waiting to be delivered": "pi pi-clock",
-            "on the way": "pi pi-truck",
-            arrived: "pi pi-check",
             recieved: "pi pi-check",
         };
         const statusTranslations = {
-            "waiting to be delivered": "ממתין למשלוח",
-            "on the way": "בדרך",
-            arrived: "הגיע",
             recieved: "התקבל",
         };
 
@@ -91,7 +41,6 @@ const MyOrders = () => {
             <Card
                 key={delivery._id}
                 title={`${orderDate} :תאריך הזמנה`}
-                // subTitle={`:סטטוס הזמנה `}
                 className="p-mb-3"
             >
                 {/* Add status with a Tag */}
@@ -104,7 +53,6 @@ const MyOrders = () => {
                 <Divider />
 
                 {/* Render the list of air-conditioners */}
-
                 <div
                     className="p-d-flex p-flex-wrap"
                     style={{
@@ -152,23 +100,8 @@ const MyOrders = () => {
         );
     };
 
-
-
-    useEffect(() => {
-        if (userDeliveries && userDeliveries.length > 0) {
-            const filteredOrders = filterData(userDeliveries);
-            const sortedOrders = sortData(filteredOrders);
-            setOrders(sortedOrders);
-        }
-    }, [userDeliveries]); // Dependency on userDeliveries
-
-    // Fetch deliveries when the component is mounted
-    useEffect(() => {
-        getUserDeliveries();
-    }, []); // Empty dependency array means this runs only once
-
     return (
-        <div className="my-orders">
+        <div className="order-history">
             <h2 style={{
                 fontSize: "2rem",
                 fontWeight: "bold",
@@ -178,11 +111,11 @@ const MyOrders = () => {
                 borderBottom: "2px solid #3498DB",
                 paddingBottom: "0.5rem"
             }}>
-                ההזמנות שלי
+                היסטוריית הזמנות
             </h2>
-            {orders.map((delivery) => renderDelivery(delivery))}
+            {historyOrders.map((delivery) => renderDelivery(delivery))}
         </div>
-    )
-}
+    );
+};
 
-export default MyOrders
+export default OrderHistory;

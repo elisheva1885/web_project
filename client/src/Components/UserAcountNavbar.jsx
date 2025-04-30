@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Dock } from 'primereact/dock';
 import { RadioButton } from 'primereact/radiobutton';
 import MyOrders from './MyOrders';
+import OrderHistory from './OrdersHistory';
 
 const UserAcountNavbar = () => {
     const items = [
@@ -30,6 +31,7 @@ const UserAcountNavbar = () => {
             </div>
                 <Dock model={items}  position='right'/>
                 <MyOrders/>
+                {/* <OrderHistory/> */}
         </div>
     )
 }
