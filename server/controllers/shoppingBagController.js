@@ -58,33 +58,6 @@ const readShoppingBagByUserId = async (req, res) => {
                  if (airConditioner.stock >= 0) {
                     return { product: airConditioner, amount: shoppingBag.amount, type: shoppingBag.type, shoppingBagId: shoppingBag._id };
                 }
-            // case "Overhead":
-            //     const overhead = await Overhead.findOne({ _id: shoppingBag.product_id }).populate("company").lean()
-            //     if (overhead.stock >= 0) {
-            //         return { product: overhead, amount: shoppingBag.amount, type: shoppingBag.type, shoppingBagId: shoppingBag._id };
-            //     }
-            //     return res.status(400).json({ message: "inValid stock amount" })
-
-            // case "MiniCenteral":
-            //     const miniCenteral = await MiniCenteral.findOne({ _id: shoppingBag.product_id }).populate("company").lean()
-            //     if (miniCenteral) {
-            //         return { product: miniCenteral, amount: shoppingBag.amount, type: shoppingBag.type, shoppingBagId: shoppingBag._id };
-            //     }
-            //     return res.status(400).json({ message: "inValid stock amount" })
-            // case "MultiOutdoorUnit":
-            //     const multiOutdoorUnit = await MultiOutdoorUnit.findOne({ _id: shoppingBag.product_id }).populate("company").lean()
-            //     if (multiOutdoorUnit) {
-            //         return { product: multiOutdoorUnit, amount: shoppingBag.amount, type: shoppingBag.type, shoppingBagId: shoppingBag._id };
-            //     }
-            //     return res.status(400).json({ message: "inValid stock amount" })
-            // case "MultiIndoorUnit":
-            //     const multiIndoorUnit = await MultiIndoorUnit.findOne({ _id: shoppingBag.product_id }).populate("company").lean()
-            //     if (multiIndoorUnit) {
-            //         return { product: multiIndoorUnit, amount: shoppingBag.amount, type: shoppingBag.type, shoppingBagId: shoppingBag._id };
-            //     }
-            //     return res.status(400).json({ message: "inValid stock amount" })
-            // default:
-            //     break;
         }
     // }
     );
