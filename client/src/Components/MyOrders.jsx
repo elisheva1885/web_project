@@ -8,7 +8,6 @@ import { classNames } from 'primereact/utils';
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import { setUserDeliveries } from '../store/userDeliveriesSlice';
-import MyOrders2 from './MyOrders2';
 import { Card } from "primereact/card";
 import { Timeline } from "primereact/timeline";
 import { Image } from "primereact/image";
@@ -66,7 +65,7 @@ const MyOrders = () => {
         console.log("sortedOrders", orders)
     }
 
-   
+
     const renderDelivery = (delivery) => {
         const orderDate = new Date(delivery.createdAt).toLocaleDateString();
         const statusColors = {
@@ -92,28 +91,30 @@ const MyOrders = () => {
                 <Divider />
 
                 {/* Render the list of air-conditioners */}
-               
-            <div className="p-grid">
-                {delivery.purchase.products.map((shoppingBagItem) => {
-                    shoppingBagItem.type = shoppingBagItem.type.charAt(0).toUpperCase() + shoppingBagItem.type.slice(1);
-                    const product = shoppingBagItem.product_id || {}; // product_id now dynamically resolves to the correct product type
-                    return (
-                        <div
-                            key={shoppingBagItem._id}
-                            className="p-col-12 p-md-4 p-lg-3"
-                            style={{ textAlign: "center" }}
-                        >
-                            <Image
-                                src={product.imagepath || 'placeholder.jpg'} // Use a placeholder image if undefined
-                                alt={product.title || 'No Title'}
-                                width="100"
-                                preview
-                            />
-                            <p>{product.title || 'No Title'}</p>
-                        </div>
-                    );
-                })}
-            </div>
+
+                <div className="p-grid">
+                    {delivery.purchase.products.map((shoppingBagItem) => {
+                        // shoppingBagItem.type = shoppingBagItem.type.charAt(0).toUpperCase() + shoppingBagItem.type.slice(1);
+                        const product = shoppingBagItem.product_id || {}; // product_id now dynamically resolves to the correct product type
+                        console.log('Product:', product);
+                        console.log('ImagePath:', product.imagepath);
+                        return (
+                            <div
+                                key={shoppingBagItem._id}
+                                className="p-col-12 p-md-4 p-lg-3"
+                                style={{ textAlign: "center" }}
+                            >
+                                <Image
+                                    src={product.imagepath || 'air-conditioner.jpg'} // Use a placeholder image if undefined
+                                    alt={product.title || 'No Title'}
+                                    width="100"
+                                    preview
+                                />
+                                <p>{product.title || 'No Title'}</p>
+                            </div>
+                        );
+                    })}
+                </div>
             </Card>
         );
     };
