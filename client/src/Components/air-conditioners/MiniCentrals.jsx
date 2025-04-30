@@ -17,6 +17,7 @@ import SideFillter from '../SideFillter';
 import UpdateMiniCenteral from './UpdateMiniCenteral';
 import { Dialog } from 'primereact/dialog';
 import { Controller, useForm } from 'react-hook-form';
+import useGetFilePath from '../../hooks/useGetFilePath';
 
 
 const MiniCenterals = () => {
@@ -34,7 +35,7 @@ const MiniCenterals = () => {
     const [stockVisible, setStockVisible] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const { control, handleSubmit, formState: { errors }, watch } = useForm()
-
+    const {getFilePath} = useGetFilePath()
 
     // const [showDialog, setShowDialog] = useState([]);
 
@@ -54,10 +55,10 @@ const MiniCenterals = () => {
 
     const addToBasket = async (product) => {
         console.log(token);
-        if(token === null){
+        if (token === null) {
             alert('כדי להוסיף לסל חובה להיכנס לאיזור האישי')
         }
-        else{
+        else {
             const shoppingBagDetails = {
                 product_id: product._id,
                 type: "MiniCenteral"
@@ -72,9 +73,9 @@ const MiniCenterals = () => {
                     console.log("res.data", res.data);
                     console.log("useState", shoppingBags);
                     alert(` המוצר נוסף לעגלה`)
-    
+
                 }
-                if(res.status==200){
+                if (res.status == 200) {
                     alert(` המוצר נוסף לעגלה`)
                 }
             }
@@ -84,10 +85,10 @@ const MiniCenterals = () => {
         }
     }
 
-        // alert("shoping")
-       
+    // alert("shoping")
 
-    
+
+
     const deleteMiniCentral = async (product) => {
         try {
             const headers = {
@@ -101,7 +102,7 @@ const MiniCenterals = () => {
                 data: _id
             });
             if (res.status === 200) {
-                const updatedMiniCenterals = miniCenterals.filter(miniCenteral=> miniCenteral._id != product._id)
+                const updatedMiniCenterals = miniCenterals.filter(miniCenteral => miniCenteral._id != product._id)
                 dispatch(setMiniCenterals(updatedMiniCenterals))
             }
         } catch (e) {
@@ -134,8 +135,8 @@ const MiniCenterals = () => {
             console.log(res);
             if (res.status === 200) {
                 alert(`${selectedProduct.title} price updated`)
-                const unUpdatedMiniCenterals = miniCenterals.filter(minicenteral=> minicenteral._id != res.data._id)
-                dispatch(setMiniCenterals([...unUpdatedMiniCenterals , res.data]))
+                const unUpdatedMiniCenterals = miniCenterals.filter(minicenteral => minicenteral._id != res.data._id)
+                dispatch(setMiniCenterals([...unUpdatedMiniCenterals, res.data]))
                 setPriceVisible(false);
             }
         }
@@ -170,12 +171,13 @@ const MiniCenterals = () => {
     // }
 
     const UpdateMiniCenteral = async (mc) => {
+        alert("updateMiniCenteral");
         const navigationData = {
             type: mc,
         };
         console.log(mc);
         navigate('/miniCenterals/miniCenteral/update', { state: navigationData })
-        }
+    }
 
     // const getCompanies = async()=>{
     //     try{
@@ -273,7 +275,7 @@ const MiniCenterals = () => {
 
                     {/* תמונת המוצר - גדולה ורחבה */}
                     <img
-                        src={`miniCenterals/${product.imagepath}`}
+                        src={getFilePath(product.imagepath)}
                         alt={product.title}
                         className="w-full h-12rem object-contain border-round"
                     />
@@ -290,19 +292,19 @@ const MiniCenterals = () => {
                         {/* {userDetails?.role === 'official' || userDetails?.role === 'admin' ? <Button onClick={()=>updateMiniCenteralPrice(product)}><i className="pi pi-pencil" style={{ fontSize: '1rem' }}> עדכון מחיר </i></Button> : <></>} */}
                         {/* {updateMiniCenteralPrice} */}
                         {/* <div> */}
-                        {userDetails?.role === 'official' || userDetails?.role === 'admin' ? (<Button onClick={() =>openPriceUpdateDialog(product)}><i className="pi pi-pencil" style={{ fontSize: '1rem' }}> עדכון מחיר </i> </Button>) : <></>}
+                        {userDetails?.role === 'official' || userDetails?.role === 'admin' ? (<Button onClick={() => openPriceUpdateDialog(product)}><i className="pi pi-pencil" style={{ fontSize: '1rem' }}> עדכון מחיר </i> </Button>) : <></>}
                         {/* </div> */}
                         {/* {userDetails?.role === 'official' || userDetails?.role === 'admin' ? <Button onClick={() =>openStockUpdateDialog(product)}><i className="pi pi-pencil" style={{ fontSize: '1rem' }}> עדכון מלאי </i></Button> : <></>} */}
                         {userDetails?.role === 'admin' && (
-                        <Button icon="pi pi-trash" className="p-button-rounded p-button-danger p-button-sm" onClick={() => deleteMiniCentral(product)} tooltip="מחק" tooltipOptions={{ position: 'bottom' }}  />
-                    )}  
+                            <Button icon="pi pi-trash" className="p-button-rounded p-button-danger p-button-sm" onClick={() => deleteMiniCentral(product)} tooltip="מחק" tooltipOptions={{ position: 'bottom' }} />
+                        )}
                     </div>
                     <Button
                         label="הוספה לעגלה"
                         icon="pi pi-shopping-cart"
                         className="w-full"
                         disabled={
-                            getSeverity(product.stock) === "danger" 
+                            getSeverity(product.stock) === "danger"
                         }
                         onClick={() => addToBasket(product)}
                     />
@@ -346,33 +348,33 @@ const MiniCenterals = () => {
             </div>
             {/* <SideFillter /> */}
             <Dialog
-    header="עדכון מחיר"
-    visible={priceVisible}
-    style={{ width: '50vw' }}
-    onHide={() => priceVisible(false)}
-    modal
->
-    <h6>מחיר:</h6>
-    <div className="field">
-        <span className="p-float-label">
-            <Controller
-                name="price"
-                control={control}
-                render={({ field }) => (
-                    <InputText id={field.name} type="number" {...field} />
-                )}
-            />
-            <label htmlFor="price">{selectedProduct?.price}</label>
-        </span>
-    </div>
-    <Button
-        label="לעדכון"
-        onClick={handleSubmit(updatePrice)}
-        className="p-button-success"
-    />
-</Dialog>
+                header="עדכון מחיר"
+                visible={priceVisible}
+                style={{ width: '50vw' }}
+                onHide={() => priceVisible(false)}
+                modal
+            >
+                <h6>מחיר:</h6>
+                <div className="field">
+                    <span className="p-float-label">
+                        <Controller
+                            name="price"
+                            control={control}
+                            render={({ field }) => (
+                                <InputText id={field.name} type="number" {...field} />
+                            )}
+                        />
+                        <label htmlFor="price">{selectedProduct?.price}</label>
+                    </span>
+                </div>
+                <Button
+                    label="לעדכון"
+                    onClick={handleSubmit(updatePrice)}
+                    className="p-button-success"
+                />
+            </Dialog>
 
-{/* <Dialog
+            {/* <Dialog
     header="עדכון מלאי"
     visible={stockVisible}
     style={{ width: '50vw' }}

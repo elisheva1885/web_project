@@ -4,21 +4,25 @@ const MiniCenteral = require("../models/airconditioners/MiniCenteral")
 
 
 const createMiniCenteral = async (req, res) => {
+    const uploadedFile = req.file;
+    const otherDataString = req.body.otherData;
+    if(!otherDataString){
+        return res.status(400).json({ message: "all details are required" })
+    }
+    const otherData = JSON.parse(otherDataString);
     const {
         company, title, describe, stock, price,
         BTU_output, efficiency_factor, energy_rating,
         working_current, CFM, Pa, pipe_connection,
         in_size, out_size, quiet, wifi, speeds,
         air4d, sabbath_command, onof_auto
-    } = req.body
-    console.log('Body Data:', req.body); // מדפיס את כל השדות שהגיעו מטופס
-    console.log('File Data:', req.file); // מדפיס את פרטי הקובץ שהועלה
+    } = otherData;
 
     if(!company || !title ||!describe || !price ){
         return res.status(400).json({ message: "all details are required" })
     }
-    const imagepath = req.file?.filename || '';
-    if(imagepath===''){
+    const imagepath = req.file.filename ;
+    if(!imagepath){
         return res.status(400).json({ message: "all details are required" })
     }
     const duplicate = await MiniCenteral.findOne({ title: title }).populate("company").lean()
@@ -53,7 +57,6 @@ const readMiniCenteralsByTitle = async (req,res)=> {
 
 const readMiniCenteralById = async (req,res)=> {
     const {_id} = req.params
-    console.log(_id);
     if(!_id){
         return res.status(400).json({message: "reqired"})
     }
@@ -64,6 +67,8 @@ const readMiniCenteralById = async (req,res)=> {
 }
 
 const updateMiniCenteral = async (req, res) => {
+    console.log("in the function");
+
     const { _id,company , title, describe , imagepath , stock , price , BTU_output ,efficiency_factor, energy_rating , working_current ,CFM, Pa, pipe_connection , in_size , out_size, quiet, wifi,speeds, air4d, sabbath_command,onof_auto} = req.body
     if(!_id){
         return res.status(400).json({message: "all details are required"})
@@ -72,6 +77,8 @@ const updateMiniCenteral = async (req, res) => {
     if(!miniCenteral){
         return res.status(400).json({message: "miniCenteral not found"})
     }
+
+    
     miniCenteral.title= title?title:miniCenteral.title
     miniCenteral.describe= describe?describe:miniCenteral.describe
     miniCenteral.imagepath= imagepath?imagepath:miniCenteral.imagepath

@@ -23,48 +23,74 @@ const AddMiniCentral = () => {
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const onSubmit = async (data) => {
-        const formDataObj = new FormData();
+        const formData = new FormData(); // Create an empty FormData object
         console.log(data);
+      
         // Append the file to the FormData object
         if (data.imagepath instanceof File) {
-            formDataObj.append('imagepath', data.imagepath);
+          formData.append('imagepath', data.imagepath);
         } else {
-            console.error("Error: imagepath is not a valid file.");
-            return;
+          console.error("Error: imagepath is not a valid file.");
+          return;
         }
+        const otherData = {
+            company: data.company,
+            title: data.title,
+            describe: data.describe,
+            imagepath: data.imagepath, // Include the imagepath
+            stock: data.stock,
+            price: data.price,
+            BTU_output: data.BTU_output_cool, // Use BTU_output as in your create call
+            efficiency_factor: data.efficiency_factor_cool, // Use efficiency_factor
+            energy_rating: data.energy_rating,
+            working_current: data.working_current_cool, // Use working_current
+            CFM: data.CFM,
+            Pa: data.Pa,
+            pipe_connection: data.pipe_connection_a, // Use pipe_connection
+            in_size: data.in_size_width, // Use in_size
+            out_size: data.out_size_width, // Use out_size
+            quiet: data.quiet,
+            wifi: data.wifi,
+            speeds: data.speeds,
+            air4d: data.air4d,
+            sabbath_command: data.sabbath_command,
+            onof_auto: data.onof_auto, // Assuming 'onof_auto' exists in your 'data'
+          };
+        formData.append('otherData', JSON.stringify(otherData));
+
 
         // Append other fields to the FormData object
-        for (const key in data) {
-            if (key !== 'imagepath') {
-                let value = data[key];
+        // for (const key in data) {
+        //     if (key !== 'imagepath') {
+        //         let value = data[key];
         
-                // המרת שדות מספריים למספרים
-                if (['stock', 'price', 'BTU_output_cool', 'BTU_output_heat', 'efficiency_factor_cool', 'efficiency_factort_heat', 'energy_rating', 'working_current_cool', 'working_current_heat', 'CFM', 'Pa', 'speeds', 'in_size_width', 'in_size_depth', 'in_size_height', 'out_size_width', 'out_size_depth', 'out_size_height', 'pipe_connection_a', 'pipe_connection_b'].includes(key)) {
-                    value = value ? Number(value) : 0; // ברירת מחדל: 0
-                }
-                if (['quiet', 'wifi', 'air4d', 'sabbath_command'].includes(key)) {
-                    value = Boolean(value); // המרת לערך בוליאני
-                }
-                formDataObj.append(key, value);
-            }
+        //         // המרת שדות מספריים למספרים
+        //         if (['stock', 'price', 'BTU_output_cool', 'BTU_output_heat', 'efficiency_factor_cool', 'efficiency_factort_heat', 'energy_rating', 'working_current_cool', 'working_current_heat', 'CFM', 'Pa', 'speeds', 'in_size_width', 'in_size_depth', 'in_size_height', 'out_size_width', 'out_size_depth', 'out_size_height', 'pipe_connection_a', 'pipe_connection_b'].includes(key)) {
+        //             value = value ? Number(value) : 0; // ברירת מחדל: 0
+        //         }
+        //         if (['quiet', 'wifi', 'air4d', 'sabbath_command'].includes(key)) {
+        //             value = Boolean(value); // המרת לערך בוליאני
+        //         }
+        //         formDataObj.append(key, value);
+        //     }
             
-        }
-        for (let [key, value] of formDataObj.entries()) {
-            console.log(`${key}: ${value}`);
-        }
+        // }
+        // for (let [key, value] of formDataObj.entries()) {
+        //     console.log(`${key}: ${value}`);
+        // }
         try {
             const headers = {
                 'Authorization': `Bearer ${token}`, // If you have authentication
                 'Content-Type': 'multipart/form-data'
             };
 
-            const res = await axios.post('http://localhost:8000/api/air-conditioner/miniCenteral', formDataObj, { headers });
+            const res = await axios.post('http://localhost:8000/api/air-conditioner/miniCenteral', formData, { headers });
 
             if (res.status === 201) {
                 setFormData(data);
                 setShowMessage(true);
                 dispatch(setMiniCenterals([...miniCenterals, res.data]));
-                navigate("/miniCenterals");
+                // navigate("/miniCenterals");
             }
         } catch (error) {
             console.error(error);
@@ -92,19 +118,9 @@ const AddMiniCentral = () => {
                     <form onSubmit={handleSubmit(onSubmit)} className="p-fluid">
                         <div className="field">
                             <span className="p-float-label">
-                                <Controller
-                                    name="company"
-                                    control={control}
-                                    render={({ field }) => (
-                                        <Dropdown
-                                            id={field.id}
-                                            value={field.value}
-                                            onChange={(e) => field.onChange(e.value._id)} // שמירת ה-_id בלבד
-                                            options={companies}
-                                            optionLabel="name"
-                                        />
-                                    )}
-                                />
+                            <Controller name="company" control={control} render={({ field }) => (
+                                    <Dropdown id={field.id} value={field.value} onChange={(e) => field.onChange(e.value)} options={companies} optionLabel="name" />
+                                )} />
                                 <label htmlFor="company">Company</label>
                             </span>
                             {getFormErrorMessage('company')}
