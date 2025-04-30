@@ -57,6 +57,10 @@ const MultiOutdoorUnits = () => {
     };
 
     const addToBasket = async (product) => {
+        if(token === null){
+            alert('כדי להוסיף לסל חובה להיכנס לאיזור האישי')
+        }
+        else{
         const shoppingBagDetails = {
             product_id: product._id,
             type: "MultiOutdoorUnit",
@@ -78,8 +82,11 @@ const MultiOutdoorUnits = () => {
         catch (e) {
             console.error(e)
         }
-
     }
+}
+  
+
+    
 
     const deleteMultiOutdoorUnit = async (product) => {
         try {

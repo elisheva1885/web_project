@@ -22,7 +22,7 @@ app.use("/api/user/shoppingBag", require("./routes/shoppingBagRoute"))
 app.use("/api/user/purchase", require("./routes/purchaseRoute"))
 app.use("/api/delivery", require("./routes/deliveryRoute"))
 app.use("/api/user/address", require("./routes/addressRoute"))
-
+app.use("/api/user", require("./routes/userRoute"))
 
 app.get("/", (req,res)=>{ 
     res.send("home page")

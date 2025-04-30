@@ -52,7 +52,6 @@ const readShoppingBagByUserId = async (req, res) => {
     const promises = shoppingBags.map(async (shoppingBag) => {
         // console.log(shoppingBag.type)
         // switch (shoppingBag.type) {
-        console.log(shoppingBag.type);
             const Model = mongoose.model(shoppingBag.type);
             const airConditioner = await Model.findOne({ _id: shoppingBag.product_id }).populate("company").lean()
                  if (airConditioner.stock >= 0) {

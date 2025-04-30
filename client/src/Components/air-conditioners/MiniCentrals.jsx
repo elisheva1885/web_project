@@ -53,32 +53,41 @@ const MiniCenterals = () => {
     };
 
     const addToBasket = async (product) => {
-        // alert("shoping")
-        const shoppingBagDetails = {
-            product_id: product._id,
-            type: "MiniCenteral"
+        console.log(token);
+        if(token === null){
+            alert('כדי להוסיף לסל חובה להיכנס לאיזור האישי')
         }
-        try {
-            const headers = {
-                'Authorization': `Bearer ${token}`
+        else{
+            const shoppingBagDetails = {
+                product_id: product._id,
+                type: "MiniCenteral"
             }
-            const res = await axios.post('http://localhost:8000/api/user/shoppingBag', shoppingBagDetails, { headers },)
-            if (res.status === 201) {
-                dispatch(setBasket([...basket, res.data]))
-                console.log("res.data", res.data);
-                console.log("useState", shoppingBags);
-                alert(` המוצר נוסף לעגלה`)
-
+            try {
+                const headers = {
+                    'Authorization': `Bearer ${token}`
+                }
+                const res = await axios.post('http://localhost:8000/api/user/shoppingBag', shoppingBagDetails, { headers },)
+                if (res.status === 201) {
+                    dispatch(setBasket([...basket, res.data]))
+                    console.log("res.data", res.data);
+                    console.log("useState", shoppingBags);
+                    alert(` המוצר נוסף לעגלה`)
+    
+                }
+                if(res.status==200){
+                    alert(` המוצר נוסף לעגלה`)
+                }
             }
-            if(res.status==200){
-                alert(` המוצר נוסף לעגלה`)
+            catch (e) {
+                console.error(e)
             }
         }
-        catch (e) {
-            console.error(e)
-        }
-
     }
+
+        // alert("shoping")
+       
+
+    
     const deleteMiniCentral = async (product) => {
         try {
             const headers = {
@@ -293,7 +302,7 @@ const MiniCenterals = () => {
                         icon="pi pi-shopping-cart"
                         className="w-full"
                         disabled={
-                            getSeverity(product.stock) === "danger" || registered === false
+                            getSeverity(product.stock) === "danger" 
                         }
                         onClick={() => addToBasket(product)}
                     />

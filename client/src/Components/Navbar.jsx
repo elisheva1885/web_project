@@ -7,6 +7,7 @@ import { MegaMenu } from 'primereact/megamenu';
 import AdminRegister from './AdminRegister';
 import Payment from './Payment';
 import MiniCenteral from './air-conditioners/MiniCenteral';
+import UpdateUserDetails from './UpdateUserDetails';
 
 const About = lazy(() => import('./About'));
 const Branch = lazy(() => import('./Branch'));
@@ -50,14 +51,14 @@ const Navbar = () => {
             command: () => navigate('/miniCenterals'),
         },
         {
-            label: 'מערכת VRF',
+            label: 'מאייד מולטי',
             // items: [{ label: 'Details for Window AC' }],
-            command: () => navigate('/miniVrfs'),
+            command: () => navigate('/multiInDoorUnits'),
         },
         {
-            label: 'מולטי',
+            label: 'מעבה מולטי',
             // items: [{ label: 'Details for Central AC' }],
-            command: () => navigate('/multis'),
+            command: () => navigate('/multiOutDoorUnits'),
         },
     ];
 
@@ -150,6 +151,8 @@ const Navbar = () => {
                 <Route path='/basket' element={<Suspense fallback="Loading..."><Basket /></Suspense>}></Route>
                 <Route path='/admin' element={<Suspense fallback="Loading..."><Admin/></Suspense>}></Route>
                 <Route path='/userAcount' element={<Suspense fallback="Loading..."><UserAcount/></Suspense>}></Route>
+                <Route path='/userAcount/UpdateDetails' element={<Suspense fallback="Loading..."><UpdateUserDetails/></Suspense>}></Route>
+
                 <Route path='/admin/registerOfficial' element={<Suspense fallback="Loading..."><AdminRegister/></Suspense>}></Route>
                 <Route path='/basket/Payment' element={<Suspense fallback="Loading..."><Payment/></Suspense>}></Route>
             </Routes>

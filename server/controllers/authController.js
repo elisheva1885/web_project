@@ -60,10 +60,11 @@ const login = async (req, res) => {
     const userInfo = {
         _id: foundUser._id, name: foundUser.name,
         username: foundUser.username,
-        email: foundUser.email, pone: foundUser.phone, roles: foundUser.roles
+        email: foundUser.email, phone: foundUser.phone, roles: foundUser.roles
     }
     const accessToken = jwt.sign(userInfo, process.env.ACCESS_TOKEN_SECRET)
-    res.status(200).json({token: accessToken, username: userInfo.username,role: userInfo.roles })
+    console.log({token: accessToken, name: userInfo.name,username: userInfo.username ,email: userInfo.email,phone: userInfo.phone,role: userInfo.roles });
+    res.status(200).json({token: accessToken, name: userInfo.name,username: userInfo.username,email: userInfo.email,phone: userInfo.phone,role: userInfo.roles })
 }
 
 module.exports = { login, register, registerAdmin }

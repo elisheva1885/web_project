@@ -55,34 +55,39 @@ const Overheads = () => {
     };
 
     const addToBasket = async (product) => {
-        // alert("shoping")
-        const shoppingBagDetails = {
-            product_id: product._id,
-            type: "Overhead",
-            amount: 1
+        if(token === null){
+            alert('כדי להוסיף לסל חובה להיכנס לאיזור האישי')
         }
-        try {
-            const headers = {
-                'Authorization': `Bearer ${token}`
+    else{
+            const shoppingBagDetails = {
+                product_id: product._id,
+                type: "Overhead",
+                amount: 1
             }
-            const res = await axios.post('http://localhost:8000/api/user/shoppingBag', shoppingBagDetails, { headers })
-            if (res.status === 201) {
-                alert("im here")
-                dispatch(setBasket([...basket, res.data]))
-                alert(` המוצר נוסף לעגלה`)
-                console.log("res.data", res.data);
-                console.log("useState", shoppingBags);
+            try {
+                const headers = {
+                    'Authorization': `Bearer ${token}`
+                }
+                const res = await axios.post('http://localhost:8000/api/user/shoppingBag', shoppingBagDetails, { headers })
+                if (res.status === 201) {
+                    alert("im here")
+                    dispatch(setBasket([...basket, res.data]))
+                    alert(` המוצר נוסף לעגלה`)
+                    console.log("res.data", res.data);
+                    console.log("useState", shoppingBags);
+                }
+                if (res.status == 200) {
+                    alert(` המוצר נוסף לעגלה`)
+                }
+                if (res.status === 409) {
+                    // updateAmount(product)
+                }
             }
-            if(res.status==200){
-                alert(` המוצר נוסף לעגלה`)
-            }
-            if (res.status === 409) {
-                // updateAmount(product)
+            catch (e) {
+                console.error(e)
             }
         }
-        catch (e) {
-            console.error(e)
-        }
+        
 
     }
 
@@ -468,33 +473,33 @@ const Overheads = () => {
 
 
             <Dialog
-    header="עדכון מחיר"
-    visible={priceVisible}
-    style={{ width: '50vw' }}
-    onHide={() => priceVisible(false)}
-    modal
->
-    <h6>מחיר:</h6>
-    <div className="field">
-        <span className="p-float-label">
-            <Controller
-                name="price"
-                control={control}
-                render={({ field }) => (
-                    <InputText id={field.name} type="number" {...field} />
-                )}
-            />
-            <label htmlFor="price">{selectedProduct?.price}</label>
-        </span>
-    </div>
-    <Button
-        label="לעדכון"
-        onClick={handleSubmit(updatePrice)}
-        className="p-button-success"
-    />
-</Dialog>
+                header="עדכון מחיר"
+                visible={priceVisible}
+                style={{ width: '50vw' }}
+                onHide={() => priceVisible(false)}
+                modal
+            >
+                <h6>מחיר:</h6>
+                <div className="field">
+                    <span className="p-float-label">
+                        <Controller
+                            name="price"
+                            control={control}
+                            render={({ field }) => (
+                                <InputText id={field.name} type="number" {...field} />
+                            )}
+                        />
+                        <label htmlFor="price">{selectedProduct?.price}</label>
+                    </span>
+                </div>
+                <Button
+                    label="לעדכון"
+                    onClick={handleSubmit(updatePrice)}
+                    className="p-button-success"
+                />
+            </Dialog>
 
-{/* <Dialog
+            {/* <Dialog
     header="עדכון מלאי"
     visible={stockVisible}
     style={{ width: '50vw' }}

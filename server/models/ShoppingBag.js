@@ -25,9 +25,5 @@ const shoppingBagSchema = new mongoose.Schema({
 }, {
     timestamps: true
 });
-<<<<<<< HEAD
-
-=======
->>>>>>> 49384975ca909cdc4fbbaa7e4b19832e11b02bc9
 
 module.exports = mongoose.model('ShoppingBag', shoppingBagSchema)

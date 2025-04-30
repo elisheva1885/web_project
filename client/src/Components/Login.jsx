@@ -52,10 +52,10 @@ const Login  =() => {
         try {
             const res = await axios.post(`http://localhost:8000/api/auth/login`,user)
             if(res.status===200){
-                console.log(res.data.token);
+                console.log(res.data);
                 dispatch(setToken(res.data.token))
                 console.log(token);
-                dispatch(setUserDetails({username:res.data.username,role:res.data.role}))
+                dispatch(setUserDetails({name:res.data.name,username:res.data.username,email:res.data.email,phone:res.data.phone,role:res.data.role}))
                 setShowMessage(true);
                 // getShoppingBag();
                 goToHome()
