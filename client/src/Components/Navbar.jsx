@@ -19,6 +19,7 @@ const Basket = lazy(() => import('./Basket'));
 const UpdateBranch = lazy(() => import('./UpdateBranch'));
 const AddBranch = lazy(() => import('./AddBranch'));
 const Admin = lazy(() => import('./Admin'));
+const Official = lazy(() => import('./Official'));
 const UserAcount = lazy(() => import('./UserAcount'));
 const MiniCenterals = lazy(() => import('./air-conditioners/MiniCentrals'));
 const Add_AirConditioner = lazy(() => import('./air-conditioners/Add_AirConditioner'));
@@ -62,17 +63,17 @@ const Navbar = () => {
         },
     ];
 
-    const menuItems = [
-        {
-            label: 'AC Types',
-            icon: 'pi pi-desktop',
-            items: [
-                [
-                    ...acItems,
-                ],
-            ],
-        },
-    ];
+    // const menuItems = [
+    //     {
+    //         label: 'AC Types',
+    //         icon: 'pi pi-desktop',
+    //         items: [
+    //             [
+    //                 ...acItems,
+    //             ],
+    //         ],
+    //     },
+    // ];
 
     const items = [
 
@@ -103,8 +104,12 @@ const Navbar = () => {
             label: 'אודות',
             icon: 'pi pi-question',
             url: '/about'
-        }
-        ,
+        },
+        {
+           label:userDetails?.role==='admin' || userDetails?.role==='official'? '':'',
+           icon: userDetails?.role==='admin' || userDetails?.role==='official'?<img src="desk.png" style={{ width: '24px', height: '24px' }} />:'' ,
+           url: userDetails?.role==='admin' || userDetails?.role==='official'?'/official' :'/'
+        },
         {
            label:userDetails?.role==='admin'? 'לאתר הניהול':'',
            icon: userDetails?.role==='admin'?<img src="admin.png" style={{ width: '24px', height: '24px' }} />:'' ,
@@ -150,6 +155,7 @@ const Navbar = () => {
                 <Route path='/air_conditioner/add' element={<Suspense fallback="Loading..."><Add_AirConditioner/></Suspense>}></Route>
                 <Route path='/basket' element={<Suspense fallback="Loading..."><Basket /></Suspense>}></Route>
                 <Route path='/admin' element={<Suspense fallback="Loading..."><Admin/></Suspense>}></Route>
+                <Route path='/official' element={<Suspense fallback="Loading..."><Official/></Suspense>}></Route>
                 <Route path='/userAcount' element={<Suspense fallback="Loading..."><UserAcount/></Suspense>}></Route>
                 <Route path='/userAcount/UpdateDetails' element={<Suspense fallback="Loading..."><UpdateUserDetails/></Suspense>}></Route>
 
