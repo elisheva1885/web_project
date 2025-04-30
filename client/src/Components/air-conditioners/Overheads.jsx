@@ -349,7 +349,8 @@ const Overheads = () => {
 
                     {/* תמונת המוצר - גדולה ורחבה */}
                     <img
-                        src={`overheads/${product.imagepath}`}
+                        // src={`overheads/${product.imagepath}`}
+                        src={`C:\\Users\\215587544\\Desktop\\web_project\\server\\public\\uploads\\${product.imagePath}`}
                         alt={product.title}
                         className="w-full h-12rem object-contain border-round"
                     />

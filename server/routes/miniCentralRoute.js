@@ -1,10 +1,28 @@
 const express = require("express")
+
+const path = require('path');
+const multer = require('multer');
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        // Save files to the 'public/uploads' directory in the project
+        cb(null, path.join("C:\\Users\\215587544\\Desktop\\web_project\\server", 'public/uploads'));
+    },
+    filename: function (req, file, cb) {
+        // Generate a unique filename for each uploaded file
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, uniqueSuffix + '-' + file.originalname);
+    }
+});
+
+const upload = multer({ storage: storage });
+
 const router = express.Router()
 const MiniCenteralController = require("../controllers/MiniCenteralController")
 const adminVerify = require("../middleware/adminVerify")
 const officialVerify = require("../middleware/officialVerify")
 const verifyJWT = require("../middleware/verifyJWT")
-router.post("/",MiniCenteralController.createMiniCenteral)
+router.post("/",upload.single('imagepath'),MiniCenteralController.createMiniCenteral)
 router.get("/",MiniCenteralController.readMiniCenterals)
 router.get("/miniCenteral/:_id",MiniCenteralController.readMiniCenteralById)
 router.get("/:title",MiniCenteralController.readMiniCenteralsByTitle)

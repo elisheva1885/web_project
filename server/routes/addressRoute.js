@@ -12,3 +12,4 @@ router.put("/",veriftyJWT, addressController.updateAddress)
 router.delete("/",veriftyJWT, addressController.deleteAddress)
 
 module.exports = router
+

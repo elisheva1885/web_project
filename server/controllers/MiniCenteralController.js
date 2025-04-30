@@ -1,9 +1,24 @@
 const MiniCenteral = require("../models/airconditioners/MiniCenteral")
 
 
+
+
 const createMiniCenteral = async (req, res) => {
-    const {company , title, describe , imagepath , stock , price , BTU_output ,efficiency_factor, energy_rating , working_current ,CFM, Pa, pipe_connection , in_size , out_size, quiet, wifi,speeds, air4d, sabbath_command,onof_auto} = req.body
-    if(!company || !title ||!describe || !price ||!imagepath ){
+    const {
+        company, title, describe, stock, price,
+        BTU_output, efficiency_factor, energy_rating,
+        working_current, CFM, Pa, pipe_connection,
+        in_size, out_size, quiet, wifi, speeds,
+        air4d, sabbath_command, onof_auto
+    } = req.body
+    console.log('Body Data:', req.body); // מדפיס את כל השדות שהגיעו מטופס
+    console.log('File Data:', req.file); // מדפיס את פרטי הקובץ שהועלה
+
+    if(!company || !title ||!describe || !price ){
+        return res.status(400).json({ message: "all details are required" })
+    }
+    const imagepath = req.file?.filename || '';
+    if(imagepath===''){
         return res.status(400).json({ message: "all details are required" })
     }
     const duplicate = await MiniCenteral.findOne({ title: title }).populate("company").lean()
@@ -17,8 +32,8 @@ const createMiniCenteral = async (req, res) => {
     else{
         return  res.status(400).json({ message: "invalid miniCenteral" })
     }
-
 }
+
 
 const readMiniCenterals = async (req,res)=> {
     const miniCenterals = await MiniCenteral.find().populate("company").lean()
@@ -34,7 +49,6 @@ const readMiniCenteralsByTitle = async (req,res)=> {
     if(!miniCenterals)
         return res.status(404).json({ message: "no such miniCenterals conditioner" })
     res.status(200).json(miniCenterals)
-
 }
 
 const readMiniCenteralById = async (req,res)=> {
@@ -55,7 +69,6 @@ const updateMiniCenteral = async (req, res) => {
         return res.status(400).json({message: "all details are required"})
     }
     const miniCenteral = await MiniCenteral.findById(_id).exec()
-
     if(!miniCenteral){
         return res.status(400).json({message: "miniCenteral not found"})
     }
@@ -80,7 +93,6 @@ const updateMiniCenteral = async (req, res) => {
     miniCenteral.sabbath_command= sabbath_command?sabbath_command:miniCenteral.sabbath_command
     miniCenteral.onof_auto= onof_auto?onof_auto:miniCenteral.onof_auto
     const updated = await miniCenteral.save()
-    // const miniCenterals = await miniCenteral.find().populate("company").lean()
     res.status(200).json(miniCenteral)
 }
 

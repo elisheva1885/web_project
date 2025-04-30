@@ -1,5 +1,7 @@
 require("dotenv").config()
 const express = require("express")
+const path = require('path');
+
 const cors = require("cors")
 const corsOptions = require("./config/corsOptions")
 const dbconnect = require("./config/dbconnect")
@@ -11,6 +13,8 @@ dbconnect()
 app.use(cors(corsOptions))
 app.use((express.json()))
 app.use(express.static("public"))
+app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
+
 app.use("/api/auth", require("./routes/authRoute"))
 app.use("/api/branches", require("./routes/branchRoute"))
 app.use("/api/air-conditioner/overhead", require("./routes/overheadRoute"))
