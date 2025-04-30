@@ -10,6 +10,7 @@ import { classNames } from 'primereact/utils';
 import axios from 'axios'
 import '../Login.css';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 
 const AdminRegister = ()=> {
@@ -17,7 +18,7 @@ const AdminRegister = ()=> {
         const [formData, setFormData] = useState({});
         const {userDetails} = useSelector((state) => state.userDetails);
         const {token} = useSelector((state) => state.token);
-
+    const navigate = useNavigate()
         const defaultValues = {
             name: '',
             username: '',
@@ -48,6 +49,7 @@ const AdminRegister = ()=> {
                 const res = await axios.post(`http://localhost:8000/api/auth/admin/register`,user,{headers})
                 if(res.status===201){
                     setShowMessage(true);
+                    navigate('/')
                 }
             } catch (error) {
                 if(error.status === 401){
