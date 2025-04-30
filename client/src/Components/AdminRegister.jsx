@@ -44,13 +44,14 @@ const AdminRegister = ()=> {
                 const headers = {
                     'Authorization': `Bearer ${token}`
                 }
-                const res = await axios.post(`http://localhost:8000/api/auth/admin/register`,headers,user)
-                if(res.status===200){
+                console.log("datas ",{headers},user);
+                const res = await axios.post(`http://localhost:8000/api/auth/admin/register`,user,{headers})
+                if(res.status===201){
                     setShowMessage(true);
                 }
             } catch (error) {
                 if(error.status === 401){
-                    alert("Unauthorized")
+                    // alert("Unauthorized")
                 }
             }
             reset();

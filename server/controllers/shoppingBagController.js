@@ -9,9 +9,9 @@ const mongoose = require('mongoose');
 //לבדוק בפוסטמן
 const createShoppingBag = async (req, res) => {
     const user_id = req.user._id
-
     // console.log("user", user_id);
     const { product_id, type, amount } = req.body
+
     // console.log(product_id,type, amount)
     if (!user_id || !product_id || !type) {
         return res.status(400).json({ message: "all details are required" })
@@ -21,11 +21,13 @@ const createShoppingBag = async (req, res) => {
         user_id: user_id,
         product_id: product_id,
     }).exec()
+
     // console.log("duplicate", duplicate)
     if (duplicate) {
         console.log("duplicate product ", duplicate);
         duplicate.amount++
         const updatedShoppingBag = await duplicate.save()
+        console.log("in here")
         return res.status(200).json({ message: "update amount" })
         // return res.status(409).json({ message: "already exist in the basket" })
     }
@@ -34,6 +36,7 @@ const createShoppingBag = async (req, res) => {
     if (shoppingBag) {
         return res.status(201).json(shoppingBag)
     }
+    return res.status(400).json({message: "error on adding shoppingBag object"})
 }
 
 const readShoppingBagByUserId = async (req, res) => {
@@ -49,6 +52,7 @@ const readShoppingBagByUserId = async (req, res) => {
     const promises = shoppingBags.map(async (shoppingBag) => {
         // console.log(shoppingBag.type)
         // switch (shoppingBag.type) {
+        console.log(shoppingBag.type);
             const Model = mongoose.model(shoppingBag.type);
             const airConditioner = await Model.findOne({ _id: shoppingBag.product_id }).populate("company").lean()
                  if (airConditioner.stock >= 0) {

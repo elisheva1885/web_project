@@ -13,7 +13,7 @@ const Admin = () => {
     // const air_conditioners = null
     const navigate = useNavigate()
     const registerOfficial = async (data) => {
-        navigate('/admin/register')
+        navigate('/admin/registerOfficial')
         const official = {
             // name: data.name,
             // username: data.username,

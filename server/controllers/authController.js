@@ -24,6 +24,7 @@ const register = async (req, res) => {
 
 const registerAdmin = async (req, res) => {
     const { name, username, password, email, phone , roles} = req.body
+    console.log(name, username, password, email, phone , roles);
     if (!name || !username || !password) {
         return res.status(400).json({ message: "all field are reqired" })
     }
