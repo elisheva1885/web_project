@@ -25,7 +25,7 @@ const UserAcount =()=> {
         <>
                 <div style={{ paddingTop: '60px' }}>
 
-        <h1> hello {userDetails.username}</h1>
+        <h1> !{userDetails.username} ,שלום</h1>
         <Button type="submit" label="ליציאה מהפרופיל" className="mt-2" onClick={signOut}/>
         </div>
         <UserAcountNavbar/>
