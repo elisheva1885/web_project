@@ -4,7 +4,9 @@ const multiIndoorUnitController = require("../controllers/multiIndoorUnitControl
 const adminVerify = require("../middleware/adminVerify")
 const officialVerify = require("../middleware/officialVerify")
 const verifyJWT = require("../middleware/verifyJWT")
-router.post("/",multiIndoorUnitController.createMultiIndoorUnit)
+const upload = require("../middleware/multer")
+
+router.post("/",upload.single('imagepath'),multiIndoorUnitController.createMultiIndoorUnit)
 router.get("/",multiIndoorUnitController.readMultiIndoorUnits)
 router.get("/miniCenteral/:_id",multiIndoorUnitController.readMultiIndoorUnitById)
 router.get("/:title",multiIndoorUnitController.readMultiIndoorUnitsByTitle)

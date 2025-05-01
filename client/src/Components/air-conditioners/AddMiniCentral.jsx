@@ -23,9 +23,7 @@ const AddMiniCentral = () => {
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const onSubmit = async (data) => {
-        const formData = new FormData(); // Create an empty FormData object
-        console.log(data);
-      
+        const formData = new FormData(); // Create an empty FormData object      
         // Append the file to the FormData object
         if (data.imagepath instanceof File) {
           formData.append('imagepath', data.imagepath);
@@ -37,7 +35,6 @@ const AddMiniCentral = () => {
             company: data.company,
             title: data.title,
             describe: data.describe,
-            imagepath: data.imagepath, // Include the imagepath
             stock: data.stock,
             price: data.price,
             BTU_output: data.BTU_output_cool, // Use BTU_output as in your create call
@@ -90,7 +87,7 @@ const AddMiniCentral = () => {
                 setFormData(data);
                 setShowMessage(true);
                 dispatch(setMiniCenterals([...miniCenterals, res.data]));
-                // navigate("/miniCenterals");
+                navigate("/miniCenterals");
             }
         } catch (error) {
             console.error(error);

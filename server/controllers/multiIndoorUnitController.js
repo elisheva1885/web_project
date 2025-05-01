@@ -2,8 +2,18 @@ const MultiIndoorUnit = require("../models/airconditioners/MultiIndoorUnit")
 
 
 const createMultiIndoorUnit = async (req, res) => {
-    const {company , title, describe , imagepath , stock , price , BTU_output ,CFM, pipe_connection , evaporator_unit_dimensions } = req.body
-    if(!company || !title ||!describe || !price ||!imagepath ){
+    const uploadedFile = req.file;
+    const otherDataString = req.body.otherData;
+    if(!otherDataString){
+        return res.status(400).json({ message: "all details are required" })
+    }
+    const otherData = JSON.parse(otherDataString);
+    const {company , title, describe  , stock , price , BTU_output ,CFM, pipe_connection , evaporator_unit_dimensions } = otherData
+    if(!company || !title ||!describe || !price ){
+        return res.status(400).json({ message: "all details are required" })
+    }
+    const imagepath = req.file.filename ;
+    if(!imagepath){
         return res.status(400).json({ message: "all details are required" })
     }
     const duplicate = await MultiIndoorUnit.findOne({ title: title }).populate("company").lean()

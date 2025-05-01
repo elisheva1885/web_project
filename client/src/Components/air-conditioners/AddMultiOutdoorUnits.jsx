@@ -10,6 +10,7 @@ import { Dropdown } from 'primereact/dropdown';
 import { useNavigate } from 'react-router-dom';
 import { setMultiOutdoorUnits } from '../../store/air-conditioner/multiOutdoorUnitsSlice';
 import { Checkbox } from 'primereact/checkbox';
+import { FileUpload } from 'primereact/fileupload';
 
 const AddMultiOutdoorUnits = () => {
     const { control, handleSubmit, formState: { errors } } = useForm();
@@ -17,17 +18,53 @@ const AddMultiOutdoorUnits = () => {
     const [formData, setFormData] = useState({});
     const { companies } = useSelector((state) => state.companies);
     const { multiOutdoorUnits } = useSelector((state) => state.multiOutdoorUnits)
+    const token = useSelector((state) => state.token);
     const navigate = useNavigate()
     const dispatch = useDispatch()
     console.log("multiOutdoorUnits", multiOutdoorUnits);
     const onSubmit = async (data) => {
-        console.log("data before adjustment", data);
-
-
-        console.log("adjustedData", data);
+        const formData = new FormData(); // Create an empty FormData object      
+        // Append the file to the FormData object
+        if (data.imagepath instanceof File) {
+          formData.append('imagepath', data.imagepath);
+        } else {
+          console.error("Error: imagepath is not a valid file.");
+          return;
+        }
+        const otherData = {
+            company: data.company,
+  title: data.title,
+  describe: data.describe,
+  stock: data.stock,
+  price: data.price,
+  BTU_output: {
+    cool: data.BTU_output_cool,
+    heat: data.BTU_output_heat
+  },
+  working_current: {
+    cool: data.working_current_cool,
+    heat: data.working_current_heat
+  },
+  condenser_unit_dimensions: {
+    width: data.out_size_width,
+    depth: data.out_size_depth,
+    height: data.out_size_height
+  },
+  quiet: data.quiet,
+  wifi: data.wifi,
+  timer: data.timer,
+  sabbath_command: data.sabbath_command,
+  onof_auto: data.onof_auto
+          };
+        formData.append('otherData', JSON.stringify(otherData));
 
         try {
-            const res = await axios.post('http://localhost:8000/api/air-conditioner/multiOutdoorUnit', data);
+            const headers = {
+                'Authorization': `Bearer ${token}`, // If you have authentication
+                'Content-Type': 'multipart/form-data'
+            };
+
+            const res = await axios.post('http://localhost:8000/api/air-conditioner/multiOutdoorUnit', formData, { headers });
             if (res.status === 201) {
                 setFormData(data);
                 setShowMessage(true);
@@ -97,8 +134,16 @@ const AddMultiOutdoorUnits = () => {
                         <div className="field">
                             <span className="p-float-label">
                                 <Controller name="imagepath" control={control} rules={{ required: 'Image path is required.' }} render={({ field, fieldState }) => (
-                                    <InputText id={field.name} {...field} className={classNames({ 'p-invalid': fieldState.invalid })} />
-                                )} />
+                                    <FileUpload
+                                            id="imagepath"
+                                            name="imagepath"
+                                            accept="image/*"
+                                            customUpload
+                                            uploadHandler={(e) => field.onChange(e.files[0])} // Attach the file to the form
+                                            auto
+                                            mode="basic" // Use 'basic' mode for a simpler layout
+                                            className={classNames({ 'p-invalid': fieldState.invalid })}
+                                        />                                )} />
                                 <label htmlFor="imagepath" className={classNames({ 'p-error': errors.imagepath })}>*Image Path</label>
                             </span>
                             {getFormErrorMessage('imagepath')}

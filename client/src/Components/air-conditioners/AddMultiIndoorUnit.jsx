@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Dropdown } from 'primereact/dropdown';
 import { useNavigate } from 'react-router-dom';
 import { setMultiIndoorUnits } from '../../store/air-conditioner/multiIndoorUnitsSlice';
+import { FileUpload } from 'primereact/fileupload';
 
 const AddMultiIndoorUnit = () => {
     const { control, handleSubmit, formState: { errors } } = useForm();
@@ -16,17 +17,53 @@ const AddMultiIndoorUnit = () => {
     const [formData, setFormData] = useState({});
     const { companies } = useSelector((state) => state.companies);
     const { multiIndoorUnits } = useSelector((state) => state.multiIndoorUnits)
+    const { token } = useSelector((state) => state.token)
+
     const navigate = useNavigate()
     const dispatch = useDispatch()
     console.log("multiIndoorUnits", multiIndoorUnits);
     const onSubmit = async (data) => {
         console.log("data before adjustment", data);
+        const formData = new FormData(); // Create an empty FormData object      
+        // Append the file to the FormData object
+        if (data.imagepath instanceof File) {
+            formData.append('imagepath', data.imagepath);
+        } else {
+            console.error("Error: imagepath is not a valid file.");
+            return;
+        }
+        const otherData = {
+            company: data.company,
+            title: data.title,
+            describe: data.describe,
+            stock: data.stock,
+            price: data.price,
+            BTU_output: {
+                cool: data.BTU_output_cool,
+                heat: data.BTU_output_heat // ודאי שזה קיים אצלך ב־data
+            },
+            CFM: data.CFM,
+            pipe_connection: {
+                a: data.pipe_connection_a,
+                b: data.pipe_connection_b
+            },
+            evaporator_unit_dimensions: {
+                width: data.in_size_width,
+                depth: data.in_size_depth,
+                height: data.in_size_height
+            }
+        };
+        formData.append('otherData', JSON.stringify(otherData));
 
 
         console.log("adjustedData", data);
 
         try {
-            const res = await axios.post('http://localhost:8000/api/air-conditioner/multiIndoorUnit', data);
+            const headers = {
+                'Authorization': `Bearer ${token}`, // If you have authentication
+                'Content-Type': 'multipart/form-data'
+            };
+            const res = await axios.post('http://localhost:8000/api/air-conditioner/multiIndoorUnit', formData, { headers });
             if (res.status === 201) {
                 setFormData(data);
                 setShowMessage(true);
@@ -90,8 +127,16 @@ const AddMultiIndoorUnit = () => {
                         <div className="field">
                             <span className="p-float-label">
                                 <Controller name="imagepath" control={control} rules={{ required: 'Image path is required.' }} render={({ field, fieldState }) => (
-                                    <InputText id={field.name} {...field} className={classNames({ 'p-invalid': fieldState.invalid })} />
-                                )} />
+                                    <FileUpload
+                                            id="imagepath"
+                                            name="imagepath"
+                                            accept="image/*"
+                                            customUpload
+                                            uploadHandler={(e) => field.onChange(e.files[0])} // Attach the file to the form
+                                            auto
+                                            mode="basic" // Use 'basic' mode for a simpler layout
+                                            className={classNames({ 'p-invalid': fieldState.invalid })}
+                                        />                                )} />
                                 <label htmlFor="imagepath" className={classNames({ 'p-error': errors.imagepath })}>*Image Path</label>
                             </span>
                             {getFormErrorMessage('imagepath')}

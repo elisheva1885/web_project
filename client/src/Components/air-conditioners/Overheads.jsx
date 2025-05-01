@@ -18,6 +18,7 @@ import SideFillter from '../SideFillter';
 import UpdateOverhead from './updateOvearhead';
 import { Controller, useForm } from 'react-hook-form';
 import { Dialog } from 'primereact/dialog';
+import useGetFilePath from '../../hooks/useGetFilePath';
 
 
 const Overhead = lazy(() => import('./Overhead'));
@@ -44,6 +45,7 @@ const Overheads = () => {
     const dispatch = useDispatch();
     const priceValue = watch('price');
     const stockValue = watch('stock');
+    const {getFilePath} = useGetFilePath()
 
 
     const goToAddOverhead = (type) => {
@@ -350,7 +352,7 @@ const Overheads = () => {
                     {/* תמונת המוצר - גדולה ורחבה */}
                     <img
                         // src={`overheads/${product.imagepath}`}
-                        src={`C:\\Users\\215587544\\Desktop\\web_project\\server\\public\\uploads\\${product.imagePath}`}
+                        src={getFilePath(product.imagepath)}
                         alt={product.title}
                         className="w-full h-12rem object-contain border-round"
                     />

@@ -2,8 +2,17 @@ const MultiOutdoorUnit = require("../models/airconditioners/MultiOutdoorUnit")
 
 
 const createMultiOutdoorUnit = async (req, res) => {
-    const {company , title, describe , imagepath , stock , price , BTU_output ,working_current, condenser_unit_dimensions , quiet ,wifi, timer, sabbath_command , onof_auto } = req.body
-    if(!company || !title ||!describe || !price ||!imagepath ){
+    const otherDataString = req.body.otherData;
+    if(!otherDataString){
+        return res.status(400).json({ message: "all details are required" })
+    }
+    const otherData = JSON.parse(otherDataString);
+    const {company , title, describe  , stock , price , BTU_output ,working_current, condenser_unit_dimensions , quiet ,wifi, timer, sabbath_command , onof_auto } = otherData
+    if(!company || !title ||!describe || !price){
+        return res.status(400).json({ message: "all details are required" })
+    }
+    const imagepath = req.file.filename ;
+    if(!imagepath){
         return res.status(400).json({ message: "all details are required" })
     }
     const duplicate = await MultiOutdoorUnit.findOne({ title: title }).populate("company").lean()

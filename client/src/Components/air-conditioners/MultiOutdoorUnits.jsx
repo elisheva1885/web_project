@@ -19,6 +19,7 @@ import UpdateOverhead from './updateOvearhead';
 import { Controller, useForm } from 'react-hook-form';
 import { Dialog } from 'primereact/dialog';
 import { setMultiOutdoorUnits } from '../../store/air-conditioner/multiOutdoorUnitsSlice';
+import useGetFilePath from '../../hooks/useGetFilePath';
 
 
 const Overhead = lazy(() => import('./Overhead'));
@@ -45,6 +46,7 @@ const MultiOutdoorUnits = () => {
     const dispatch = useDispatch();
     const priceValue = watch('price');
     const stockValue = watch('stock');
+    const {getFilePath} = useGetFilePath()
 
     console.log("multiOutdoorUnits",multiOutdoorUnits);
 
@@ -329,7 +331,7 @@ const MultiOutdoorUnits = () => {
 
                     {/* תמונת המוצר - גדולה ורחבה */}
                     <img
-                        src={`overheads/${product.imagepath}`}
+                        src={getFilePath(product.imagepath)}
                         alt={product.title}
                         className="w-full h-12rem object-contain border-round"
                     />

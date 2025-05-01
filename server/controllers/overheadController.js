@@ -1,8 +1,18 @@
 const Overhead = require("../models/airconditioners/Overhead")
 
 const createOverhead = async (req, res) => {
-    const {company , title, describe , imagepath , stock , price , BTU_output , energy_rating  , working_current ,CFM, recommended_model_C, pipe_connection , in_size , out_size, air_flow, quiet, wifi,speeds, air4d,night_mode,timer, sabbath_command,onof_auto} = req.body
-    if(!company || !title ||!describe || !price ||!imagepath ){
+    const uploadedFile = req.file;
+    const otherDataString = req.body.otherData;
+    if(!otherDataString){
+        return res.status(400).json({ message: "all details are required" })
+    }
+    const otherData = JSON.parse(otherDataString);
+    const {company , title, describe  , stock , price , BTU_output , energy_rating  , working_current ,CFM, recommended_model_C, pipe_connection , in_size , out_size, air_flow, quiet, wifi,speeds, air4d,night_mode,timer, sabbath_command,onof_auto} = otherData
+    if(!company || !title ||!describe || !price ){
+        return res.status(400).json({ message: "all details are required" })
+    }
+    const imagepath = req.file.filename ;
+    if(!imagepath){
         return res.status(400).json({ message: "all details are required" })
     }
     const duplicate = await Overhead.findOne({ title: title }).populate("company").lean()
@@ -11,8 +21,8 @@ const createOverhead = async (req, res) => {
     }
     const overhead = await Overhead.create({company , title, describe , imagepath , stock , price , BTU_output , energy_rating  , working_current ,CFM, recommended_model_C, pipe_connection , in_size , out_size, air_flow, quiet, wifi,speeds, air4d,night_mode,timer, sabbath_command,onof_auto})
     if(overhead){
-        const overheads = await Overhead.find().populate("company").lean()
-        res.status(201).json(overheads)
+        // const overheads = await Overhead.find().populate("company").lean()
+        res.status(201).json(overhead)
     }
     else{
         return  res.status(400).json({ message: "invalid overhead" })
