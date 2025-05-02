@@ -47,9 +47,7 @@ const minicenteralSchema = new mongoose.Schema({
     Pa:{//לחץ סטטי
         type:Number
     },
-    // recommended_model_C:{ 
-    //     type:String
-    // },
+
     pipe_connection: {
         a:{ type:String},
         b:{ type:String},
@@ -64,10 +62,7 @@ const minicenteralSchema = new mongoose.Schema({
         depth: {type: Number},    
         height: {type: Number},
     },
-    // air_flow:{
-    //     type:Number
-    // },
-    //icons
+
     quiet:{
         type: Boolean
     }, 
@@ -82,22 +77,12 @@ const minicenteralSchema = new mongoose.Schema({
         type: Boolean,
         default:false
     },
-    // night_mode: {
-    //     type: Boolean,
-    //     default:false
-    // },
-    // timer: {
-    //     type: Boolean,
-    //     default:false
-    // },
+
     sabbath_command: {
         type: Boolean,
         default:false
     },
-    // onof_auto:{
-    //     type: Boolean,
-    //     default:false
-    // }
+
 
 })
 

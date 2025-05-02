@@ -9,6 +9,7 @@ import 'primeicons/primeicons.css';
 import { setBasket } from '../../store/basketSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
+import useGetFilePath from '../../hooks/useGetFilePath';
 
 const Overhead = () => {
   const { product: productId } = useParams();
@@ -17,6 +18,7 @@ const Overhead = () => {
   const [error, setError] = useState(null);
   const stepperRef = useRef(null);
   const dispatch = useDispatch()
+    const {getFilePath} = useGetFilePath()
 
   const {basket} = useSelector((state)=> state.basket)
   const {token} = useSelector((state)=> state.token)
@@ -89,7 +91,7 @@ const getOverhead = async () => {
   return (
     <div style={styles.container}>
       <div style={styles.imageContainer}>
-        <img src={`/overheads/${product.imagepath}`} alt={product.title} style={styles.productImage} />
+        <img src={getFilePath(product.imagepath)} alt={product.title} style={styles.productImage} />
         {product.company?.imagePath && (
           <img src={`/${product.company.imagePath}`} alt={product.company.name} style={styles.companyImage} />
         )}
@@ -148,6 +150,8 @@ const getOverhead = async () => {
                 <TableRow label="מידות פנימיות" value={`${product.in_size?.width} x ${product.in_size?.depth} x ${product.in_size?.height}`} />
                 <TableRow label="מידות חיצוניות" value={`${product.out_size?.width} x ${product.out_size?.depth} x ${product.out_size?.height}`} />
                 <TableRow label="זרימת אוויר" value={product.air_flow} />
+                <FeatureRow label="מהירויות" value={product.speeds} isBoolean={false} />
+
               </tbody>
             </table>
           </StepperPanel>
@@ -156,7 +160,6 @@ const getOverhead = async () => {
               <tbody>
                 <FeatureRow label="מצב שקט" value={product.quiet} />
                 <FeatureRow label="WiFi" value={product.wifi} />
-                <FeatureRow label="מהירויות" value={product.speeds} isBoolean={false} />
                 <FeatureRow label="תלת מימד" value={product.air4d} />
                 <FeatureRow label="מצב לילה" value={product.night_mode} />
                 <FeatureRow label="טיימר" value={product.timer} />

@@ -7,23 +7,26 @@ import { Button } from 'primereact/button';
 import { Divider } from 'primereact/divider';
 import { setBasket } from '../../store/basketSlice';
 import { useDispatch, useSelector } from 'react-redux';
+import useGetFilePath from '../../hooks/useGetFilePath';
 
 const MiniCenteral = () => {
     const { product: productId } = useParams();
     const stepperRef = useRef(null);
-    const [miniCenteral, setMiniCenteral] = useState(null);
+    // const [miniCenteral, setMiniCenteral] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const dispatch = useDispatch();
     const { basket } = useSelector((state) => state.basket);
     const { token } = useSelector((state) => state.token);
+    const {getFilePath} = useGetFilePath()
+    const [product, setProduct] = useState(null);
 
     const addToBasket = async () => {
         if (!token) {
             alert('כדי להוסיף לסל חובה להכינס לאיזור האישי');
         } else {
             const shoppingBagDetails = {
-                product_id: miniCenteral._id,
+                product_id: product._id,
                 type: "MiniCenteral",
                 amount: 1
             };
@@ -52,7 +55,7 @@ const MiniCenteral = () => {
                 throw new Error(`HTTP error! status: ${res.status}`);
             }
             const data = await res.data;
-            setMiniCenteral(data);
+            setProduct(data);
         } catch (e) {
             setError(e.message);
         } finally {
@@ -72,51 +75,45 @@ const MiniCenteral = () => {
         return <p style={styles.error}>שגיאה בטעינת המוצר: {error}</p>;
     }
 
-    if (!miniCenteral) {
+    if (!product) {
         return null;
     }
 
     return (
         <div style={styles.container}>
             <div style={styles.imageContainer}>
-                <img src={`/miniCenterals/${miniCenteral.imagepath}`} alt={miniCenteral.title} style={styles.productImage} />
-                {miniCenteral.company?.imagePath && (
-                    <img src={`/${miniCenteral.company.imagePath}`} alt={miniCenteral.company.name} style={styles.companyImage} />
+            <img src={getFilePath(product.imagepath)} alt={product.title} style={styles.productImage} />
+                {product.company?.imagePath && (
+                    <img src={`/${product.company.imagePath}`} alt={product.company.name} style={styles.companyImage} />
                 )}
             </div>
 
             <div style={styles.detailsContainer}>
-                <h1 style={styles.title}>{miniCenteral.title}</h1>
-                <p style={styles.description}>{miniCenteral.describe}</p>
+                <h1 style={styles.title}>{product.title}</h1>
+                <p style={styles.description}>{product.describe}</p>
                 <div style={styles.featuresRow}>
-                    {miniCenteral.BTU_output?.cool && (
+                    {product.BTU_output?.cool && (
                         <div style={styles.featureItem}>
                             <img src="/BTU_cool.png" alt="cool" style={styles.featureIcon} />
-                            <span>{miniCenteral.BTU_output.cool}</span>
+                            <span>{product.BTU_output.cool}</span>
                             <span style={styles.featureUnit}>BTU</span>
                         </div>
                     )}
-                    {miniCenteral.BTU_output?.heat && (
+                    {product.BTU_output?.heat && (
                         <div style={styles.featureItem}>
                             <img src="/BTU_heat.png" alt="heat" style={styles.featureIcon} />
-                            <span>{miniCenteral.BTU_output.heat}</span>
+                            <span>{product.BTU_output.heat}</span>
                             <span style={styles.featureUnit}>BTU</span>
                         </div>
                     )}
-                    {miniCenteral.energy_rating?.cool && (
+                    {product.energy_rating && (
                         <div style={styles.featureItem}>
-                            <span style={styles.energyRating}>{miniCenteral.energy_rating.cool}</span>
-                            <span>דירוג אנרגיה קירור</span>
-                        </div>
-                    )}
-                    {miniCenteral.energy_rating?.heat && (
-                        <div style={styles.featureItem}>
-                            <span style={styles.energyRating}>{miniCenteral.energy_rating.heat}</span>
-                            <span>דירוג אנרגיה חימום</span>
+                            <span style={styles.energyRating}>{product.energy_rating}</span>
+                            <span>דירוג אנרגיה</span>
                         </div>
                     )}
                 </div>
-                <h2 style={styles.price}>₪{miniCenteral.price}</h2>
+                <h2 style={styles.price}>₪{product.price}</h2>
                 <button style={styles.addToCartButton} onClick={addToBasket}>הוספה לסל</button>
             </div>
 
@@ -126,17 +123,18 @@ const MiniCenteral = () => {
                     <StepperPanel header="תפוקה ונתונים טכניים">
                         <table style={{ ...styles.table, direction: 'rtl' }}>
                             <tbody>
-                                <TableRow label="תפוקת קירור (BTU)" value={miniCenteral.BTU_output?.cool} />
-                                <TableRow label="תפוקת חימום (BTU)" value={miniCenteral.BTU_output?.heat} />
-                                <TableRow label="דירוג אנרגטי קירור" value={miniCenteral.energy_rating?.cool} />
-                                <TableRow label="דירוג אנרגטי חימום" value={miniCenteral.energy_rating?.heat} />
-                                <TableRow label="זרם עבודה קירור" value={miniCenteral.working_current?.cool} />
-                                <TableRow label="זרם עבודה חימום" value={miniCenteral.working_current?.heat} />
-                                <TableRow label="קוטר חיבור צנרת א" value={miniCenteral.pipe_connection?.a} />
-                                <TableRow label="קוטר חיבור צנרת ב" value={miniCenteral.pipe_connection?.b} />
-                                <TableRow label="מידות פנימיות" value={`${miniCenteral.in_size?.width} x ${miniCenteral.in_size?.depth} x ${miniCenteral.in_size?.height}`} />
-                                <TableRow label="מידות חיצוניות" value={`${miniCenteral.out_size?.width} x ${miniCenteral.out_size?.depth} x ${miniCenteral.out_size?.height}`} />
-                                <TableRow label="זרימת אוויר" value={miniCenteral.air_flow} />
+                                <TableRow label="תפוקת קירור (BTU)" value={product.BTU_output?.cool} />
+                                <TableRow label="תפוקת חימום (BTU)" value={product.BTU_output?.heat} />
+                                <TableRow label="מקדם יעילות קירור" value={product.efficiency_factor?.cool} />
+                                <TableRow label="מקדם יעילות חימום" value={product.efficiency_factor?.heat} />
+                                <TableRow label="דירוג אנרגטי" value={product.energy_rating} />
+                                <TableRow label="זרם עבודה קירור" value={product.working_current?.cool} />
+                                <TableRow label="זרם עבודה חימום" value={product.working_current?.heat} />
+                                <TableRow label="CFM" value={product.CFM} />
+                                <TableRow label="Pa (לחץ סטטי)" value={product.Pa} />
+                                <TableRow label="קוטר חיבורי צנרת" value={`${product.pipe_connection?.a} x ${product.pipe_connection?.b}`} />
+                                <TableRow label="מידות פנימיות" value={`${product.in_size?.width} x ${product.in_size?.depth} x ${product.in_size?.height}`} />
+                                <TableRow label="מידות חיצוניות" value={`${product.out_size?.width} x ${product.out_size?.depth} x ${product.out_size?.height}`} />
                             </tbody>
                         </table>
                     </StepperPanel>
@@ -144,14 +142,11 @@ const MiniCenteral = () => {
                     <StepperPanel header="מאפיינים">
                         <table style={{ ...styles.table, direction: 'rtl' }}>
                             <tbody>
-                                <FeatureRow label="מצב שקט" value={miniCenteral.quiet} />
-                                <FeatureRow label="WiFi" value={miniCenteral.wifi} />
-                                <FeatureRow label="מהירויות" value={miniCenteral.speeds} isBoolean={false} />
-                                <FeatureRow label="תלת מימד" value={miniCenteral.air4d} />
-                                <FeatureRow label="מצב לילה" value={miniCenteral.night_mode} />
-                                <FeatureRow label="טיימר" value={miniCenteral.timer} />
-                                <FeatureRow label="פיקוד שבת" value={miniCenteral.sabbath_command} />
-                                <FeatureRow label="הדלקה וכיבוי אוטומטיים" value={miniCenteral.onof_auto} />
+                                <FeatureRow label="מצב שקט" value={product.quiet} />
+                                <FeatureRow label="WiFi" value={product.wifi} />
+                                <FeatureRow label="מהירויות" value={product.speeds} isBoolean={false} />
+                                <FeatureRow label="תלת מימד" value={product.air4d} />
+                                <FeatureRow label="פיקוד שבת" value={product.sabbath_command} />
                             </tbody>
                         </table>
                     </StepperPanel>
@@ -288,7 +283,7 @@ const styles = {
         padding: '6px', // Slightly reduced padding to bring the label closer to the value
         fontWeight: 'bold',
         textAlign: 'right',
-        flex: '0.3', // Adjusted flex for tighter layout
+        flex: '0.4', // Adjusted flex for tighter layout
     },
     tableCellValue: {
         padding: '6px', // Keep the padding reduced as needed
@@ -296,7 +291,7 @@ const styles = {
         display: 'flex', // Use flexbox for centering
         // alignItems: 'center', // Center content vertically
         // justifyContent: 'center', // Center content horizontally
-        flex: '0.4',
+        flex: '0.6',
     },
     featureCheck: {
         color: '#28a745',

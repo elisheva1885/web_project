@@ -71,6 +71,7 @@ const Payment = () => {
             countryCode: "US"
         }
     };
+
     const createAddress = async (address) => {
         try {
             const headers = {
