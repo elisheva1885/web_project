@@ -2,7 +2,6 @@ const MultiIndoorUnit = require("../models/airconditioners/MultiIndoorUnit")
 
 
 const createMultiIndoorUnit = async (req, res) => {
-    const uploadedFile = req.file;
     const otherDataString = req.body.otherData;
     if(!otherDataString){
         return res.status(400).json({ message: "all details are required" })

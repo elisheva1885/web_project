@@ -10,7 +10,7 @@ import { useState } from "react";
 import { Button } from "primereact/button";
 
 const AddCompany = () => {
-    const {companies} = useSelector((state) => state.companies);
+    const { companies } = useSelector((state) => state.companies);
     const { token } = useSelector((state) => state.token)
 
     const { control, handleSubmit, formState: { errors } } = useForm();
@@ -31,61 +31,79 @@ const AddCompany = () => {
             console.error("Error: imagepath is not a valid file.");
             return;
         }
-        formData.append('title', data.title);
+        formData.append('name', data.name);
 
-        try{
+        try {
             const headers = {
                 'Authorization': `Bearer ${token}`, // If you have authentication
-                'Content-Type': 'multipart/form-data'
+                // 'Content-Type': 'multipart/form-data'
             };
-            const res = await axios.post('http://localhost:8080/api/company', formData, { headers });
-             if (res.status === 201) {
+            const res = await axios.post('http://localhost:8000/api/company', formData, { headers });
+            console.log(res);
+            if (res.status === 201) {
+
                 // setFormData(data);
                 setShowMessage(true);
                 dispatch(setCompanies([...companies, res.data]));
                 navigate("/official");
             }
+
         }
         catch (error) {
+            if (error.response) {
+                // The request was made and the server responded with a status code
+               alert('Error:', error.response.data.message);
+            } else if (error.request) {
+                // The request was made but no response was received
+                alert('Error:', error.request.message);
+            } else {
+                // Something happened in setting up the request that triggered an Error
             console.error(error);
         }
     }
+}
     return (
         <>
-            <div className="field">
-                <span className="p-float-label">
-                    <Controller name="title" control={control} rules={{ required: 'Title is required.' }} render={({ field, fieldState }) => (
-                        <InputText id={field.name} {...field} className={classNames({ 'p-invalid': fieldState.invalid })} />
-                    )} />
-                    <label htmlFor="title" className={classNames({ 'p-error': errors.title })}>*Title</label>
-                </span>
-                {getFormErrorMessage('title')}
-            </div>
-            <div className="field">
-                <span className="p-float-label">
-                    <Controller
-                        name="imagepath"
-                        control={control}
-                        rules={{ required: 'Image is required.' }}
-                        render={({ field, fieldState }) => (
-                            <FileUpload
-                                id="imagepath"
-                                name="imagepath"
-                                accept="image/*"
-                                customUpload
-                                uploadHandler={(e) => field.onChange(e.files[0])} // Attach the file to the form
-                                auto
-                                mode="basic" // Use 'basic' mode for a simpler layout
-                                className={classNames({ 'p-invalid': fieldState.invalid })}
-                            />
-                        )}
-                    />
-                    <label htmlFor="imagepath" className={classNames({ 'p-error': errors.imagepath })}>*Image</label>
-                </span>
-                {getFormErrorMessage('imagepath')}
-            </div>
-            <Button type="submit" label="Add Company" className="mt-2" />
-
+            <form onSubmit={handleSubmit(onSubmit)} className="p-fluid">
+                <div className="field">
+                    <span className="p-float-label">
+                        <Controller name="name" control={control} rules={{ required: 'Title is required.' }} render={({ field, fieldState }) => (
+                            <InputText id={field.name} {...field} className={classNames({ 'p-invalid': fieldState.invalid })} />
+                        )} />
+                        <label htmlFor="name" className={classNames({ 'p-error': errors.name })}>*Title</label>
+                    </span>
+                    {getFormErrorMessage('name')}
+                </div>
+                <div className="field">
+                    <span className="p-float-label">
+                        <Controller
+                            name="imagepath"
+                            control={control}
+                            rules={{ required: 'Image is required.' }}
+                            render={({ field, fieldState }) => (
+                                <FileUpload
+                                    id="imagepath"
+                                    name="imagepath"
+                                    accept="image/*"
+                                    customUpload
+                                    uploadHandler={(e) => field.onChange(e.files[0])} // Attach the file to the form
+                                    auto
+                                    mode="basic" // Use 'basic' mode for a simpler layout
+                                    className={classNames({ 'p-invalid': fieldState.invalid })}
+                                />
+                            )}
+                        />
+                        <label htmlFor="imagepath" className={classNames({ 'p-error': errors.imagepath })}>*Image</label>
+                    </span>
+                    {getFormErrorMessage('imagepath')}
+                </div>
+                <Button type="submit" label="Add Company" className="mt-2" />
+            </form>
+            {showMessage && (
+                <div className="p-message p-message-success">
+                    <span>Company added successfully!</span>
+                </div>
+            )}
         </>
     )
 }

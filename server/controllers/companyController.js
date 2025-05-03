@@ -1,9 +1,12 @@
 const Company = require("../models/airconditioners/Company")
 
 const createCompany = async (req, res) => {
-    const {name, imagepath } = req.body
-
-    if(!name || !imagepath){
+    const name = req.body.name;
+    if(!name){
+        return res.status(400).json({ message: "all details are required" })
+    }
+    const imagepath = req.file.filename ;
+    if(!imagepath){
         return res.status(400).json({ message: "all details are required" })
     }
 
@@ -14,8 +17,7 @@ const createCompany = async (req, res) => {
     const company = await Company.create({name, imagePath: imagepath })
 
     if(company){
-        const companies = await Company.find().lean()
-        res.status(201).json(companies)
+        res.status(201).json(company)
     }
     else{
         return  res.status(400).json({ message: "invalid company" })

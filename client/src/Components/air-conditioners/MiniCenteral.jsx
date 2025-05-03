@@ -18,7 +18,7 @@ const MiniCenteral = () => {
     const dispatch = useDispatch();
     const { basket } = useSelector((state) => state.basket);
     const { token } = useSelector((state) => state.token);
-    const {getFilePath} = useGetFilePath()
+    const { getFilePath } = useGetFilePath()
     const [product, setProduct] = useState(null);
 
     const addToBasket = async () => {
@@ -45,17 +45,18 @@ const MiniCenteral = () => {
         }
     };
 
-    const getMiniCenteralById = async (_id) => {
+    const getMiniCenteral = async () => {
         setLoading(true);
         setError(null);
         try {
-            console.log(_id);
-            const res = await axios(`http://localhost:8000/api/air-conditioner/miniCenteral/miniCenteral/${_id}`);
-            if (!res.status===200) {
+            const res = await axios.get(`http://localhost:8000/api/air-conditioner/miniCenteral/miniCenteral/${productId}`);
+            if (!res.status === 200) {
                 throw new Error(`HTTP error! status: ${res.status}`);
             }
             const data = await res.data;
             setProduct(data);
+            console.log("product",res.data);
+
         } catch (e) {
             setError(e.message);
         } finally {
@@ -64,7 +65,7 @@ const MiniCenteral = () => {
     };
 
     useEffect(() => {
-        getMiniCenteralById(productId);
+        getMiniCenteral();
     }, [productId]);
 
     if (loading) {
@@ -82,7 +83,7 @@ const MiniCenteral = () => {
     return (
         <div style={styles.container}>
             <div style={styles.imageContainer}>
-            <img src={getFilePath(product.imagepath)} alt={product.title} style={styles.productImage} />
+                <img src={getFilePath(product.imagepath)} alt={product.title} style={styles.productImage} />
                 {product.company?.imagePath && (
                     <img src={`/${product.company.imagePath}`} alt={product.company.name} style={styles.companyImage} />
                 )}
@@ -92,6 +93,7 @@ const MiniCenteral = () => {
                 <h1 style={styles.title}>{product.title}</h1>
                 <p style={styles.description}>{product.describe}</p>
                 <div style={styles.featuresRow}>
+                    {console.log(product.BTU_output?.cool)}
                     {product.BTU_output?.cool && (
                         <div style={styles.featureItem}>
                             <img src="/BTU_cool.png" alt="cool" style={styles.featureIcon} />
@@ -99,6 +101,7 @@ const MiniCenteral = () => {
                             <span style={styles.featureUnit}>BTU</span>
                         </div>
                     )}
+                    {console.log(product.BTU_output?.heat)}
                     {product.BTU_output?.heat && (
                         <div style={styles.featureItem}>
                             <img src="/BTU_heat.png" alt="heat" style={styles.featureIcon} />
