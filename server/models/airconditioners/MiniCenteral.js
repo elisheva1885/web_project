@@ -83,7 +83,6 @@ const minicenteralSchema = new mongoose.Schema({
         default:false
     },
 
-
 })
 
 module.exports = mongoose.model('MiniCenteral', minicenteralSchema)

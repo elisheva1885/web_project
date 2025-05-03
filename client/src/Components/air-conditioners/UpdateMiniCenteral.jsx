@@ -21,62 +21,63 @@ const UpdateMiniCenteral = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch()
     const onSubmit = async (data) => {
-        const minicenteral = {
-            _id: data._id,
-            title: data.title,
-            describe: data.describe,
-            imagepath: data.imagepath,
-            stock: data.stock,
-            BTU_output: {
-                cool: data.BTU_output?.cool,
-                heat: data.BTU_output?.heat
-            },
-            efficiency_factor: {
-                cool: data.efficiency_factor?.cool,
-                heat: data.efficiency_factor?.heat
-            },
-            energy_rating: data.energy_rating,
-            working_current: {
-                cool: data.working_current?.cool,
-                heat: data.working_current?.heat
-            },
-            CFM: data.CFM,
-            Pa: data.Pa,
-            pipe_connection: {
-                a: data.pipe_connection?.a,
-                b: data.pipe_connection?.b
-            },
-            in_size: {
-                width: data.in_size?.width,
-                depth: data.in_size?.depth,
-                height: data.in_size?.height
-            },
-            out_size: {
-                width: data.out_size?.width,
-                depth: data.out_size?.depth,
-                height: data.out_size?.height
-            },
-            quiet: data.quiet,
-            wifi: data.wifi,
-            speeds: data.speeds,
-            air4d: data.air4d,
-            sabbath_command: data.sabbath_command
+            const minicenteral = {
+                _id: data._id,
+                title: data.title,
+                describe: data.describe,
+                imagepath: data.imagepath,
+                stock: data.stock,
+                BTU_output: {
+                    cool: parseFloat(data.BTU_output?.cool?.replace(/,/g, '').trim()), // Remove comma and trim
+                    heat: parseFloat(data.BTU_output?.heat?.replace(/,/g, '').trim())  // Remove comma and trim
+                },
+                efficiency_factor: {
+                    cool: data.efficiency_factor?.cool,
+                    heat: data.efficiency_factor?.heat
+                },
+                energy_rating: data.energy_rating,
+                working_current: {
+                    cool: data.working_current?.cool,
+                    heat: data.working_current?.heat
+                },
+                CFM: data.CFM,
+                Pa: data.Pa,
+                pipe_connection: {
+                    a: data.pipe_connection?.a,
+                    b: data.pipe_connection?.b
+                },
+                in_size: {
+                    width: data.in_size?.width,
+                    depth: data.in_size?.depth,
+                    height: data.in_size?.height
+                },
+                out_size: {
+                    width: data.out_size?.width,
+                    depth: data.out_size?.depth,
+                    height: data.out_size?.height
+                },
+                quiet: data.quiet,
+                wifi: data.wifi,
+                speeds: data.speeds,
+                air4d: data.air4d,
+                sabbath_command: data.sabbath_command
+            };
+            console.log(minicenteral);
+            try {
+                const headers = {
+                    'Authorization': `Bearer ${token}` // Corrected template literal
+                };
+                const res = await axios.put('http://localhost:8000/api/air-conditioner/miniCenteral', minicenteral, { headers });
+                if (res.status === 200) {
+                    setShowMessage(true);
+                    const unUpdatedMiniCenterals = miniCenterals.filter(mc => mc._id !== res.data._id); // Corrected filter condition
+                    dispatch(setMiniCenterals([...unUpdatedMiniCenterals, res.data]));
+                    navigate('/minicenterals');
+                }
+            } catch (error) {
+                console.error(error);
+            }
         };
-        try {
-            const headers = {
-                'Authorization': `Bearer ${token}`
-            }
-            const res = await axios.put(`http://localhost:8000/api/air-conditioner/miniCenteral`, minicenteral, {headers});
-            if (res.status === 200) {
-                setShowMessage(true);
-                const unUpdatedMiniCenterals = miniCenterals.filter(minicenteral=> minicenteral._id != res.data._id)
-                dispatch(setMiniCenterals([...unUpdatedMiniCenterals , res.data]))
-                navigate('/minicenterals');
-            }
-        } catch (error) {
-            console.error(error);
-        }
-    };
     
     return (
         <div style={{ paddingTop: '60px' }}>

@@ -57,7 +57,7 @@ const getOverhead = async () => {
       setLoading(true);
       setError(null);
       try {
-        const res = await axios(`http://localhost:8000/api/air-conditioner/overhead/overhead/${productId}`);
+        const res = await axios.get(`http://localhost:8000/api/air-conditioner/overhead/overhead/${productId}`);
         if (!res.status===200) {
           throw new Error(`HTTP error! status: ${res.status}`);
         }

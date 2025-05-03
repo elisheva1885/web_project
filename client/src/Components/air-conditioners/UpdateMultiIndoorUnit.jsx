@@ -50,6 +50,7 @@ const UpdateMultiIndoorUnit = () => {
             sabbath_command: data.sabbath_command
         };
 
+        console.log(updatedUnit);
         try {
             const headers = { 'Authorization': `Bearer ${token}` };
             const res = await axios.put(`http://localhost:8000/api/air-conditioner/multiIndoorUnit`, updatedUnit, { headers });
