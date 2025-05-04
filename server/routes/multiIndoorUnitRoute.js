@@ -8,7 +8,7 @@ const upload = require("../middleware/multer")
 
 router.post("/",upload.single('imagepath'),multiIndoorUnitController.createMultiIndoorUnit)
 router.get("/",multiIndoorUnitController.readMultiIndoorUnits)
-router.get("/miniCenteral/:_id",multiIndoorUnitController.readMultiIndoorUnitById)
+router.get("/multiIndoorUnit/:_id",multiIndoorUnitController.readMultiIndoorUnitById)
 router.get("/:title",multiIndoorUnitController.readMultiIndoorUnitsByTitle)
 router.put("/",officialVerify, multiIndoorUnitController.updateMultiIndoorUnit)
 router.put("/stock",officialVerify, multiIndoorUnitController.updatMultiIndoorUnitStock)

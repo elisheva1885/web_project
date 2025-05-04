@@ -14,7 +14,11 @@ const createMiniCenteral = async (req, res) => {
         in_size, out_size, quiet, wifi, speeds,
         air4d, sabbath_command, onof_auto
     } = otherData;
-
+    console.log("otherData", company, title, describe, stock, price,
+        BTU_output, efficiency_factor, energy_rating,
+        working_current, CFM, Pa, pipe_connection,
+        in_size, out_size, quiet, wifi, speeds,
+        air4d, sabbath_command, onof_auto);
     if (!company || !title || !describe || !price) {
         return res.status(400).json({ message: "all details are required" })
     }
@@ -28,6 +32,7 @@ const createMiniCenteral = async (req, res) => {
     }
     const miniCenteral = await MiniCenteral.create({ company, title, describe, imagepath, stock, price, BTU_output, efficiency_factor, energy_rating, working_current, CFM, Pa, pipe_connection, in_size, out_size, quiet, wifi, speeds, air4d, sabbath_command, onof_auto })
     if (miniCenteral) {
+        console.log("miniCenteral", miniCenteral);
         res.status(201).json(miniCenteral)
     }
     else {

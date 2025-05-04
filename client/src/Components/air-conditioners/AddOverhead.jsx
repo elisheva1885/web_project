@@ -30,51 +30,7 @@ const dispatch = useDispatch();
           console.error("Error: imagepath is not a valid file.");
           return;
         }
-        const otherData = {
-            company: data.company,
-  title: data.title,
-  describe: data.describe,
-  stock: data.stock,
-  price: data.price,
-  BTU_output: {
-    cool: data.BTU_output_cool,
-    heat: data.BTU_output_heat
-  },
-  energy_rating: {
-    cool: data.energy_rating_cool,
-    heat: data.energy_rating_heat
-  },
-  working_current: {
-    cool: data.working_current_cool,
-    heat: data.working_current_heat
-  },
-  recommended_model_C: data.recommended_model_C,
-  pipe_connection: {
-    a: data.pipe_connection_a,
-    b: data.pipe_connection_b
-  },
-  in_size: {
-    width: data.in_size_width,
-    depth: data.in_size_depth,
-    height: data.in_size_height
-  },
-  out_size: {
-    width: data.out_size_width,
-    depth: data.out_size_depth,
-    height: data.out_size_height
-  },
-  air_flow: data.CFM, // CFM במודל שלך מוגדר כ-air_flow
-  quiet: data.quiet,
-  wifi: data.wifi,
-  speeds: data.speeds,
-  air4d: data.air4d,
-  night_mode: data.night_mode,
-  timer: data.timer,
-  sabbath_command: data.sabbath_command,
-  onof_auto: data.onof_auto
-          };
-        formData.append('otherData', JSON.stringify(otherData));
-        console.log(data);
+          formData.append('otherData', JSON.stringify(data));
         try {
             const headers = {
                 'Authorization': `Bearer ${token}`, // If you have authentication
@@ -243,14 +199,6 @@ const dispatch = useDispatch();
                                     </span>
                                 </div>
                             </div>
-                        </div>
-                        <div className="field">
-                            <span className="p-float-label">
-                                <Controller name="CFM" control={control}  render={({ field }) => (
-                                    <InputText id="CFM" {...field}  />
-                                )} />
-                                <label htmlFor="CFM" >CFM</label>
-                            </span>
                         </div>
                         <div className="field">
                             <span className="p-float-label">

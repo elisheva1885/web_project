@@ -76,19 +76,21 @@ const createDelivery = async (req, res) => {
 const sendDeliveryEmail = async (deliveryId) => {
     try{
     const delivery = await Delivery.findById(deliveryId)
-        .populate('user_id') // שליפת פרטי המשתמש
-        .populate('address') // שליפת פרטי הכתובת
-        .populate({
-            path: 'purchase',
+    .populate({
+        path: 'purchase',
+        populate: {
+            path: 'products',
             populate: {
-              path: 'products', // שליפת פרטי המוצרים
-              model: 'ShoppingBag'
-            }
-          });
+                path: 'product_id', // Populate the product details
+            },
+        },
+    })
+    .populate('address')
+    .lean()
     if (!delivery) {
         throw new Error("ההזמנה לא נמצאה");
     }
-
+    
     // שליפת המשתמש מההזמנה
     const user = delivery.user_id;
     const address = delivery.address;
@@ -114,7 +116,17 @@ catch (error) {
 }
 }
 const readDeliveries = async (req, res) => {
-    const deliveries = await Delivery.find().lean()
+    const deliveries = await Delivery.find().populate({
+        path: 'purchase',
+        populate: {
+            path: 'products',
+            populate: {
+                path: 'product_id', // Populate the product details
+            },
+        },
+    })
+    .populate('address')
+    .lean()
     if (!deliveries?.length)
         return res.status(404).json({ message: "no deliveries found" })
     return res.status(200).json(deliveries)
