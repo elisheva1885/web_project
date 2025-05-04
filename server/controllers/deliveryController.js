@@ -44,7 +44,7 @@ const createDelivery = async (req, res) => {
         delivery = await Delivery.create({ user_id, address, purchase, status })
     }
     if (delivery) {
-        sendDeliveryEmail(delivery._id)
+        sendDeliveryCreatedEmail(delivery._id)
         // const user = await User.findById(user_id).lean()
         // if (!user) {
         //     return res.status(404).json({ message: "user not found" })
@@ -73,51 +73,112 @@ const createDelivery = async (req, res) => {
     }
 }
 
-const sendDeliveryEmail = async (deliveryId) => {
-    try{
-    const delivery = await Delivery.findById(deliveryId)
-        .populate('user_id') // שליפת פרטי המשתמש
-        .populate('address') // שליפת פרטי הכתובת
-        .populate({
-            path: 'purchase',
-            populate: {
-              path: 'products', // שליפת פרטי המוצרים
-              model: 'ShoppingBag'
-            }
-          });
-    if (!delivery) {
-        throw new Error("ההזמנה לא נמצאה");
+const sendDeliveryCreatedEmail = async (deliveryId) => {
+    try {
+        const delivery = await Delivery.findById(deliveryId)
+            .populate('user_id') // שליפת פרטי המשתמש
+            .populate('address') // שליפת פרטי הכתובת
+            .populate({
+                path: 'purchase',
+                populate: {
+                    path: 'products', // שליפת פרטי המוצרים
+                    model: 'ShoppingBag'
+                }
+            });
+        if (!delivery) {
+            throw new Error("ההזמנה לא נמצאה");
+        }
+
+        // שליפת המשתמש מההזמנה
+        const user = delivery.user_id;
+        const address = delivery.address;
+        const purchase = delivery.purchase;
+
+        // מבנה תוכן המייל
+        console.log("products", purchase.products)
+        const mailOptions = {
+            from: 'eli7saf@gmail.com',
+            to: user.email,
+            subject: 'ההזמנה שלך נכנסה למערכת ותשלח אליך בקרוב',
+            text: `שלום ${user.name},\n\nההזמנה שלך נכנסה למערכת ותשלח אליך בקרוב.\n\nפרטי ההזמנה:\nכתובת: ${address.street}, ${address.city}, ${address.zipCode}\nסטטוס: ${delivery.status}\n\nפרטי רכישה:\nמוצרים: ${delivery.purchase.products.map(p => `• ${p.productName} - כמות: ${p.quantity}`).join('\n')}\nסכום כולל: ${""} ש"ח\n\nתודה על רכישתך!\nצוות השירות שלנו`
+        };
+
+        // שלח את המייל
+        await transporter.sendMail(mailOptions);
+        console.log("הודעת דואר נשלחה בהצלחה!");
     }
 
-    // שליפת המשתמש מההזמנה
-    const user = delivery.user_id;
-    const address = delivery.address;
-    const purchase = delivery.purchase;
+    catch (error) {
+        console.error("אירעה שגיאה בשליחת האימייל:", error);
 
-    // מבנה תוכן המייל
-    console.log( "products",purchase.products)
-    const mailOptions = {
-        from: 'eli7saf@gmail.com',
-        to: user.email,
-        subject: 'ההזמנה שלך נכנסה למערכת ותשלח אליך בקרוב',
-        text: `שלום ${user.name},\n\nההזמנה שלך נכנסה למערכת ותשלח אליך בקרוב.\n\nפרטי ההזמנה:\nכתובת: ${address.street}, ${address.city}, ${address.zipCode}\nסטטוס: ${delivery.status}\n\nפרטי רכישה:\nמוצרים: ${delivery.purchase.products.map(p => `• ${p.productName} - כמות: ${p.quantity}`).join('\n')}\nסכום כולל: ${   ""} ש"ח\n\nתודה על רכישתך!\nצוות השירות שלנו`
-    };
-
-    // שלח את המייל
-    await transporter.sendMail(mailOptions);
-    console.log("הודעת דואר נשלחה בהצלחה!");
+    }
 }
 
-catch (error) {
-    console.error("אירעה שגיאה בשליחת האימייל:", error);
+const sendDeliveryUpdatedEmail = async (deliveryId) => {
+    try {
+        const delivery = await Delivery.findById(deliveryId)
+            .populate('user_id') // שליפת פרטי המשתמש
+            .populate('address') // שליפת פרטי הכתובת
+            .populate({
+                path: 'purchase',
+                populate: {
+                    path: 'products', // שליפת פרטי המוצרים
+                    model: 'ShoppingBag'
+                }
+            });
+        if (!delivery) {
+            throw new Error("ההזמנה לא נמצאה");
+        }
 
-}
+        // שליפת המשתמש מההזמנה
+        const user = delivery.user_id;
+        const address = delivery.address;
+        const purchase = delivery.purchase;
+
+        // מבנה תוכן המייל
+        console.log("products", purchase.products)
+        const mailOptions = {
+            from: 'eli7saf@gmail.com',
+            to: user.email,
+            subject: 'ההזמנה שלך מתקרבת אליך :)',
+            text: `שלום ${user.name},\nסטטוס ההזמנה שלך השתנה. .\n\nפרטי ההזמנה:\nכתובת: ${address.street}, ${address.city}, ${address.zipCode}\nסטטוס: ${delivery.status}\n\nפרטי רכישה:\nמוצרים: ${delivery.purchase.products.map(p => `• ${p.productName} - כמות: ${p.quantity}`).join('\n')}\nסכום כולל: ${""} ש"ח\n\nתודה על רכישתך!\nצוות השירות שלנו`
+        };
+
+        // שלח את המייל
+        await transporter.sendMail(mailOptions);
+        console.log("הודעת דואר נשלחה בהצלחה!");
+    }
+
+    catch (error) {
+        console.error("אירעה שגיאה בשליחת האימייל:", error);
+
+    }
 }
 const readDeliveries = async (req, res) => {
-    const deliveries = await Delivery.find().lean()
-    if (!deliveries?.length)
-        return res.status(404).json({ message: "no deliveries found" })
-    return res.status(200).json(deliveries)
+    try {
+        const deliveries = await Delivery.find()
+            .populate('user_id', 'username') // Populate user details (fetch only username)
+            .populate('address') // Populate delivery address details
+            .populate({
+                path: 'purchase',
+                populate: {
+                    path: 'products',
+                    populate: {
+                        path: 'product_id', // Populate product details
+                    },
+                },
+            })
+            .lean();
+
+        if (!deliveries?.length) {
+            return res.status(404).json({ message: "No deliveries found" });
+        }
+
+        return res.status(200).json(deliveries);
+    } catch (error) {
+        console.error("Error fetching deliveries:", error);
+        return res.status(500).json({ message: "An error occurred while fetching deliveries" });
+    }
 }
 
 const readDeliveriesByUserId = async (req, res) => {
@@ -126,6 +187,7 @@ const readDeliveriesByUserId = async (req, res) => {
         return res.status(400).json({ message: "user required" })
     }
     const deliveries = await Delivery.find({ user_id: user_id })
+        .populate('user_id', 'username')
         .populate({
             path: 'purchase',
             populate: {
@@ -163,12 +225,9 @@ const readDeliveriesByUserName = async (req, res) => {
 const updateDelivery = async (req, res) => {
     const { _id, address, purchase, status } = req.body
     if (!_id) {
-        return res.status(400).json({ message: "error on updating" })
+        return res.status(400).json({ message: "error on updating, no id passed" })
     }
-    if (!products) {
-        return res.status(400).json({ message: "nothing changed" })
-    }
-    if (status === "waiting to be delivered") {
+    try {
         const delivery = await Delivery.findById(_id).exec()
         if (!delivery) {
             return res.status(400).json({ message: "no such delivery" })
@@ -178,10 +237,15 @@ const updateDelivery = async (req, res) => {
         delivery.status = status ? status : delivery.status
 
         const updateddelivery = await delivery.save()
+        if(updateddelivery && status)
+        {
+            sendDeliveryUpdatedEmail(_id)
+        }
         const deliveries = await Delivery.find().lean()
         return res.status(200).json(deliveries)
+    } catch (error) {
+        return res.status(404).json({ message: "unable to update", error: error })
     }
-    return res.status(404).json({ message: "unable to update" })
 
 }
 

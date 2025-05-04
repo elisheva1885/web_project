@@ -8,7 +8,7 @@ import AdminRegister from './AdminRegister';
 import Payment from './Payment';
 import MiniCenteral from './air-conditioners/MiniCenteral';
 import UpdateUserDetails from './UpdateUserDetails';
-import AddCompany from './air-conditioners/AddCompany';
+
 
 const About = lazy(() => import('./About'));
 const Branch = lazy(() => import('./Branch'));
@@ -31,7 +31,8 @@ const MultiIndoorUnits = lazy(() => import('./air-conditioners/MultiIndoorUnits'
 const MultiOutdoorUnits = lazy(() => import('./air-conditioners/MultiOutdoorUnits'));
 const UpdateMultiIndoorUnit = lazy(() => import('./air-conditioners/UpdateMultiIndoorUnit'));
 const UpdateMultiOutdoorUnit = lazy(() => import('./air-conditioners/UpdateMultiOutdoorUnit'));
-
+const AddCompany = lazy(() => import('./air-conditioners/AddCompany'));
+const UpdateDeliveryStatus = lazy(() => import('./UpdateDeliveryStatus'));
 
 const Navbar = () => {
 
@@ -64,18 +65,6 @@ const Navbar = () => {
             command: () => navigate('/multiOutDoorUnits'),
         },
     ];
-
-    // const menuItems = [
-    //     {
-    //         label: 'AC Types',
-    //         icon: 'pi pi-desktop',
-    //         items: [
-    //             [
-    //                 ...acItems,
-    //             ],
-    //         ],
-    //     },
-    // ];
 
     const items = [
 
@@ -161,9 +150,9 @@ const Navbar = () => {
                 <Route path='/official' element={<Suspense fallback="Loading..."><Official/></Suspense>}></Route>
                 <Route path='/userAcount' element={<Suspense fallback="Loading..."><UserAcount/></Suspense>}></Route>
                 <Route path='/userAcount/UpdateDetails' element={<Suspense fallback="Loading..."><UpdateUserDetails/></Suspense>}></Route>
-                <Route path='/addCompany' element={<Suspense fallback="Loading..."><AddCompany/></Suspense>}></Route>
                 <Route path='/admin/orders' element={<Suspense fallback="Loading..."><AdminOrders/></Suspense>}></Route>
-
+                <Route path='/official/updateDeliveryStatus' element={<Suspense fallback="Loading..."><UpdateDeliveryStatus/></Suspense>}></Route>
+                <Route path='/official/addCompany' element={<Suspense fallback="Loading..."><AddCompany/></Suspense>}></Route>
                 <Route path='/admin/registerOfficial' element={<Suspense fallback="Loading..."><AdminRegister/></Suspense>}></Route>
                 <Route path='/basket/Payment' element={<Suspense fallback="Loading..."><Payment/></Suspense>}></Route>
             </Routes>
