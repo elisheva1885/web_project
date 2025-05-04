@@ -31,32 +31,8 @@ const AddMultiOutdoorUnits = () => {
           console.error("Error: imagepath is not a valid file.");
           return;
         }
-        const otherData = {
-            company: data.company,
-  title: data.title,
-  describe: data.describe,
-  stock: data.stock,
-  price: data.price,
-  BTU_output: {
-    cool: data.BTU_output_cool,
-    heat: data.BTU_output_heat
-  },
-  working_current: {
-    cool: data.working_current_cool,
-    heat: data.working_current_heat
-  },
-  condenser_unit_dimensions: {
-    width: data.out_size_width,
-    depth: data.out_size_depth,
-    height: data.out_size_height
-  },
-  quiet: data.quiet,
-  wifi: data.wifi,
-  timer: data.timer,
-  sabbath_command: data.sabbath_command,
-  onof_auto: data.onof_auto
-          };
-        formData.append('otherData', JSON.stringify(otherData));
+     
+        formData.append('otherData', JSON.stringify(data));
 
         try {
             const headers = {

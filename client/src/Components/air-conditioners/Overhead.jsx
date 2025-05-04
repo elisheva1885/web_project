@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { Stepper } from 'primereact/stepper';
 import { StepperPanel } from 'primereact/stepperpanel';
-import 'primereact/resources/themes/lara-light-indigo/theme.css'; 
+import 'primereact/resources/themes/lara-light-indigo/theme.css';
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
 import { setBasket } from '../../store/basketSlice';
@@ -18,60 +18,60 @@ const Overhead = () => {
   const [error, setError] = useState(null);
   const stepperRef = useRef(null);
   const dispatch = useDispatch()
-    const {getFilePath} = useGetFilePath()
+  const { getFilePath } = useGetFilePath()
 
-  const {basket} = useSelector((state)=> state.basket)
-  const {token} = useSelector((state)=> state.token)
+  const { basket } = useSelector((state) => state.basket)
+  const { token } = useSelector((state) => state.token)
 
   const addToBasket = async () => {
-    if(!token){
+    if (!token) {
       alert('כדי להוסיף לסל חובה להכינס לאיזור האישי')
 
     }
-    else{
-    const shoppingBagDetails = {
+    else {
+      const shoppingBagDetails = {
         product_id: product._id,
         type: "Overhead",
         amount: 1
-    }
-    try {
+      }
+      try {
         const headers = {
-            'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`
         }
         const res = await axios.post('http://localhost:8000/api/user/shoppingBag', shoppingBagDetails, { headers })
         if (res.status === 201) {
-            dispatch(setBasket([...basket, res.data]))
-            alert(` המוצר נוסף לעגלה`)
+          dispatch(setBasket([...basket, res.data]))
+          alert(` המוצר נוסף לעגלה`)
         }
-        if(res.status==200){
-            alert(` המוצר נוסף לעגלה`)
+        if (res.status == 200) {
+          alert(` המוצר נוסף לעגלה`)
         }
-    }
-    catch (e) {
+      }
+      catch (e) {
         console.error(e)
+      }
     }
   }
-}
 
-const getOverhead = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const res = await axios.get(`http://localhost:8000/api/air-conditioner/overhead/overhead/${productId}`);
-        if (!res.status===200) {
-          throw new Error(`HTTP error! status: ${res.status}`);
-        }
-        const data = await res.data;
-        setProduct(data);
-      } catch (e) {
-        setError(e.message);
-      } finally {
-        setLoading(false);
+  const getOverhead = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await axios.get(`http://localhost:8000/api/air-conditioner/overhead/overhead/${productId}`);
+      if (!res.status === 200) {
+        throw new Error(`HTTP error! status: ${res.status}`);
       }
-    };
+      const data = await res.data;
+      setProduct(data);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    
+
 
     getOverhead();
   }, [productId]);
@@ -96,7 +96,6 @@ const getOverhead = async () => {
           <img src={`/${product.company.imagePath}`} alt={product.company.name} style={styles.companyImage} />
         )}
       </div>
-
       <div style={styles.detailsContainer}>
         <h1 style={styles.title}>{product.title}</h1>
         <p style={styles.description}>{product.describe}</p>
@@ -115,7 +114,8 @@ const getOverhead = async () => {
               <span style={styles.featureUnit}>BTU</span>
             </div>
           )}
-          {/* <br/> */}
+          <div style={styles.emptyLine}></div>
+
           {product.energy_rating?.cool && (
             <div style={styles.featureItem}>
               <span style={styles.energyRating}>{product.energy_rating.cool}</span>
@@ -145,10 +145,16 @@ const getOverhead = async () => {
                 <TableRow label="דירוג אנרגטי חימום" value={product.energy_rating?.heat} />
                 <TableRow label="זרם עבודה קירור" value={product.working_current?.cool} />
                 <TableRow label="זרם עבודה חימום" value={product.working_current?.heat} />
-                <TableRow label="קוטר חיבור צנרת א" value={product.pipe_connection?.a} />
-                <TableRow label="קוטר חיבור צנרת ב" value={product.pipe_connection?.b} />
-                <TableRow label="מידות פנימיות" value={`${product.in_size?.width} x ${product.in_size?.depth} x ${product.in_size?.height}`} />
-                <TableRow label="מידות חיצוניות" value={`${product.out_size?.width} x ${product.out_size?.depth} x ${product.out_size?.height}`} />
+                <TableRow label="קוטר חיבורי צנרת" value={<span style={{ direction: 'ltr', unicodeBidi: 'embed' }}>
+                  {`${product.pipe_connection?.a} x ${product.pipe_connection?.b}`}
+                </span>} />
+
+                <TableRow label="מידות פנימיות" value={<span style={{ direction: 'ltr', unicodeBidi: 'embed' }}>
+                  {`${product.in_size?.width} x ${product.in_size?.depth} x ${product.in_size?.height}`}
+                </span>} />
+                <TableRow label="מידות חיצוניות" value={<span style={{ direction: 'ltr', unicodeBidi: 'embed' }}>
+                  {`${product.out_size?.width} x ${product.out_size?.depth} x ${product.out_size?.height}`}
+                </span>} />
                 <TableRow label="זרימת אוויר" value={product.air_flow} />
                 <FeatureRow label="מהירויות" value={product.speeds} isBoolean={false} />
 
@@ -195,143 +201,148 @@ const FeatureRow = ({ label, value, isBoolean = true }) => (
 );
 
 const styles = {
-    container: {
-      display: 'flex',
-      flexDirection: 'column',
-      backgroundColor: '#fff',
-      borderRadius: '8px',
-      overflow: 'hidden',
-      boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
-      margin: '16px',
-      padding: '16px',
-    },
-    imageContainer: {
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      padding: '16px',
-    },
-    productImage: {
-      maxWidth: '100%',
-      height: 'auto',
-      borderRadius: '4px',
-      marginBottom: '16px',
-    },
-    companyImage: {
-      width: '25%', // Increased width
-      height: 'auto', // Maintain aspect ratio
-      marginBottom: '8px', // Add some space below the logo if needed
-    },
-    detailsContainer: {
-      padding: '16px',
-      textAlign: 'right',
-      borderBottom: '1px solid #eee',
-      marginBottom: '16px',
-    },
-    title: {
-      fontSize: '1.75rem',
-      fontWeight: 'bold',
-      color: '#343a40',
-      marginBottom: '8px',
-    },
-    description: {
-      color: '#6c757d',
-      marginBottom: '16px',
-      lineHeight: '1.5',
-    },
-    featuresRow: {
-      display: 'flex',
-      flexWrap: 'wrap',
-      gap: '10px',
-      marginBottom: '16px',
-      justifyContent: 'flex-end',
-      alignItems: 'center',
-    },
-    featureItem: {
-      display: 'flex',
-      alignItems: 'center',
-      gap: '4px',
-      fontSize: '0.9rem',
-      color: '#495057',
-    },
-    featureIcon: {
-      width: '20px',
-      height: '20px',
-    },
-    featureUnit: {
-      marginLeft: '2px',
-    },
-    energyRating: {
-      backgroundColor: '#ffc107',
-      color: '#fff',
-      borderRadius: '4px',
-      padding: '2px 6px',
-      fontWeight: 'bold',
-    },
-    price: {
-      fontSize: '2rem',
-      fontWeight: 'bold',
-      color: '#28a745',
-      marginBottom: '16px',
-    },
-    addToCartButton: {
-      backgroundColor: '#007bff',
-      color: '#fff',
-      border: 'none',
-      borderRadius: '4px',
-      padding: '12px 24px',
-      cursor: 'pointer',
-      fontSize: '1.1rem',
-    },
-    stepperContainer: {
-      padding: '16px',
-    },
-    table: {
-      width: '100%',
-      borderCollapse: 'collapse',
-      marginBottom: '16px',
-    },
-    tableRow: {
-      borderBottom: '1px solid #eee',
-      display: 'flex',
-      flexDirection: 'row-reverse',
-      gap: '2px', // Reduced gap for tighter spacing
-    },
-    tableCellLabel: {
-      padding: '6px', // Slightly reduced padding to bring the label closer to the value
-      fontWeight: 'bold',
-      textAlign: 'right',
-      flex: '0.3', // Adjusted flex for tighter layout
-    },
-    tableCellValue: {
-      padding: '6px', // Keep the padding reduced as needed
-      textAlign: 'center', // Center the text horizontally
-      display: 'flex', // Use flexbox for centering
-      // alignItems: 'center', // Center content vertically
-      // justifyContent: 'center', // Center content horizontally
-      flex: '0.4',
-    },
-    featureCheck: {
-      color: '#28a745',
-      fontSize: '1rem',
-    },
-    featureCross: {
-      color: '#dc3545',
-      fontSize: '1rem',
-    },
-    loading: {
-      textAlign: 'center',
-      padding: '20px',
-      fontSize: '1rem',
-      color: '#6c757d',
-    },
-    error: {
-      textAlign: 'center',
-      padding: '20px',
-      fontSize: '1rem',
-      color: '#dc3545',
-    },
-  
+  // Existing styles...
+  emptyLine: {
+    width: '100%',
+    height: '1px', // Adjust the height as needed for spacing
+  },
+  container: {
+    display: 'flex',
+    flexDirection: 'column',
+    backgroundColor: '#fff',
+    borderRadius: '8px',
+    overflow: 'hidden',
+    boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
+    margin: '16px',
+    padding: '16px',
+  },
+  imageContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    padding: '16px',
+  },
+  productImage: {
+    maxWidth: '100%',
+    height: 'auto',
+    borderRadius: '4px',
+    marginBottom: '16px',
+  },
+  companyImage: {
+    width: '25%', // Increased width
+    height: 'auto', // Maintain aspect ratio
+    marginBottom: '8px', // Add some space below the logo if needed
+  },
+  detailsContainer: {
+    padding: '16px',
+    textAlign: 'right',
+    borderBottom: '1px solid #eee',
+    marginBottom: '16px',
+  },
+  title: {
+    fontSize: '1.75rem',
+    fontWeight: 'bold',
+    color: '#343a40',
+    marginBottom: '8px',
+  },
+  description: {
+    color: '#6c757d',
+    marginBottom: '16px',
+    lineHeight: '1.5',
+  },
+  featuresRow: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: '10px',
+    marginBottom: '16px',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+  },
+  featureItem: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '4px',
+    fontSize: '0.9rem',
+    color: '#495057',
+  },
+  featureIcon: {
+    width: '20px',
+    height: '20px',
+  },
+  featureUnit: {
+    marginLeft: '2px',
+  },
+  energyRating: {
+    backgroundColor: '#ffc107',
+    color: '#fff',
+    borderRadius: '4px',
+    padding: '2px 6px',
+    fontWeight: 'bold',
+  },
+  price: {
+    fontSize: '2rem',
+    fontWeight: 'bold',
+    color: '#28a745',
+    marginBottom: '16px',
+  },
+  addToCartButton: {
+    backgroundColor: '#007bff',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '4px',
+    padding: '12px 24px',
+    cursor: 'pointer',
+    fontSize: '1.1rem',
+  },
+  stepperContainer: {
+    padding: '16px',
+  },
+  table: {
+    width: '100%',
+    borderCollapse: 'collapse',
+    marginBottom: '16px',
+  },
+  tableRow: {
+    borderBottom: '1px solid #eee',
+    display: 'flex',
+    flexDirection: 'row-reverse',
+    gap: '2px', // Reduced gap for tighter spacing
+  },
+  tableCellLabel: {
+    padding: '6px', // Slightly reduced padding to bring the label closer to the value
+    fontWeight: 'bold',
+    textAlign: 'right',
+    flex: '0.3', // Adjusted flex for tighter layout
+  },
+  tableCellValue: {
+    padding: '6px', // Keep the padding reduced as needed
+    textAlign: 'center', // Center the text horizontally
+    display: 'flex', // Use flexbox for centering
+    // alignItems: 'center', // Center content vertically
+    // justifyContent: 'center', // Center content horizontally
+    flex: '0.4',
+  },
+  featureCheck: {
+    color: '#28a745',
+    fontSize: '1rem',
+  },
+  featureCross: {
+    color: '#dc3545',
+    fontSize: '1rem',
+  },
+  loading: {
+    textAlign: 'center',
+    padding: '20px',
+    fontSize: '1rem',
+    color: '#6c757d',
+  },
+  error: {
+    textAlign: 'center',
+    padding: '20px',
+    fontSize: '1rem',
+    color: '#dc3545',
+  },
+
 };
 
 export default Overhead;

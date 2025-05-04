@@ -7,13 +7,13 @@ import { Divider } from "primereact/divider"
 import { Tag } from "primereact/tag"
 import { Card } from "primereact/card"
 
-const AdminOrders = ()=> {
-    const {token} = useSelector((state)=>state.token)
-    const [deliveries , setDeliveries] = useState([])
+const AdminOrders = () => {
+    const { token } = useSelector((state) => state.token)
+    const [deliveries, setDeliveries] = useState([])
     const [orders, setOrders] = useState([]);
 
     const filterData = (data) => {
-        console.log("before filter", data)
+        // console.log("before filter", data)
         if (!data) {
             return [];
         }
@@ -21,12 +21,12 @@ const AdminOrders = ()=> {
     };
 
     const sortData = (data) => {
-        console.log("sort",data);
+        // console.log("sort", data);
 
         if (!data || data.length === 0) {
             return [];
         }
-        console.log("sort",data);
+        // console.log("sort", data);
         return data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // Return the sorted array
     };
 
@@ -40,7 +40,7 @@ const AdminOrders = ()=> {
                 console.log("res.status === 200. Deliveries from server:", res.data)
                 setDeliveries(res.data)
                 // console.log("userDeliveries", userDeliveries)
-                setOrders(res.data)
+                // setOrders(res.data)
                 const sortedOrders = sortData(res.data)
                 setOrders(sortedOrders)
                 // console.log("sortedOrders", orders)
@@ -48,21 +48,21 @@ const AdminOrders = ()=> {
             }
         } catch (error) {
             if (error.status === 404) {
-                console.log("error 404:", error)
+                // console.log("error 404:", error)
                 alert("not found")
             }
             console.error(error)
             if (error.status === 401) {
-                console.log("error 401:", error)
+                // console.log("error 401:", error)
                 alert("Unauthorized")
             }
         }
         // const filteredOrders = filterData(deliveries)
-       
+
     }
 
     const renderDelivery = (delivery) => {
-        console.log("renderDelivery", delivery);
+        // console.log("renderDelivery", delivery);
         const orderDate = new Date(delivery.createdAt).toLocaleDateString();
         const statusColors = {
             "waiting to be delivered": "warning",
@@ -125,8 +125,10 @@ const AdminOrders = ()=> {
                                     margin: "0 1rem",
                                 }}
                             >
+                                {console.log(product.imagepath)
+                                }
                                 <Image
-                                    src={product.imagepath || 'air-conditioner.jpg'} // Use a placeholder image if undefined
+                                    src={"/"+product.imagepath || 'air-conditioner.jpg'} // Use a placeholder image if undefined
                                     alt={product.title || 'No Title'}
                                     width="100"
                                     preview
@@ -155,5 +157,23 @@ const AdminOrders = ()=> {
         getDeliveries()
         // }
     }, []);
+
+    return (
+        <div className="my-orders">
+            <h2 style={{
+                fontSize: "2rem",
+                fontWeight: "bold",
+                textAlign: "center",
+                color: "#2C3E50",
+                marginBottom: "1rem",
+                borderBottom: "2px solid #3498DB",
+                paddingBottom: "0.5rem"
+            }}>
+                ההזמנות שלי
+            </h2>
+            {/* {console.log("orders", orders)} */}
+            {orders.map((delivery) => renderDelivery(delivery))}
+        </div>
+    )
 }
 export default AdminOrders

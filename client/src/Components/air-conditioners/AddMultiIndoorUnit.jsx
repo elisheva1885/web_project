@@ -32,32 +32,8 @@ const AddMultiIndoorUnit = () => {
             console.error("Error: imagepath is not a valid file.");
             return;
         }
-        const otherData = {
-            company: data.company,
-            title: data.title,
-            describe: data.describe,
-            stock: data.stock,
-            price: data.price,
-            BTU_output: {
-                cool: data.BTU_output_cool,
-                heat: data.BTU_output_heat // ודאי שזה קיים אצלך ב־data
-            },
-            CFM: data.CFM,
-            pipe_connection: {
-                a: data.pipe_connection_a,
-                b: data.pipe_connection_b
-            },
-            evaporator_unit_dimensions: {
-                width: data.in_size_width,
-                depth: data.in_size_depth,
-                height: data.in_size_height
-            }
-        };
-        formData.append('otherData', JSON.stringify(otherData));
-
-
-        console.log("adjustedData", data);
-
+       
+        formData.append('otherData', JSON.stringify(data));
         try {
             const headers = {
                 'Authorization': `Bearer ${token}`, // If you have authentication

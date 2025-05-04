@@ -55,7 +55,7 @@ const MiniCenteral = () => {
             }
             const data = await res.data;
             setProduct(data);
-            console.log("product",res.data);
+            console.log("product", res.data);
 
         } catch (e) {
             setError(e.message);
@@ -93,7 +93,6 @@ const MiniCenteral = () => {
                 <h1 style={styles.title}>{product.title}</h1>
                 <p style={styles.description}>{product.describe}</p>
                 <div style={styles.featuresRow}>
-                    {console.log(product.BTU_output?.cool)}
                     {product.BTU_output?.cool && (
                         <div style={styles.featureItem}>
                             <img src="/BTU_cool.png" alt="cool" style={styles.featureIcon} />
@@ -101,7 +100,6 @@ const MiniCenteral = () => {
                             <span style={styles.featureUnit}>BTU</span>
                         </div>
                     )}
-                    {console.log(product.BTU_output?.heat)}
                     {product.BTU_output?.heat && (
                         <div style={styles.featureItem}>
                             <img src="/BTU_heat.png" alt="heat" style={styles.featureIcon} />
@@ -135,9 +133,15 @@ const MiniCenteral = () => {
                                 <TableRow label="זרם עבודה חימום" value={product.working_current?.heat} />
                                 <TableRow label="CFM" value={product.CFM} />
                                 <TableRow label="Pa (לחץ סטטי)" value={product.Pa} />
-                                <TableRow label="קוטר חיבורי צנרת" value={`${product.pipe_connection?.a} x ${product.pipe_connection?.b}`} />
-                                <TableRow label="מידות פנימיות" value={`${product.in_size?.width} x ${product.in_size?.depth} x ${product.in_size?.height}`} />
-                                <TableRow label="מידות חיצוניות" value={`${product.out_size?.width} x ${product.out_size?.depth} x ${product.out_size?.height}`} />
+                                <TableRow label="קוטר חיבורי צנרת" value={<span style={{ direction: 'ltr', unicodeBidi: 'embed' }}>
+                                    {`${product.pipe_connection?.a} x ${product.pipe_connection?.b}`}
+                                </span>} />                                <TableRow label="מידות פנימיות" value={<span style={{ direction: 'ltr', unicodeBidi: 'embed' }}>
+                                    {`${product.in_size?.width} x ${product.in_size?.depth} x ${product.in_size?.height}`}
+                                </span>} />
+                                <TableRow label="מידות חיצוניות" value={<span style={{ direction: 'ltr', unicodeBidi: 'embed' }}>
+                                    {`${product.out_size?.width} x ${product.out_size?.depth} x ${product.out_size?.height}`}
+                                </span>} />
+                                <FeatureRow label="מהירויות" value={product.speeds} isBoolean={false} />
                             </tbody>
                         </table>
                     </StepperPanel>
@@ -147,7 +151,6 @@ const MiniCenteral = () => {
                             <tbody>
                                 <FeatureRow label="מצב שקט" value={product.quiet} />
                                 <FeatureRow label="WiFi" value={product.wifi} />
-                                <FeatureRow label="מהירויות" value={product.speeds} isBoolean={false} />
                                 <FeatureRow label="תלת מימד" value={product.air4d} />
                                 <FeatureRow label="פיקוד שבת" value={product.sabbath_command} />
                             </tbody>

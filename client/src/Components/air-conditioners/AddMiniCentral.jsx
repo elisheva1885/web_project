@@ -31,50 +31,9 @@ const AddMiniCentral = () => {
           console.error("Error: imagepath is not a valid file.");
           return;
         }
-        const otherData = {
-            company: data.company,
-            title: data.title,
-            describe: data.describe,
-            stock: data.stock,
-            price: data.price,
-            BTU_output: data.BTU_output_cool, // Use BTU_output as in your create call
-            efficiency_factor: data.efficiency_factor_cool, // Use efficiency_factor
-            energy_rating: data.energy_rating,
-            working_current: data.working_current_cool, // Use working_current
-            CFM: data.CFM,
-            Pa: data.Pa,
-            pipe_connection: data.pipe_connection_a, // Use pipe_connection
-            in_size: data.in_size_width, // Use in_size
-            out_size: data.out_size_width, // Use out_size
-            quiet: data.quiet,
-            wifi: data.wifi,
-            speeds: data.speeds,
-            air4d: data.air4d,
-            sabbath_command: data.sabbath_command,
-            onof_auto: data.onof_auto, // Assuming 'onof_auto' exists in your 'data'
-          };
-        formData.append('otherData', JSON.stringify(otherData));
-
-
-        // Append other fields to the FormData object
-        // for (const key in data) {
-        //     if (key !== 'imagepath') {
-        //         let value = data[key];
-        
-        //         // המרת שדות מספריים למספרים
-        //         if (['stock', 'price', 'BTU_output_cool', 'BTU_output_heat', 'efficiency_factor_cool', 'efficiency_factort_heat', 'energy_rating', 'working_current_cool', 'working_current_heat', 'CFM', 'Pa', 'speeds', 'in_size_width', 'in_size_depth', 'in_size_height', 'out_size_width', 'out_size_depth', 'out_size_height', 'pipe_connection_a', 'pipe_connection_b'].includes(key)) {
-        //             value = value ? Number(value) : 0; // ברירת מחדל: 0
-        //         }
-        //         if (['quiet', 'wifi', 'air4d', 'sabbath_command'].includes(key)) {
-        //             value = Boolean(value); // המרת לערך בוליאני
-        //         }
-        //         formDataObj.append(key, value);
-        //     }
-            
-        // }
-        // for (let [key, value] of formDataObj.entries()) {
-        //     console.log(`${key}: ${value}`);
-        // }
+       
+        formData.append('otherData', JSON.stringify(data));
+        console.log(data)
         try {
             const headers = {
                 'Authorization': `Bearer ${token}`, // If you have authentication
@@ -87,7 +46,7 @@ const AddMiniCentral = () => {
                 setFormData(data);
                 setShowMessage(true);
                 dispatch(setMiniCenterals([...miniCenterals, res.data]));
-                navigate("/miniCenterals");
+                // navigate("/miniCenterals");
             }
         } catch (error) {
             console.error(error);
@@ -192,18 +151,18 @@ const AddMiniCentral = () => {
                             <div className="flex">
                                 <div style={{ flex: '1', marginRight: '10px' }}>
                                     <span className="p-float-label">
-                                        <Controller name="BTU_output_cool" control={control} render={({ field }) => (
-                                            <InputText id="BTU_output_cool" {...field} />
+                                        <Controller name="BTU_output.cool" control={control} render={({ field }) => (
+                                            <InputText id="BTU_output.cool" {...field} />
                                         )} />
-                                        <label htmlFor="BTU_output_cool">BTU Output Cool</label>
+                                        <label htmlFor="BTU_output.cool">BTU Output Cool</label>
                                     </span>
                                 </div>
                                 <div style={{ flex: '1', marginLeft: '10px' }}>
                                     <span className="p-float-label">
-                                        <Controller name="BTU_output_heat" control={control} render={({ field }) => (
-                                            <InputText id="BTU_output_heat" {...field} />
+                                        <Controller name="BTU_output.heat" control={control} render={({ field }) => (
+                                            <InputText id="BTU_output.heat" {...field} />
                                         )} />
-                                        <label htmlFor="BTU_output_heat">BTU Output Heat</label>
+                                        <label htmlFor="BTU_output.heat">BTU Output Heat</label>
                                     </span>
                                 </div>
                             </div>
@@ -212,18 +171,18 @@ const AddMiniCentral = () => {
                             <div className="flex">
                                 <div style={{ flex: '1', marginRight: '10px' }}>
                                     <span className="p-float-label">
-                                        <Controller name="efficiency_factor_cool" control={control} render={({ field }) => (
-                                            <InputText id="efficiency_factor_cool" {...field} />
+                                        <Controller name="efficiency_factor.cool" control={control} render={({ field }) => (
+                                            <InputText id="efficiency_factor.cool" {...field} />
                                         )} />
-                                        <label htmlFor="efficiency_factor_cool">Efficiency Factor Cool</label>
+                                        <label htmlFor="efficiency_factor.cool">Efficiency Factor Cool</label>
                                     </span>
                                 </div>
                                 <div style={{ flex: '1', marginLeft: '10px' }}>
                                     <span className="p-float-label">
-                                        <Controller name="efficiency_factort_heat" control={control} render={({ field }) => (
-                                            <InputText id="efficiency_factor_heat" {...field} />
+                                        <Controller name="efficiency_factor.heat" control={control} render={({ field }) => (
+                                            <InputText id="efficiency_factor.heat" {...field} />
                                         )} />
-                                        <label htmlFor="efficiency_factor_heat">Efficiency Factor Heat</label>
+                                        <label htmlFor="efficiency_factor.heat">Efficiency Factor Heat</label>
                                     </span>
                                 </div>
                             </div>
@@ -243,18 +202,18 @@ const AddMiniCentral = () => {
                             <div className="flex">
                                 <div style={{ flex: '1', marginRight: '10px' }}>
                                     <span className="p-float-label">
-                                        <Controller name="working_current_cool" control={control} render={({ field }) => (
-                                            <InputText id="working_current_cool" {...field} />
+                                        <Controller name="working_current.cool" control={control} render={({ field }) => (
+                                            <InputText id="working_current.cool" {...field} />
                                         )} />
-                                        <label htmlFor="working_current_cool">Working Current Cool</label>
+                                        <label htmlFor="working_current.cool">Working Current Cool</label>
                                     </span>
                                 </div>
                                 <div style={{ flex: '1', marginLeft: '10px' }}>
                                     <span className="p-float-label">
-                                        <Controller name="working_current_heat" control={control} render={({ field }) => (
-                                            <InputText id="working_current_heat" {...field} />
+                                        <Controller name="working_current.heat" control={control} render={({ field }) => (
+                                            <InputText id="working_current.heat" {...field} />
                                         )} />
-                                        <label htmlFor="working_current_heat">Working Current Heat</label>
+                                        <label htmlFor="working_current.heat">Working Current Heat</label>
                                     </span>
                                 </div>
                             </div>
@@ -283,18 +242,18 @@ const AddMiniCentral = () => {
                             <div className="flex">
                                 <div style={{ flex: '1', marginRight: '10px' }}>
                                     <span className="p-float-label">
-                                        <Controller name="pipe_connection_a" control={control} render={({ field }) => (
-                                            <InputText id="pipe_connection_a" {...field} />
+                                        <Controller name="pipe_connection.a" control={control} render={({ field }) => (
+                                            <InputText id="pipe_connection.a" {...field} />
                                         )} />
-                                        <label htmlFor="pipe_connection_a">Pipe Connection A</label>
+                                        <label htmlFor="pipe_connection.a">Pipe Connection A</label>
                                     </span>
                                 </div>
                                 <div style={{ flex: '1', marginLeft: '10px' }}>
                                     <span className="p-float-label">
-                                        <Controller name="pipe_connection_b" control={control} render={({ field }) => (
-                                            <InputText id="pipe_connection_b" {...field} />
+                                        <Controller name="pipe_connection.b" control={control} render={({ field }) => (
+                                            <InputText id="pipe_connection.b" {...field} />
                                         )} />
-                                        <label htmlFor="pipe_connection_b">Pipe Connection B</label>
+                                        <label htmlFor="pipe_connection.b">Pipe Connection B</label>
                                     </span>
                                 </div>
                             </div>
@@ -305,26 +264,26 @@ const AddMiniCentral = () => {
                             <div className="flex">
                                 <div style={{ flex: '1', marginRight: '10px' }}>
                                     <span className="p-float-label">
-                                        <Controller name="in_size_width" control={control} render={({ field }) => (
-                                            <InputText id="in_size_width" type="number" {...field} />
+                                        <Controller name="in_size.width" control={control} render={({ field }) => (
+                                            <InputText id="in_size.width" type="number" {...field} />
                                         )} />
-                                        <label htmlFor="in_size_width">In Size Width</label>
+                                        <label htmlFor="in_size.width">In Size Width</label>
                                     </span>
                                 </div>
                                 <div style={{ flex: '1', marginLeft: '10px' }}>
                                     <span className="p-float-label">
-                                        <Controller name="in_size_depth" control={control} render={({ field }) => (
-                                            <InputText id="in_size_depth" type="number" {...field} />
+                                        <Controller name="in_size.depth" control={control} render={({ field }) => (
+                                            <InputText id="in_size.depth" type="number" {...field} />
                                         )} />
-                                        <label htmlFor="in_size_depth">In Size Depth</label>
+                                        <label htmlFor="in_size.depth">In Size Depth</label>
                                     </span>
                                 </div>
                                 <div style={{ flex: '1', marginLeft: '10px' }}>
                                     <span className="p-float-label">
-                                        <Controller name="in_size_height" control={control} render={({ field }) => (
-                                            <InputText id="in_size_height" type="number" {...field} />
+                                        <Controller name="in_size.height" control={control} render={({ field }) => (
+                                            <InputText id="in_size.height" type="number" {...field} />
                                         )} />
-                                        <label htmlFor="in_size_height">In Size Height</label>
+                                        <label htmlFor="in_size.height">In Size Height</label>
                                     </span>
                                 </div>
                             </div>
@@ -335,26 +294,26 @@ const AddMiniCentral = () => {
                             <div className="flex">
                                 <div style={{ flex: '1', marginRight: '10px' }}>
                                     <span className="p-float-label">
-                                        <Controller name="out_size_width" control={control} render={({ field }) => (
-                                            <InputText id="out_size_width" type="number" {...field} />
+                                        <Controller name="out_size.width" control={control} render={({ field }) => (
+                                            <InputText id="out_size.width" type="number" {...field} />
                                         )} />
-                                        <label htmlFor="out_size_width">Out Size Width</label>
+                                        <label htmlFor="out_size.width">Out Size Width</label>
                                     </span>
                                 </div>
                                 <div style={{ flex: '1', marginLeft: '10px' }}>
                                     <span className="p-float-label">
-                                        <Controller name="out_size_depth" control={control} render={({ field }) => (
-                                            <InputText id="out_size_depth" type="number" {...field} />
+                                        <Controller name="out_size.depth" control={control} render={({ field }) => (
+                                            <InputText id="out_size.depth" type="number" {...field} />
                                         )} />
-                                        <label htmlFor="out_size_depth">Out Size Depth</label>
+                                        <label htmlFor="out_size.depth">Out Size Depth</label>
                                     </span>
                                 </div>
                                 <div style={{ flex: '1', marginLeft: '10px' }}>
                                     <span className="p-float-label">
-                                        <Controller name="out_size_height" control={control} render={({ field }) => (
-                                            <InputText id="out_size_height" type="number" {...field} />
+                                        <Controller name="out_size.height" control={control} render={({ field }) => (
+                                            <InputText id="out_size.height" type="number" {...field} />
                                         )} />
-                                        <label htmlFor="out_size_height">Out Size Height</label>
+                                        <label htmlFor="out_size.height">Out Size Height</label>
                                     </span>
                                 </div>
                             </div>

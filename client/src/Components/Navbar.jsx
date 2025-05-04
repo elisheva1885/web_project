@@ -28,7 +28,9 @@ const Add_AirConditioner = lazy(() => import('./air-conditioners/Add_AirConditio
 const UpdateOverheadAC = lazy(() => import('./air-conditioners/updateOvearhead'));
 const UpdateMiniCenteral = lazy(() => import('./air-conditioners/UpdateMiniCenteral'));
 const MultiIndoorUnits = lazy(() => import('./air-conditioners/MultiIndoorUnits'));
+const MultiIndoorUnit = lazy(() => import('./air-conditioners/MultiInDoorUnit'));
 const MultiOutdoorUnits = lazy(() => import('./air-conditioners/MultiOutdoorUnits'));
+const MultiOutdoorUnit = lazy(() => import('./air-conditioners/MultiOutdoorUnit'));
 const UpdateMultiIndoorUnit = lazy(() => import('./air-conditioners/UpdateMultiIndoorUnit'));
 const UpdateMultiOutdoorUnit = lazy(() => import('./air-conditioners/UpdateMultiOutdoorUnit'));
 const AddCompany = lazy(() => import('./air-conditioners/AddCompany'));
@@ -137,9 +139,10 @@ const Navbar = () => {
                 <Route path='/multiOutdoorUnits' element={<Suspense fallback="Loading..."><MultiOutdoorUnits /></Suspense>}>        </Route>
                 <Route path={`/overheads/overhead/:product`} element={<Suspense fallback="Loading..."><Overhead /></Suspense>}></Route>
                 <Route path={`/miniCenterals/miniCenteral/:product`} element={<Suspense fallback="Loading..."><MiniCenteral /></Suspense>}></Route>
+                <Route path={`/multiOutdoorUnits/multiOutdoorUnit/:product`} element={<Suspense fallback="Loading..."><MultiOutdoorUnit /></Suspense>}></Route>
+                <Route path={`/multiIndoorUnits/multiIndoorUnit/:product`} element={<Suspense fallback="Loading..."><MultiIndoorUnit /></Suspense>}></Route>
                 <Route path='/multiIndoorUnits/multiIndoorUnit/update' element={<Suspense fallback="Loading..."><UpdateMultiIndoorUnit/></Suspense>}></Route>
                 <Route path='/overheads/overhead/update' element={<Suspense fallback="Loading..."><UpdateOverheadAC/></Suspense>}></Route>
-                {/* <Route path='/overheads/overhead/update' element={<Suspense fallback="Loading..."><UpdateOverheadAC/></Suspense>}></Route> */}
                 <Route path='/multiOutdoorUnits/multiOutdoorUnit/update' element={<Suspense fallback="Loading..."><UpdateMultiOutdoorUnit/></Suspense>}></Route>
                 <Route path='/miniCenterals/miniCenteral/update' element={<Suspense fallback="Loading..."><UpdateMiniCenteral/></Suspense>}></Route>
                 <Route path='/login' element={<Suspense fallback="Loading..."><Login /></Suspense>}></Route>
