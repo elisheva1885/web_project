@@ -60,7 +60,9 @@ const Admin = () => {
             }
         });
     };
-
+const toOrders = ()=> {
+    navigate('/admin/orders')
+}
     // const cols = [
     //     { field: 'code', header: 'Code' },
     //     { field: 'name', header: 'Name' },
@@ -75,7 +77,9 @@ const Admin = () => {
             <div style={{ paddingTop: '60px' }}>
                 <Button type="button" label="הוספת מזכירה" className="mt-2" onClick={registerOfficial} />
             </div>
-            <Button type="button" icon="pi pi-file-excel" severity="success" rounded onClick={exportExcel} data-pr-tooltip="XLS" />
+            <Button type="button" label="לצפייה בכל ההזמנות" className="mt-2" onClick={toOrders} />
+
+            {/* <Button type="button" icon="pi pi-file-excel" severity="success" rounded onClick={exportExcel} data-pr-tooltip="XLS" /> */}
             {/* <Button type="button" icon="pi pi-file-pdf" severity="warning" rounded onClick={exportPdf} data-pr-tooltip="PDF" /> */}
         </>
     )

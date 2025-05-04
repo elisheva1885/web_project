@@ -20,6 +20,7 @@ const Basket = lazy(() => import('./Basket'));
 const UpdateBranch = lazy(() => import('./UpdateBranch'));
 const AddBranch = lazy(() => import('./AddBranch'));
 const Admin = lazy(() => import('./Admin'));
+const AdminOrders = lazy(() => import('./AdminOrders'));
 const Official = lazy(() => import('./Official'));
 const UserAcount = lazy(() => import('./UserAcount'));
 const MiniCenterals = lazy(() => import('./air-conditioners/MiniCentrals'));
@@ -161,6 +162,7 @@ const Navbar = () => {
                 <Route path='/userAcount' element={<Suspense fallback="Loading..."><UserAcount/></Suspense>}></Route>
                 <Route path='/userAcount/UpdateDetails' element={<Suspense fallback="Loading..."><UpdateUserDetails/></Suspense>}></Route>
                 <Route path='/addCompany' element={<Suspense fallback="Loading..."><AddCompany/></Suspense>}></Route>
+                <Route path='/admin/orders' element={<Suspense fallback="Loading..."><AdminOrders/></Suspense>}></Route>
 
                 <Route path='/admin/registerOfficial' element={<Suspense fallback="Loading..."><AdminRegister/></Suspense>}></Route>
                 <Route path='/basket/Payment' element={<Suspense fallback="Loading..."><Payment/></Suspense>}></Route>
