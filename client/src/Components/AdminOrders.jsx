@@ -169,7 +169,7 @@ const AdminOrders = () => {
                 borderBottom: "2px solid #3498DB",
                 paddingBottom: "0.5rem"
             }}>
-                ההזמנות שלי
+                כל ההזמנות 
             </h2>
             {/* {console.log("orders", orders)} */}
             {orders.map((delivery) => renderDelivery(delivery))}
