@@ -348,7 +348,7 @@ const Payment = () => {
         );
     };
     const getUserAddress = async (c) => {
-        console.log("address: ")
+        console.log("address in getUserAddress: ")
         try {
             const headers = {
                 'Authorization': `Bearer ${token}`
@@ -528,7 +528,9 @@ const Payment = () => {
                 }}
                 style={{ width: buttonWidth, height: buttonHeight }}
             />
+            {console.log("in the return",address)}
             {address ? existAddress() : <></>}
+
             <div>
                 {/* Left: Payment Square */}
                 <>
