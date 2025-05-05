@@ -17,6 +17,8 @@ const Register = () => {
     const [showMessage, setShowMessage] = useState(false);
     const [formData, setFormData] = useState({});
     const {userDetails} = useSelector((state) => state.userDetails);
+    const [errorMessage, setErrorMessage] = useState('');
+
     const navigate = useNavigate()
     const defaultValues = {
         name: '',
@@ -31,7 +33,6 @@ const Register = () => {
 
   
     const onSubmit = async (data) => {
-        console.log("here");
         setFormData(data);
         const user = {
             name: data.name,
@@ -48,7 +49,11 @@ const Register = () => {
                 setShowMessage(true);
             }
         } catch (error) {
-            console.error(error)
+            if (error.response) {
+                setErrorMessage(error.response.data.message);
+            } else {
+                setErrorMessage("Something went wrong. Please try again later.");
+            }
         }
         reset();
     };
@@ -146,6 +151,11 @@ const Register = () => {
                         <Button type="submit" label="הירשם" className="mt-2" />
                         {/* {userDetails?.role==="user"?<Button type="button"label="הוספת מזכירה" className="mt-2" onClick={registerOfficial()} />: <></> } */}
 
+            {/* Display error message if it exists */}
+            {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
+
+            {/* Success message */}
+            {showMessage && <p style={{ color: 'green' }}>Registration successful! Redirecting...</p>}
                     </form>
                 </div>
             </div>
