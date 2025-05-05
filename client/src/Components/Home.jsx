@@ -25,10 +25,10 @@ const Home = () => {
     // console.log("userDetails",userDetails.username)
     const AirConditionerTypes = () => {
         const acTypes = [
-            { id: 1, name: 'מזגן עילי', imageUrl: '/overheads/back.jpg' },
-            { id: 2, name: 'מזגן מיני מרכזי', imageUrl: '/overheads/back.jpg' },
-            { id: 3, name: 'מעבי מולטי', imageUrl: '/overheads/back.jpg' },
-            { id: 4, name: 'מאייד מולטי' , imageUrl: '/overheads/back.jpg' },
+            { id: 1, name: 'מזגן עילי', imageUrl: '/overheads/overhead-room.jpg' },
+            { id: 2, name: 'מזגן מיני מרכזי', imageUrl: '/overheads/central.png' },
+            { id: 3, name: 'מעבי מולטי', imageUrl: '/overheads/mm.jpg' },
+            { id: 4, name: 'מאייד מולטי' , imageUrl: '/overheads/uu.jpeg' },
         ];
 
         const goToACDetail = (id) => {
@@ -110,10 +110,6 @@ const Home = () => {
 
     const getMultiIndoorUnit = async () => {
         try {
-            // const headers = {
-            //     'Authorization': `Bearer ${token}`
-            // }
-            // const res = await axios.get('http://localhost:8000/api/air-conditioner/overhead',{headers})
             const res = await axios.get('http://localhost:8000/api/air-conditioner/multiIndoorUnit')
             if (res.status === 200) {
                 dispatch(setMultiIndoorUnits(res.data));
@@ -127,10 +123,6 @@ const Home = () => {
 
     const getMultiOutdoorUnit = async () => {
         try {
-            // const headers = {
-            //     'Authorization': `Bearer ${token}`
-            // }
-            // const res = await axios.get('http://localhost:8000/api/air-conditioner/overhead',{headers})
             const res = await axios.get('http://localhost:8000/api/air-conditioner/multiOutdoorUnit')
             if (res.status === 200) {
                 dispatch(setMultiOutdoorUnits(res.data));

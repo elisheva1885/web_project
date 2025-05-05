@@ -12,6 +12,9 @@
     overflow: hidden; /* Hide overflow for the hover effect */
     transition: transform 0.3s ease; /* Smooth transition for scaling */
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Shadow for each card */
+    background-size: cover; /* Ensure the image covers the container */
+    background-position: center; /* Center the image within the container */
+    background-repeat: no-repeat; /* Prevent tiling of the image */
 }
 
 .cardContainer:hover {
@@ -50,4 +53,8 @@
     color: black; /* Set text color */
     padding: 16px; /* Add padding */
     z-index: 1; /* Ensure the text is above the overlay */
+    font-size: 4.5rem; /* Font size for the text */
+    font-weight: bold; /* Bold text */
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); /* Text shadow for better readability */
+    transition: color 0.3s ease; /* Smooth transition for text color */
 }

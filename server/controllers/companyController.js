@@ -1,3 +1,4 @@
+const { default: mongoose } = require("mongoose");
 const Company = require("../models/airconditioners/Company")
 
 const createCompany = async (req, res) => {
@@ -37,6 +38,9 @@ const readCompany = async (req,res)=> {
 const readCompanyByName = async (req,res)=> {
     const {name} = req.params
     console.log(name);
+    if (!name || typeof name !== 'string' || name.trim().length === 0) {
+        return res.status(400).json({ message: "Name parameter is required and must be a valid string" });
+    }
     const company = await Company.findOne({name: name}).lean()
     console.log(company);
     if(!company)
@@ -48,6 +52,9 @@ const readCompanyByName = async (req,res)=> {
 
 const deleteCompany = async (req,res)=> {
     const {_id} = req.body
+    if (!mongoose.Types.ObjectId.isValid(_id)) {
+        return res.status(400).json({ message: "Invalid company ID" });
+    }
     const company = await Company.findById(_id).exec()
     if(!company){
         return res.status(400).json({ message: "company not found" })
