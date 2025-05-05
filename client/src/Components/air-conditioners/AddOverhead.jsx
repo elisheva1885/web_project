@@ -7,21 +7,43 @@ import axios from 'axios';
 import classNames from 'classnames';
 import { useDispatch, useSelector } from 'react-redux';
 import { Dropdown } from 'primereact/dropdown';
+import { setOverheads } from '../../store/air-conditioner/overHeadsSlice';
+import { useNavigate } from 'react-router-dom';
+import { FileUpload } from 'primereact/fileupload';
 
 
-const AddOverheadForm = () => {
+const AddOverhead = () => {
     const { control, handleSubmit, formState: { errors } } = useForm();
     const [showMessage, setShowMessage] = useState(false);
     const [formData, setFormData] = useState({});
-    // const {companies} = useSelector((state) => state.companies)
-    const {companies} = useSelector((state) => state.company)
-
+    const {overheads} = useSelector((state) => state.overheads)
+    const {companies} = useSelector((state) => state.companies)
+const token = useSelector((state) => state.token);
+const navigate = useNavigate();
+const dispatch = useDispatch();
     const onSubmit = async (data) => {
-        console.log(data);
+        const formData = new FormData(); // Create an empty FormData object      
+        // Append the file to the FormData object
+        if (data.imagepath instanceof File) {
+          formData.append('imagepath', data.imagepath);
+        } else {
+          console.error("Error: imagepath is not a valid file.");
+          return;
+        }
+          formData.append('otherData', JSON.stringify(data));
         try {
-            const response = await axios.post('http://localhost:8000/api/air-conditioner/overhead', data);
-            setFormData(data);
+            const headers = {
+                'Authorization': `Bearer ${token}`, // If you have authentication
+                'Content-Type': 'multipart/form-data'
+            };
+            const res = await axios.post('http://localhost:8000/api/air-conditioner/overhead', formData, { headers });
+            if(res.status===201){
+                setFormData(data);
             setShowMessage(true);
+                dispatch(setOverheads([...overheads, res.data]));
+                navigate('/overheads');
+            }
+            
         } catch (error) {
             console.error(error);
         }
@@ -32,7 +54,6 @@ const AddOverheadForm = () => {
     };
 
     return (
-        
         <div className="form-demo">
             <Dialog visible={showMessage} onHide={() => setShowMessage(false)} position="top" footer={<Button label="Close" onClick={() => setShowMessage(false)} />} showHeader={false} breakpoints={{ '960px': '80vw' }} style={{ width: '40vw' }}>
                 <div className="flex justify-content-center flex-column pt-6 px-3">
@@ -79,9 +100,17 @@ const AddOverheadForm = () => {
 
                         <div className="field">
                             <span className="p-float-label">
-                                <Controller name="image" control={control} rules={{ required: 'Image is required.' }} render={({ field, fieldState }) => (
-                                    <InputText id={field.name} {...field} className={classNames({ 'p-invalid': fieldState.invalid })} />
-                                )} />
+                                <Controller name="imagepath" control={control} rules={{ required: 'Image path is required.' }} render={({ field, fieldState }) => (
+                                    <FileUpload
+                                            id="imagepath"
+                                            name="imagepath"
+                                            accept="image/*"
+                                            customUpload
+                                            uploadHandler={(e) => field.onChange(e.files[0])} // Attach the file to the form
+                                            auto
+                                            mode="basic" // Use 'basic' mode for a simpler layout
+                                            className={classNames({ 'p-invalid': fieldState.invalid })}
+                                        />                                   )} />
                                 <label htmlFor="imagepath" className={classNames({ 'p-error': errors.imagepath })}>*Image Path</label>
                             </span>
                             {getFormErrorMessage('imagepath')}
@@ -170,14 +199,6 @@ const AddOverheadForm = () => {
                                     </span>
                                 </div>
                             </div>
-                        </div>
-                        <div className="field">
-                            <span className="p-float-label">
-                                <Controller name="CFM" control={control}  render={({ field }) => (
-                                    <InputText id="CFM" {...field}  />
-                                )} />
-                                <label htmlFor="CFM" >CFM</label>
-                            </span>
                         </div>
                         <div className="field">
                             <span className="p-float-label">
@@ -353,6 +374,6 @@ const AddOverheadForm = () => {
     );
 };
 
-export default AddOverheadForm;
+export default AddOverhead;
 
 

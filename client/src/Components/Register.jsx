@@ -11,11 +11,15 @@ import { classNames } from 'primereact/utils';
 import axios from 'axios'
 import '../Login.css';
 import { useSelector } from 'react-redux';
+import { Navigate, useNavigate } from 'react-router-dom';
 
 const Register = () => {
     const [showMessage, setShowMessage] = useState(false);
     const [formData, setFormData] = useState({});
     const {userDetails} = useSelector((state) => state.userDetails);
+    const [errorMessage, setErrorMessage] = useState('');
+
+    const navigate = useNavigate()
     const defaultValues = {
         name: '',
         username: '',
@@ -39,11 +43,17 @@ const Register = () => {
         }
         try {
             const res = await axios.post(`http://localhost:8000/api/auth/register`,user)
-            if(res.status===200){
+            if(res.status===201){
+                console.log("res");
+                navigate('/')
                 setShowMessage(true);
             }
         } catch (error) {
-            console.error(error)
+            if (error.response) {
+                setErrorMessage(error.response.data.message);
+            } else {
+                setErrorMessage("Something went wrong. Please try again later.");
+            }
         }
         reset();
     };
@@ -68,6 +78,8 @@ const Register = () => {
     );
 
     return (
+        <div style={{ paddingTop: '60px' }}>
+
         <div className="form-demo">
             <Dialog visible={showMessage} onHide={() => setShowMessage(false)} position="top" footer={dialogFooter} showHeader={false} breakpoints={{ '960px': '80vw' }} style={{ width: '30vw' }}>
                 <div className="flex justify-content-center flex-column pt-6 px-3">
@@ -139,10 +151,16 @@ const Register = () => {
                         <Button type="submit" label="הירשם" className="mt-2" />
                         {/* {userDetails?.role==="user"?<Button type="button"label="הוספת מזכירה" className="mt-2" onClick={registerOfficial()} />: <></> } */}
 
+            {/* Display error message if it exists */}
+            {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
+
+            {/* Success message */}
+            {showMessage && <p style={{ color: 'green' }}>Registration successful! Redirecting...</p>}
                     </form>
                 </div>
             </div>
         </div>
+           </div>
     );
 }
 

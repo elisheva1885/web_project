@@ -1,6 +1,8 @@
 const User = require("../models/User")
 const updateUser = async (req, res) => {
-    const {_id, email, phone } = req.body
+    console.log("update");
+    const  _id =  req.user._id
+    const {email, phone } = req.body
     if(!_id){
         return res.status(400).json({message: "error on updating"})
     }
@@ -17,10 +19,11 @@ const updateUser = async (req, res) => {
     if (phone) {
         user.phone = phone
     }
-    const updatedUser = await User.save()
-    const users = await User.find().lean()
-    res.status(200).json(users)  
+    console.log(user);
 
+    const updatedUser = await user.save()
+    console.log(updatedUser);
+    return res.status(200).json(updatedUser)  
 }
 
 module.exports = { updateUser}

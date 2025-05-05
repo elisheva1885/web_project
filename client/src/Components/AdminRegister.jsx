@@ -10,6 +10,7 @@ import { classNames } from 'primereact/utils';
 import axios from 'axios'
 import '../Login.css';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 
 const AdminRegister = ()=> {
@@ -17,7 +18,7 @@ const AdminRegister = ()=> {
         const [formData, setFormData] = useState({});
         const {userDetails} = useSelector((state) => state.userDetails);
         const {token} = useSelector((state) => state.token);
-
+    const navigate = useNavigate()
         const defaultValues = {
             name: '',
             username: '',
@@ -44,13 +45,15 @@ const AdminRegister = ()=> {
                 const headers = {
                     'Authorization': `Bearer ${token}`
                 }
-                const res = await axios.post(`http://localhost:8000/api/auth/admin/register`,headers,user)
-                if(res.status===200){
+                console.log("datas ",{headers},user);
+                const res = await axios.post(`http://localhost:8000/api/auth/admin/register`,user,{headers})
+                if(res.status===201){
                     setShowMessage(true);
+                    navigate('/')
                 }
             } catch (error) {
                 if(error.status === 401){
-                    alert("Unauthorized")
+                    // alert("Unauthorized")
                 }
             }
             reset();
@@ -76,6 +79,7 @@ const AdminRegister = ()=> {
         );
     
         return (
+            <div style={{ paddingTop: '60px' }}>
             <div className="form-demo">
                 <Dialog visible={showMessage} onHide={() => setShowMessage(false)} position="top" footer={dialogFooter} showHeader={false} breakpoints={{ '960px': '80vw' }} style={{ width: '30vw' }}>
                     <div className="flex justify-content-center flex-column pt-6 px-3">
@@ -150,6 +154,7 @@ const AdminRegister = ()=> {
                         </form>
                     </div>
                 </div>
+            </div>
             </div>
         );
     

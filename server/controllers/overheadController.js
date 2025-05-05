@@ -1,8 +1,18 @@
 const Overhead = require("../models/airconditioners/Overhead")
 
 const createOverhead = async (req, res) => {
-    const {company , title, describe , imagepath , stock , price , BTU_output , energy_rating  , working_current ,CFM, recommended_model_C, pipe_connection , in_size , out_size, air_flow, quiet, wifi,speeds, air4d,night_mode,timer, sabbath_command,onof_auto} = req.body
-    if(!company || !title ||!describe || !price ||!imagepath ){
+    const uploadedFile = req.file;
+    const otherDataString = req.body.otherData;
+    if(!otherDataString){
+        return res.status(400).json({ message: "all details are required" })
+    }
+    const otherData = JSON.parse(otherDataString);
+    const {company , title, describe  , stock , price , BTU_output , energy_rating  , working_current ,CFM, recommended_model_C, pipe_connection , in_size , out_size, air_flow, quiet, wifi,speeds, air4d,night_mode,timer, sabbath_command,onof_auto} = otherData
+    if(!company || !title ||!describe || !price ){
+        return res.status(400).json({ message: "all details are required" })
+    }
+    const imagepath = req.file.filename ;
+    if(!imagepath){
         return res.status(400).json({ message: "all details are required" })
     }
     const duplicate = await Overhead.findOne({ title: title }).populate("company").lean()
@@ -11,8 +21,8 @@ const createOverhead = async (req, res) => {
     }
     const overhead = await Overhead.create({company , title, describe , imagepath , stock , price , BTU_output , energy_rating  , working_current ,CFM, recommended_model_C, pipe_connection , in_size , out_size, air_flow, quiet, wifi,speeds, air4d,night_mode,timer, sabbath_command,onof_auto})
     if(overhead){
-        const overheads = await Overhead.find().populate("company").lean()
-        res.status(201).json(overheads)
+        // const overheads = await Overhead.find().populate("company").lean()
+        res.status(201).json(overhead)
     }
     else{
         return  res.status(400).json({ message: "invalid overhead" })
@@ -56,11 +66,14 @@ const updateOverhead = async (req, res) => {
         return res.status(400).json({message: "all details are required"})
     }
     const overhead = await Overhead.findById(_id).exec()
+    if(!overhead){
+        return res.status(400).json({message: "overhead not found"})
+    }
     overhead.title= title?title:overhead.title
     overhead.describe= describe?describe:overhead.describe
     overhead.imagepath= imagepath?imagepath:overhead.imagepath
     overhead.stock= stock?stock:overhead.stock
-    overhead.price= overhead.price
+    // overhead.price= overhead.price
     overhead.BTU_output= BTU_output?BTU_output:overhead.BTU_output
     overhead.energy_rating= energy_rating?energy_rating:overhead.energy_rating
     overhead.working_current= working_current?working_current:overhead.working_current
@@ -79,8 +92,39 @@ const updateOverhead = async (req, res) => {
     overhead.sabbath_command= sabbath_command?sabbath_command:overhead.sabbath_command
     overhead.onof_auto= onof_auto?onof_auto:overhead.onof_auto
     const updated = await overhead.save()
-    const overheads = await Overhead.find().populate("company").lean()
-    res.status(200).json(overheads)
+    res.status(200).json(overhead)
+}
+
+const updateOverheadStock = async (req,res) => {
+
+    console.log("in the function");
+    const { _id, amount} = req.body
+    console.log( "the DB of the function ",_id, amount);
+
+    if(!_id){
+        return res.status(400).json({message: "all details are required"})
+    }
+    if(!amount){
+        return res.status(204).json({message: "the stock didn't change"})
+    }
+    const overhead = await Overhead.find({_id:_id}).populate("company").exec()
+    overhead.stock= overhead.stock- amount
+    const updated = await overhead.save()
+    res.status(200).json(overhead)
+}
+
+const updatOverheadPrice = async (req,res) => {
+    const { _id, price} = req.body
+    if(!_id){
+        return res.status(400).json({message: "all details are required"})
+    }
+    if(!price){
+        return res.status(204).json({message: "the price didn't change"})
+    }
+    const overhead = await Overhead.findById(_id).populate("company").exec()
+    overhead.price= price
+    const updated = await overhead.save()
+    res.status(200).json(overhead)
 }
 
 const deleteOverhead = async (req,res)=> {
@@ -94,7 +138,9 @@ const deleteOverhead = async (req,res)=> {
     if(!overheads?.length){
         return res.status(400).json({ message: "no overheads found" })
     }
-    return res.status(200).json(overheads)
+    // return res.status(200).json(overheads)
+    return res.status(200).json({message:"overhead deleted"})
+
 }
 
-module.exports = {createOverhead , readOverheads, readOverheadById,readOverheadByTitle , updateOverhead , deleteOverhead}
+module.exports = {createOverhead , readOverheads, readOverheadById,readOverheadByTitle , updateOverhead , updateOverheadStock,updatOverheadPrice, deleteOverhead}

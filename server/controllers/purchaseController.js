@@ -1,20 +1,131 @@
 const Purchase = require("../models/Purchase")
+const mongoose = require('mongoose')
+const shoppingBagController = require("../controllers/shoppingBagController");
+const ShoppingBag = require("../models/ShoppingBag");
+const Overhead = require("../models/airconditioners/Overhead");
+const MiniCenteral = require("../models/airconditioners/MiniCenteral");
 
 const createPurchase = async (req, res) => {
     const user_id = req.user._id
     const { products , paymentType} = req.body
-    if (!user_id || !products || paymentType) {
+    console.log("createPurchase the products", products);
+    // const transformedProducts = products.map(product => {
+    //     if (mongoose.Types.ObjectId.isValid(product.product._id)) {
+    //       product.product._id = new mongoose.Types.ObjectId(product.product._id); // Convert to ObjectId
+    //     } else {
+    //       console.error(`Invalid ObjectId: ${product.product._id}`); // Handle invalid ObjectId
+    //     }
+    //     return product; // Return the updated product object
+    //   });
+      
+    //   console.log(transformedProducts); // Logs the updated products array
+        // if (mongoose.Types.ObjectId.isValid(product.product._id)) {
+        //   product.product._id = new mongoose.Types.ObjectId(product.product._id); // Convert only if valid
+        // } else {
+        //   throw new Error(`Invalid ObjectId: ${product.product}`); // Handle invalid ObjectId
+        // }
+        // return product;
+    //   });
+    if (!user_id || !products?.length || !paymentType) {
         return res.status(400).json({ message: "all details are required" })
     }
-    const purchase = await Purchase.create({ user_id, products,paymentType})
-    if (purchase) {
-        const purchases = await Purchase.find().lean()
-        return res.status(201).json(purchases)
+    
+        const result = await checkProductsStock(products)
+        console.log("result in the main", result);
+        if(result.status===200){
+        const purchase = await Purchase.create({user_id, products,paymentType})
+        if (purchase) {
+            // const purchases = await Purchase.find().lean()
+            // console.log("here", purchase);
+            return res.status(201).json(purchase)
+        }
+        else {   
+            return res.status(400).json({ message: "invalid purchase" })
+        }
     }
-    else {   
-        return res.status(400).json({ message: "invalid purchase" })
+    else{
+        return res.status(result.status).json({message: result.message})
     }
+    
 }
+
+
+const checkProductsStock = async (products)=>{  
+    try {
+        const results = await Promise.all(
+          products.map(async (product) => {
+            const productDetails = await ShoppingBag.findById(product).lean();
+            console.log("ppppp",productDetails);
+            const result = await changeProductStockByIdAndType(
+              productDetails.product_id,
+              productDetails.type,
+              productDetails.amount
+            );
+            if (result.status == 400) {
+              return {status:400,message:`${productDetails} is out of stock from ${productDetails.type}`};
+            }
+            if(result.status===200){
+                return { status: 200 ,message:'Ok',  product: productDetails };
+            }
+          })
+        );
+        console.log(results);
+        return {status:200, message: 'All products are in stock', results };
+      } catch (error) {
+        console.error('Error checking stock:', error.message);
+        return {error:error, message: error.message };
+        // return {status:error.status, message: error.message };
+
+      }
+} 
+
+const changeProductStockByIdAndType = async (_id, type, amount)=>{
+    const Model = mongoose.model(type);
+    const airConditioner = await Model.findOne({ _id: _id }).populate("company").exec()
+    if (airConditioner.stock < amount) {
+        return { status: 400, message: `not enough, there is only ${airConditioner.stock} in the stock` };
+    }
+    airConditioner.stock = airConditioner.stock - amount
+    const updatedAirConditioner = await airConditioner.save()
+    return { status: 200, message: `Ok` }
+    // switch (type) {
+    //     case "overhead":
+    //         const overhead = await Overhead.findById({ _id: _id }).populate("company").exec()
+    //         if(overhead){
+    //             if (overhead.stock < amount) {
+    //                 console.log("in error");
+    //                 return {status:400,message:`not enough, there is only ${overhead.stock} in the stock`};
+    //             }
+    //             overhead.stock = overhead.stock - amount
+    //             const updatedOverhead = await overhead.save()
+    //             return {status:200, message : `Ok`}
+    //         }
+    //         else{
+    //             return {status:404,message: `not found`}
+    //         }
+    //         //delete from the basket
+    //         break;
+    //     case "miniCenteral":
+    //         const miniCenteral = await MiniCenteral.findById({ _id:_id}).populate("company").exec()
+    //         if(miniCenteral){
+    //             if (miniCenteral.stock < amount) {
+    //                 return {message:`not enough, there is only ${miniCenteral.stock} in the stock`};
+    //             }
+    //             miniCenteral.stock = miniCenteral.stock - amount
+    //             const updatedMiniCenteral = await miniCenteral.save()
+    //             return { status:200,message : `Ok`}
+    //         }
+    //         else{
+    //             return {status:404,message: `not found`}
+    //         }
+            
+    //         //delete from the basket
+    //         break;
+    //     default:
+    //         break;
+    // }
+}
+
 
 const readPurchases = async (req, res) => {
     const purchases = await Purchase.find().lean()

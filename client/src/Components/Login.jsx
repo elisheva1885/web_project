@@ -13,6 +13,7 @@ import myStore from '../store/store';
 import { setBasket ,clearBasket  } from '../store/basketSlice';
 import { clearUserDetails, setUserDetails } from '../store/userDetailsSlice';
 import Basket from './Basket';
+import { clearUserDeliveries } from '../store/userDeliveriesSlice';
 
 const Login  =() => {
     const {token} = useSelector((state) => state.token)
@@ -37,23 +38,10 @@ const Login  =() => {
     const signOut = ()=> {
         clearToken()
         clearBasket()
+        clearUserDeliveries()
     }
 
-    const getShoppingBag = async () => {
-        try {
-            const headers = {
-                'Authorization': `Bearer ${token.token}`
-            }
-            const res = await axios.get('http://localhost:8000/api/user/shoppingBag',{headers})
-            if (res.status === 200) {
-                dispatch(setBasket(res.data))
-                console.log("res.data",res.data);
-            }
-        }
-        catch (e) {
-            console.error(e)
-        }
-    }
+  
 
     const onSubmit = async (data) => {
         setFormData(data);
@@ -64,10 +52,10 @@ const Login  =() => {
         try {
             const res = await axios.post(`http://localhost:8000/api/auth/login`,user)
             if(res.status===200){
-                console.log(res.data.token);
+                console.log(res.data);
                 dispatch(setToken(res.data.token))
                 console.log(token);
-                dispatch(setUserDetails({username:res.data.username,role:res.data.role}))
+                dispatch(setUserDetails({name:res.data.name,username:res.data.username,email:res.data.email,phone:res.data.phone,role:res.data.role}))
                 setShowMessage(true);
                 // getShoppingBag();
                 goToHome()
@@ -89,12 +77,10 @@ const Login  =() => {
     };
 
     const dialogFooter = <div className="flex justify-content-center"><Button label="OK" className="p-button-text" autoFocus onClick={() => setShowMessage(false)} /></div>;
-    useEffect(() => {
-        // if (token) {
-        //     // קריאה ל-API רק אם יש טוקן
-        // }
-    }, [token]);
+
     return (
+          <div style={{ paddingTop: '60px' }}>
+
         <div className="form-demo">
         {/* //     <Dialog visible={showMessage} onHide={() => setShowMessage(false)} position="top" footer={dialogFooter} showHeader={false} breakpoints={{ '960px': '80vw' }} style={{ width: '30vw' }}>
         //         <div className="flex justify-content-center flex-column pt-6 px-3">
@@ -137,7 +123,7 @@ const Login  =() => {
             </div>
 
         </div>
-
+        </div>
 
     );
 }

@@ -1,9 +1,13 @@
+const { default: mongoose } = require("mongoose");
 const Company = require("../models/airconditioners/Company")
 
 const createCompany = async (req, res) => {
-    const {name, imagepath } = req.body
-
-    if(!name || !imagepath){
+    const name = req.body.name;
+    if(!name){
+        return res.status(400).json({ message: "all details are required" })
+    }
+    const imagepath = req.file.filename ;
+    if(!imagepath){
         return res.status(400).json({ message: "all details are required" })
     }
 
@@ -14,8 +18,7 @@ const createCompany = async (req, res) => {
     const company = await Company.create({name, imagePath: imagepath })
 
     if(company){
-        const companies = await Company.find().lean()
-        res.status(201).json(companies)
+        res.status(201).json(company)
     }
     else{
         return  res.status(400).json({ message: "invalid company" })
@@ -35,6 +38,9 @@ const readCompany = async (req,res)=> {
 const readCompanyByName = async (req,res)=> {
     const {name} = req.params
     console.log(name);
+    if (!name || typeof name !== 'string' || name.trim().length === 0) {
+        return res.status(400).json({ message: "Name parameter is required and must be a valid string" });
+    }
     const company = await Company.findOne({name: name}).lean()
     console.log(company);
     if(!company)
@@ -46,6 +52,9 @@ const readCompanyByName = async (req,res)=> {
 
 const deleteCompany = async (req,res)=> {
     const {_id} = req.body
+    if (!mongoose.Types.ObjectId.isValid(_id)) {
+        return res.status(400).json({ message: "Invalid company ID" });
+    }
     const company = await Company.findById(_id).exec()
     if(!company){
         return res.status(400).json({ message: "company not found" })

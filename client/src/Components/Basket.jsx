@@ -1,445 +1,3 @@
-// import axios from 'axios'
-// import { useEffect, useState } from 'react'
-// import { Button } from 'primereact/button';
-// import { DataView, DataViewLayoutOptions } from 'primereact/dataview';
-// import { Tag } from 'primereact/tag';
-// import { classNames } from 'primereact/utils';
-// import { Link, useNavigate } from 'react-router-dom';
-// import { InputText } from 'primereact/inputtext';
-// import { IconField } from 'primereact/iconfield';
-// import { InputIcon } from 'primereact/inputicon';
-// import { getToken } from '../store/tokenSlice';
-// import { useDispatch, useSelector } from 'react-redux';
-// import { setBasket } from '../store/basketSlice';
-
-
-// const Basket = () => {
-//     const { token } = useSelector((state) => state.token)
-//     // const { basket } = useSelector((state) => state.basket)
-//     const dispatch = useDispatch();
-//     const [shoppingBags, setShoppingBags] = useState([])
-
-//     const [layout, setLayout] = useState('list');
-
-//     // const sortData = (data) => {
-//     //     data.sort((a, b) => {
-//     //         if (a.title < b.title) return -1;  // a comes before b
-//     //         if (a.title > b.title) return 1;   // a comes after b
-//     //         return 0;                           // a and b are equal
-//     //     })
-//     // }
-
-//     const getShoppingBags = async () => {
-//         try {
-//             console.log(`token: ${token}`); // token is null here!!!!!!!!!
-//             const headers = {
-//                 'Authorization': `Bearer ${token}`
-//             }
-//             const res = await axios.get('http://localhost:8000/api/user/shoppingBag', { headers })
-//             if (res.status === 200) {
-//                 // sortData(res.data)
-//                 console.log(res.data);
-//                 // dispatch(setBasket(res.data))
-//                 setShoppingBags(res.data)
-//                 // alert("basket:", basket);
-//                 console.log("res.data", res.data);
-//                 // console.log("useState",shoppingBags);
-//             }
-//         }
-//         catch (e) {
-//             if (e.status === 401){
-//                 alert("unauthorized")
-//             }
-//             else if (e.status === 403){
-//                 alert("forbiddened")
-//             }
-//             console.error(e)
-//         }
-//     }
-//     const deleteShoppingBag = async (product) => {
-//         alert("hgvh")
-//         try {
-//             const headers = {
-//                 'Authorization': `Bearer ${token}`
-//             }
-//             const product_id = {
-//                 product_id: product._id
-//             }
-//             const res = await axios.delete('http://localhost:8000/api/user/shoppingBag', {
-//                 headers: headers,
-//                 data: product_id
-//             })
-//             if (res.status === 200) {
-//                 // dispatch(setBasket(res.data))
-//                 // sortData(res.data)
-//                 // setShoppingBags(res.data)
-//                 console.log("res.data", res.data);
-//                 // console.log("useState",shoppingBags);
-//                 getShoppingBags()
-//             }
-
-//         }
-//         catch (e) {
-//             console.error(e)
-//         }
-//     }
-
-//     const getSeverity = (s) => {
-//         if (s >= 50) {
-//             return 'success'
-//         }
-//         else if (s > 0) {
-//             return 'warning';
-//         }
-//         else if (s === 0) {
-//             return 'danger';
-//         }
-
-//     };
-//     const getSeverityText = (product) => {
-//         const severity = getSeverity(product.stock)
-
-//         switch (severity) {
-//             case 'success':
-//                 return "במלאי";
-
-//             case 'warning': //check what problematic
-//                 return "פריטים אחרונים";
-
-//             case 'danger':
-//                 return "אזל מהמלאי";
-
-//             default:
-//                 return null;
-//         }
-//     };
-
-//     const listItem = (product, index) => {
-//         // alert(product.describe)
-//         return (
-//             <>
-//                 <div className="col-12" key={product._id}>
-//                     <div className={classNames('flex flex-column xl:flex-row xl:align-items-start p-4 gap-4', { 'border-top-1 surface-border': index !== 0 })}>
-//                         {/* <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`/${product.company.imagePath}`} /> */}
-//                         <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`${product.imagepath}`} />
-//                         <div className="flex flex-column sm:flex-row justify-content-between align-items-center xl:align-items-start flex-1 gap-4">
-//                             <div className="flex flex-column align-items-center sm:align-items-start gap-3">
-//                                 {/* <Link to={{pathName:`/overheads/${product.title}` , state: {product:product} }}><div className="text-2xl font-bold text-900" style={{}} >{product.title}</div></Link> */}
-//                                 <Link to={`/overheads/overhead/${product._id}`} params={{ product: product }}><div className="text-2xl font-bold text-900" style={{}} >{product.title}</div></Link>
-
-//                                 <div className="flex align-items-center gap-3">
-//                                     <Tag value={getSeverityText(product)} severity={getSeverity(product.stock)}></Tag>
-//                                 </div>
-//                             </div>
-//                             <div className="flex sm:flex-column align-items-center sm:align-items-end gap-3 sm:gap-2">
-//                                 <span className="text-2xl font-semibold">₪{product.price}</span>
-//                                 <Button icon="pi pi-shopping-cart" className="p-button-rounded" disabled={getSeverity(product.stock) === "danger"} onClick={() => deleteShoppingBag(product)}>   להסרה מהעגלה  </Button>
-//                             </div>
-//                         </div>
-//                     </div>
-//                 </div>
-//             </>
-//         );
-//     };
-
-//     const gridItem = (product) => {
-//         alert(product.describe)
-//         return (
-//             <div className="col-12 sm:col-6 lg:col-12 xl:col-4 p-2" key={product._id}>
-//                 <div className="p-4 border-1 surface-border surface-card border-round">
-//                     <div className="flex flex-wrap align-items-center justify-content-between gap-2">
-//                         {/* <img className="w-9 shadow-2 border-round" src={`${product.company.imagePath}`} /> */}
-//                         <div className="flex align-items-center gap-2">
-//                             <Link to={"/overheads/overhead"}><div className="text-2xl font-bold text-900" style={{}}>{product.title}</div></Link>
-//                         </div>
-//                     </div>
-//                     <div className="flex flex-column align-items-center gap-3 py-5">
-//                         <img className="w-9 shadow-2 border-round" src={`${product.imagepath}`} />
-//                     </div>
-//                     <Tag value={getSeverityText(product)} severity={getSeverity(product.stock)}></Tag>
-
-//                     <div className="flex align-items-center justify-content-between">
-//                         <span className="text-2xl font-semibold">₪{product.price}</span>
-//                         <Button icon="pi pi-shopping-cart" className="p-button-rounded" disabled={getSeverity(product.stock) === "danger"}> להסרה מהעגלה </Button>
-//                     </div>
-//                 </div>
-//             </div>
-//         );
-//     };
-
-//     const itemTemplate = (product, layout, index) => {
-//         if (!product) {
-//             return;
-//         }
-
-//         if (layout === 'list') return listItem(product, index);
-//         else if (layout === 'grid') return gridItem(product);
-//     };
-
-//     const listTemplate = (products, layout) => {
-//         if (!token) {
-//             return <h1>please login to see your shopping bag</h1>; // Or any other fallback UI
-//         }
-//         if (!shoppingBags) {
-//             return <h1>Your basket is empty</h1>; // Or any other fallback UI
-//         }
-//         return <div className="grid grid-nogutter">{shoppingBags.map((product, index) => itemTemplate(product, layout, index))}</div>;
-//         // else{
-//         //     <h1>basketIsEmpty</h1>
-//         // }
-//     };
-
-//     const header = () => {
-//         return (
-//             <div className="flex justify-content-end">
-//                 <DataViewLayoutOptions layout={layout} onChange={(e) => setLayout(e.value)} />
-//             </div>
-//         );
-//     };
-//     useEffect(() => {
-//         getShoppingBags()
-//     }, [])
-
-//     return (
-//         <>
-//             {/* 
-//             <Routes>
-//                 <Route path='/overheads/overhead' element={<Suspense fallback="Loading..."><Overhead /></Suspense>}></Route>
-//             </Routes> */}
-//             {/* {userDetalis!=null ?userDetalis.role === 'user'?<Button onClick={ ()=>goToAddOverhead("Overhead")}>add overhead</Button>: <></> : <></>} */}
-//             {/* {<Button onClick={ ()=>goToAddOverhead("Overhead")}>add overhead</Button>} */}
-
-
-//             <div className="card">
-//                 <div className="flex justify-content-end">
-//                     <IconField iconPosition="left">
-//                         <InputIcon className="pi pi-search" />
-//                         {/* <InputText placeholder="Search by name" onChange={(c) => getOverheadByTitle(c)} value={value} /> */}
-//                     </IconField>
-//                 </div>
-//                 {/* {console.log("in return",basket)} */}
-//                 <DataView value={shoppingBags} listTemplate={listTemplate} layout={layout} header={header()} />
-//             </div>
-//         </>
-//     )
-//     //showing all the shopping bag objects which belongs to the userId
-//     // alert("basket")
-// }
-// export default Basket
-// import axios from 'axios'
-//  import { useEffect, useState} from 'react'
-//  import { Button } from 'primereact/button';
-//  import { DataView, DataViewLayoutOptions } from 'primereact/dataview';
-//  import { Tag } from 'primereact/tag';
-//  import { classNames } from 'primereact/utils';
-//  import { Link, useNavigate } from 'react-router-dom';
-//  import { InputText } from 'primereact/inputtext';
-//  import { IconField } from 'primereact/iconfield';
-//  import { InputIcon } from 'primereact/inputicon';
-//  import { getToken } from '../store/tokenSlice';
-//  import { useSelector } from 'react-redux';
- 
-//  const Basket = () =>{
- 
- 
-//      const {token} = useSelector((state) => state.token)
-//      const [shoppingBags, setShoppingBags] = useState([])
-//      const [layout, setLayout] = useState('list');
- 
-//      const sortData = (data) => {
-//          data.sort((a, b) => {
-//              if (a.title < b.title) return -1;  // a comes before b
-//              if (a.title > b.title) return 1;   // a comes after b
-//              return 0;                           // a and b are equal
-//          })
-//      }
- 
-//      const getShoppingBags = async () => {
-//          try {
-//              const headers = {
-//                  'Authorization': `Bearer ${token}`
-//              }
-//              const res = await axios.get('http://localhost:8000/api/user/shoppingBag',{headers})
-//              if (res.status === 200) {
-//                  // sortData(res.data)
-//                  setShoppingBags(res.data)
-//                  console.log("res.data",res.data);
-//                  console.log("useState",shoppingBags);
-//              }
-//          }
-//          catch (e) {
-//            if( e.status === 401){
-//                 alert('Unauthorized')
-//            }
-
-//              console.error(e)
-//          }
-//      }
- 
-//      const deleteShoppingBag = async (product)=>{
-//          alert("hgvh")
-//          try {
-//              const headers = {
-//                  'Authorization': `Bearer ${token}`
-//              }
-//              const product_id = {
-//                  product_id: product._id
-//              }
-//              const res = await axios.delete('http://localhost:8000/api/user/shoppingBag',{
-//                  headers: headers,
-//              data:product_id
-//          })
-//              if (res.status === 200) {
-//                  // sortData(res.data)
-//                  // setShoppingBags(res.data)
-//                  console.log("res.data",res.data);
-//                  console.log("useState",shoppingBags);
-//              }
-             
-//          }
-//          catch (e) {
-//              console.error(e)
-//          }
-//      }
- 
-//      const getSeverity = (s) => {
-//          if (s >= 50) {
-//              return 'success'
-//          }
-//          else if (s > 0) {
-//              return 'warning';
-//          }
-//          else if (s === 0) {
-//              return 'danger';
-//          }
- 
-//      };
-//      const getSeverityText = (product) => {
-//          const severity = getSeverity(product.stock)
- 
-//          switch (severity) {
-//              case 'success':
-//                  return "במלאי";
- 
-//              case 'warning': //check what problematic
-//                  return "פריטים אחרונים";
- 
-//              case 'danger':
-//                  return "אזל מהמלאי";
- 
-//              default:
-//                  return null;
-//          }
-//      };
- 
-//      const listItem = (product, index) => {
-//          return (
-//              <>
-//                  <div className="col-12" key={product._id}>
-//                      <div className={classNames('flex flex-column xl:flex-row xl:align-items-start p-4 gap-4', { 'border-top-1 surface-border': index !== 0 })}>
-//                          {/* <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`/${product.company.imagePath}`} /> */}
-//                          <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`${product.imagepath}`} />
-//                          <div className="flex flex-column sm:flex-row justify-content-between align-items-center xl:align-items-start flex-1 gap-4">
-//                              <div className="flex flex-column align-items-center sm:align-items-start gap-3">
-//                                  {/* <Link to={{pathName:`/overheads/${product.title}` , state: {product:product} }}><div className="text-2xl font-bold text-900" style={{}} >{product.title}</div></Link> */}
-//                                  <Link to={`/overheads/overhead/${product._id}` } params={{ product: product }}><div className="text-2xl font-bold text-900" style={{}} >{product.title}</div></Link>
- 
-//                                  <div className="flex align-items-center gap-3">
-//                                      <Tag value={getSeverityText(product)} severity={getSeverity(product.stock)}></Tag>
-//                                  </div>
-//                              </div>
-//                              <div className="flex sm:flex-column align-items-center sm:align-items-end gap-3 sm:gap-2">
-//                                  <span className="text-2xl font-semibold">₪{product.price}</span>
-//                                  <Button icon="pi pi-shopping-cart" className="p-button-rounded" disabled={getSeverity(product.stock) === "danger"} onClick={()=>deleteShoppingBag(product)}>   להסרה מהעגלה  </Button>
-//                              </div>
-//                          </div>
-//                      </div>
-//                  </div>
-//              </>
-//          );
-//      };
- 
-//      const gridItem = (product) => {
-//          return (
-//              <div className="col-12 sm:col-6 lg:col-12 xl:col-4 p-2" key={product._id}>
-//                  <div className="p-4 border-1 surface-border surface-card border-round">
-//                      <div className="flex flex-wrap align-items-center justify-content-between gap-2">
-//                          {/* <img className="w-9 shadow-2 border-round" src={`${product.company.imagePath}`} /> */}
-//                          <div className="flex align-items-center gap-2">
-//                              <Link to={"/overheads/overhead"}><div className="text-2xl font-bold text-900" style={{}}>{product.title}</div></Link>
-//                          </div>
-//                      </div>
-//                      <div className="flex flex-column align-items-center gap-3 py-5">
-//                          <img className="w-9 shadow-2 border-round" src={`${product.imagepath}`} />
-//                      </div>
-//                      <Tag value={getSeverityText(product)} severity={getSeverity(product.stock)}></Tag>
- 
-//                      <div className="flex align-items-center justify-content-between">
-//                          <span className="text-2xl font-semibold">₪{product.price}</span>
-//                          <Button icon="pi pi-shopping-cart" className="p-button-rounded" disabled={getSeverity(product.stock) === "danger"}> להסרה מהעגלה </Button>
-//                      </div>
-//                  </div>
-//              </div>
-//          );
-//      };
- 
-//      const itemTemplate = (product, layout, index) => {
-//          if (!product) {
-//              return;
-//          }
-         
-//          if (layout === 'list') return listItem(product, index);
-//          else if (layout === 'grid') return gridItem(product);
-//      };
- 
-//      const listTemplate = (products, layout) => {
-//          if(shoppingBags!=null){
-//              return <div className="grid grid-nogutter">{shoppingBags.map((product, index) => itemTemplate(product, layout, index))}</div>;
-//          }
-//          else{
-//              <>basketIsEmpty</>
-//          }
-//          };
- 
-//      const header = () => {
-//          return (
-//              <div className="flex justify-content-end">
-//                  <DataViewLayoutOptions layout={layout} onChange={(e) => setLayout(e.value)} />
-//              </div>
-//          );
-//      };
-//      useEffect(() => {
-//          getShoppingBags()
-//      }, [])
- 
-//      return (
-//          <>
-//  {/* 
-//              <Routes>
-//                  <Route path='/overheads/overhead' element={<Suspense fallback="Loading..."><Overhead /></Suspense>}></Route>
-//              </Routes> */}
-//              {/* {userDetalis!=null ?userDetalis.role === 'user'?<Button onClick={ ()=>goToAddOverhead("Overhead")}>add overhead</Button>: <></> : <></>} */}
-//              {/* {<Button onClick={ ()=>goToAddOverhead("Overhead")}>add overhead</Button>} */}
- 
- 
-//              <div className="card">
-//                  <div className="flex justify-content-end">
-//                      <IconField iconPosition="left">
-//                          <InputIcon className="pi pi-search" />
-//                          {/* <InputText placeholder="Search by name" onChange={(c) => getOverheadByTitle(c)} value={value} /> */}
-//                      </IconField>
-//                  </div>
-//                  <DataView value={shoppingBags} listTemplate={listTemplate} layout={layout} header={header()} />
-//              </div>
-//          </>
-//      )
-//      //showing all the shopping bag objects which belongs to the userId
-//  // alert("basket")
-//  }
-
-//  export default Basket
-
-
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { Button } from 'primereact/button';
@@ -451,18 +9,36 @@ import { IconField } from 'primereact/iconfield';
 import { InputIcon } from 'primereact/inputicon';
 import { useDispatch, useSelector } from 'react-redux';
 import { setBasket } from '../store/basketSlice';
+import { Checkbox } from 'primereact/checkbox';
+import { InputNumber } from 'primereact/inputnumber';
 
 const Basket = () => {
-    const {basket} = useSelector((state) => state.basket);
-    const {token} = useSelector((state) => state.token);
+    const { basket } = useSelector((state) => state.basket);
+    const { token } = useSelector((state) => state.token);
     const [layout, setLayout] = useState('list');
+    const [selectedItems, setSelectedItems] = useState([]);
+    const [shoppingBags, setShoppingBags] = useState([]);
+    const [errorStates, setErrorStates] = useState({}); // To track errors
+    const [sum, setSum] = useState(1);
+
+    const [amount, setAmount] = useState(1);
+    const [quantities, setQuantities] = useState({});
+
     const dispatch = useDispatch()
     const navigate = useNavigate()
-    console.log("token Basket",token)
-    let amount =0;
-    basket.map(b=> amount+=b.price)
 
-    const [totalAmount,setTotalAmount] =useState(0);
+    // // let sum = 0;
+    // if (basket) {
+    //     console.log(selectedItems);
+    //     selectedItems.map(item => sum += item.price)
+    // }
+
+    // console.log(basket);
+    //     const updatedItems = selectedItems.map(item => ({
+    //   ...item,
+    //   amount: 1
+    // }));
+    const [totalAmount, setTotalAmount] = useState(0);
     const deleteShoppingBag = async (product) => {
         try {
             const headers = {
@@ -474,7 +50,8 @@ const Basket = () => {
                 data: product_id
             });
             if (res.status === 200) {
-                console.log("Item removed", res.data);
+                const updatedBasket = basket.filter(itemInBasket => itemInBasket.product._id != product._id)
+                dispatch(setBasket(updatedBasket))
             }
         } catch (e) {
             console.error(e);
@@ -486,20 +63,76 @@ const Basket = () => {
             const headers = {
                 'Authorization': `Bearer ${token}`
             }
-            const res = await axios.get('http://localhost:8000/api/user/shoppingBag',{headers})
+            const res = await axios.get('http://localhost:8000/api/user/shoppingBag', { headers })
             if (res.status === 200) {
+                console.log("res.data ", res.data);
                 dispatch(setBasket(res.data))
-                console.log("res.data",res.data);
+                setShoppingBags(res.data)
+                // console.log("res.data", res.data);
             }
         }
         catch (e) {
             console.error(e)
         }
     }
+    const updateShoppingBagProductAmount = async (productDetails, newAmount) => {
+        try {
+            const headers = {
+                'Authorization': `Bearer ${token}`
+            };
+            const data = {
+                product_id: productDetails._id,
+                amount: newAmount
+            };
 
-    const goToPayment = ()=> {
-        navigate('/basket/payment')
+            const res = await axios.put('http://localhost:8000/api/user/shoppingBag', data, { headers });
+
+            if (res.status === 200) {
+                const updatedBasket = basket.map(item => {
+                    if (!item) return item;
+                    if (item.product._id === res.data.updatedShoppingBag.product_id) {
+                        return { ...item, amount: res.data.updatedShoppingBag.amount };
+                    }
+                    return item;
+                });
+
+                dispatch(setBasket(updatedBasket));
+
+                // גם לעדכן את selectedItems
+                const updatedSelectedItems = selectedItems.map(item => {
+                    if (item.product._id === res.data.updatedShoppingBag.product_id) {
+                        return { ...item, amount: res.data.updatedShoppingBag.amount };
+                    }
+                    return item;
+                });
+
+                setSelectedItems(updatedSelectedItems);
+
+                // חישוב מחדש של הסכום
+                const totalSum = updatedSelectedItems.reduce((sum, item) => sum + (item.product.price * item.amount), 0);
+                setSum(totalSum);
+
+            }
+            else {
+                // if (res.status === 404) {
+                //     console.log("error 404:", res)
+                //     alert("not found")
+                // }
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    };
+    const goToPayment = () => {
+        const navigationData = {
+            products: selectedItems,
+            // You can add any other data you may want to send
+        };
+        navigate('/basket/payment', { state: navigationData })
     }
+    useEffect(() => {
+        getShoppingBag()
+    }, [])
     const getSeverity = (stock) => {
         if (stock >= 50) return 'success';
         else if (stock > 0) return 'warning';
@@ -516,82 +149,205 @@ const Basket = () => {
         }
     };
 
-    const listItem = (product, index) => {
+    const listItem = (productInBasket, index) => {
+        const productDetails = productInBasket?.product;
+        if (!productDetails) {
+            return null; // אל תרנדר פריטים ללא פרטים או שאזלו מהמלאי
+        }
+
+        const isSelected = selectedItems.some(item => item.product._id === productDetails._id);
+
+        const handleSelectionChange = (productInBasket) => {
+            const alreadySelected = selectedItems.some(item => item.product._id === productInBasket.product._id);
+            let updatedSelectedItems;
+
+            if (alreadySelected) {
+                updatedSelectedItems = selectedItems.filter(item => item.product._id !== productInBasket.product._id);
+            } else {
+                updatedSelectedItems = [...selectedItems, productInBasket];
+            }
+
+            setSelectedItems(updatedSelectedItems);
+
+            const totalSum = updatedSelectedItems.reduce((sum, item) => sum + (item.product.price * item.amount), 0);
+            setSum(totalSum);
+        };
+
         return (
-            <div className="col-12" key={product._id}>
-                <div className={classNames('flex flex-column xl:flex-row xl:align-items-start p-4 gap-4', { 'border-top-1 surface-border': index !== 0 })}>
-                    <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`${product.imagepath}`} />
+            <div className="col-12" key={productDetails._id}>
+                <div className={classNames('flex flex-column xl:flex-row p-4 gap-3 border-bottom-1')}>
+                    <Checkbox
+                        inputId={productDetails._id}
+                        checked={isSelected}
+                        onChange={() => handleSelectionChange(productInBasket)}
+                        disabled={productDetails.stock === 0}
+                    />
+                    {productDetails.stock === 0 && <> <h3>אזל מהמלאי <br /> המוצר יהיה ניתן לרכישה בעדכון המלאי </h3>   </>}
+
+                    <img
+                        className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round"
+                        src={`${productDetails.imagepath}`}
+                        alt={productDetails.title}
+                    />
                     <div className="flex flex-column sm:flex-row justify-content-between align-items-center xl:align-items-start flex-1 gap-4">
                         <div className="flex flex-column align-items-center sm:align-items-start gap-3">
-                            <Link to={`/overheads/overhead/${product._id}`}><div className="text-2xl font-bold text-900">{product.title}</div></Link>
-                            <div className="flex align-items-center gap-3">
-                                <Tag value={getSeverityText(product)} severity={getSeverity(product.stock)}></Tag>
-                            </div>
+                            <Link
+                                to={`/overheads/overhead/${productDetails._id}`}
+                                style={{
+                                    textDecoration: 'none'
+                                }}
+                            >
+                                <div className="text-2xl font-bold text-900">{productDetails.title}</div>
+                            </Link>
+                            <Tag value={getSeverityText(productDetails)} severity={getSeverity(productDetails.stock)}></Tag>
                         </div>
                         <div className="flex sm:flex-column align-items-center sm:align-items-end gap-3 sm:gap-2">
-                            <span className="text-2xl font-semibold">₪{product.price}</span>
-                            <Button icon="pi pi-shopping-cart" className="p-button-rounded" disabled={getSeverity(product.stock) === "danger"} onClick={() => deleteShoppingBag(product)}> להסרה מהעגלה </Button>
+                            <span className="text-2xl font-semibold">₪{productDetails.price}</span>
+                            <h2>amount : {productInBasket?.amount}</h2>
+                            <InputNumber
+                                value={productInBasket?.amount}
+                                onValueChange={(e) => {
+                                    const newAmount = e.value;
+                                    // Handle invalid input cases
+                                    if (newAmount < 1 || newAmount === null) {
+                                        setErrorStates((prev) => ({ ...prev, [productDetails._id]: true }));
+                                    } 
+                                    else if (newAmount > productDetails.stock) {
+                                        setErrorStates((prev) => ({ ...prev, [productDetails._id]: true }));
+                                        //alert(`לא ניתן להזמין יותר מהמלאי הקיים. כמות נוכחית במלאי: ${productDetails.stock}`); // Show alert if exceeds stock
+                                        // productInBasket?.amount = productDetails.stock; // Set to max stock
+
+                                    }
+                                    else {
+                                        // Update the basket locally for immediate UI feedback
+                                        const updatedBasket = basket.map((item) =>
+                                            item.product._id === productDetails._id
+                                                ? { ...item, amount: newAmount }
+                                                : item
+                                        );
+                                        dispatch(setBasket(updatedBasket));
+                                        // Synchronize with the backend
+                                        updateShoppingBagProductAmount(productDetails, newAmount);
+                                        console.log("newAmount", newAmount);
+                                        console.log("productDetails.stock", productDetails.stock);
+                                    }
+                                }}
+                                showButtons
+                                className="p-inputnumber-sm"
+                                inputStyle={{ padding: '0.5rem', textAlign: 'center', width: 'auto' }}
+                                decrementButtonClassName="p-button-sm p-button-primary"
+                                incrementButtonClassName="p-button-sm p-button-primary"
+                                //incrementButtonDisabled={productInBasket?.amount >= productDetails.stock}
+                                incrementButtonIcon="pi pi-plus"
+                                decrementButtonIcon="pi pi-minus"
+                                disabled={productDetails.stock === 0}
+                                min={1}
+                            />
+                            <Button
+                                // icon="pi pi-shopping-cart" 
+                                icon="pi pi-trash"
+                                className="p-button-rounded p-button-danger"
+                                disabled={getSeverity(productDetails.stock) === "danger"}
+                                onClick={() => deleteShoppingBag(productDetails)}
+                            />
                         </div>
                     </div>
                 </div>
             </div>
         );
     };
-
-    const listTemplate = (products, layout) => {
-        if(!basket){
+    const listTemplate = () => {
+        if (!basket) {
             return <h1>basket is empty</h1>
         }
-        return <div className="grid grid-nogutter">{basket.map((product, index) => listItem(product, index))}</div>;
+        //console.log(basket);
+        return (
+            <div
+                className="grid grid-nogutter"
+                style={{ maxWidth: '1300px', margin: '0 auto', alignContent: 'center' }}
+            >
+                {basket.map((product, index) => listItem(product, index))}
+            </div>
+        )
     };
 
-    const header = () => {
-        return (
-            <div className="flex justify-content-end">
-                <DataViewLayoutOptions layout={layout} onChange={(e) => setLayout(e.value)} />
-            </div>
-        );
-    };
+    // const header = () => {
+    //     return (
+    //         <div className="flex justify-content-end">
+    //             <DataViewLayoutOptions layout={layout} onChange={(e) => setLayout(e.value)} />
+    //         </div>
+    //     );
+    // };
     useEffect(() => {
-        if (token) {
-            // קריאה ל-API רק אם יש טוקן
-            getShoppingBag();
-            amount = 0;
-        }
-    }, [token]);
+        // if (token) {
+        //     // קריאה ל-API רק אם יש טוקן
+        //     getShoppingBag();
+        setSum(0)
+        // }
+        // else {
+        //     alert("to save thing in your basket you need to register")
+        //     navigate("/register")
+        // }
+
+    }, []);
 
     return (
-        <div className="flex">
-        {/* Left Panel with Payment Button */}
-        <div className="card p-4 mr-4" style={{ width: '200px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}>
-            <h3>סך הכל</h3>
-            {/* {setTotalAmount(amount)} */}
-            <h4>{amount} ש"ח</h4>
-            <div className="flex justify-content-center align-items-center" style={{ height: '200px', border: '2px solid #e0e0e0', borderRadius: '8px' }}>
-                <Button label="לשלם עכשיו" icon="pi pi-credit-card" onClick={goToPayment} className="p-button-success p-button-rounded" style={{ width: '150px' }} />
-            </div>
-        </div>
+        <div style={{ paddingTop: '60px' }}>
+            <h1 style={{ textAlign: 'center', marginBottom: '20px', fontSize: '2rem', color: '#333' }}>
+                סל הקניות שלי
+            </h1>
+            <div className="flex">
+                {/* Left Panel with Payment Button */}
+                <div
+                    className="card p-3"
+                    style={{
+                        width: '200px',
+                        height: '150px',
+                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+                        borderRadius: '12px',
+                        textAlign: 'center',
+                        position: 'sticky',
+                        top: '400px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        background: 'linear-gradient(135deg, #d0f0fd, #b0e0f8)',
+                        border: '2px solid #90caf9',
+                        color: '#fff',
+                    }}
+                >
+                    <h3 style={{ marginBottom: '10px' }}>
+                        <span style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>סך הכל</span>
+                        <br />
+                        <span style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>₪{sum}</span>
+                    </h3>
+                    <Button
+                        label="לשלם עכשיו"
+                        icon="pi pi-credit-card"
+                        onClick={goToPayment}
+                        className="p-button-rounded"
+                        style={{
+                            width: '160px',
+                            height: '35px',
+                            fontSize: '1rem',
+                            background: '#ff9800',
+                            border: 'none',
+                            color: '#fff',
+                            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+                        }}
+                    />
+                </div>
 
-        {/* Right Side with Shopping Basket Items */}
-        <div className="card flex-1">
-            <div className="flex justify-content-end">
-                <IconField iconPosition="left">
-                    <InputIcon className="pi pi-search" />
-                </IconField>
+                {/* Right Side with Shopping Basket Items */}
+                <div className="card flex-1">
+                    {/* <div className="flex justify-content-end">
+                    </div> */}
+                    <DataView value={basket} listTemplate={listTemplate} layout="list" />
+                </div>
             </div>
-            <DataView value={basket} listTemplate={listTemplate} layout={layout} header={header()} />
         </div>
-    </div>
-);
-        // <div className="card">
-        //     <div className="flex justify-content-end">
-        //         <IconField iconPosition="left">
-        //             <InputIcon className="pi pi-search" />
-        //         </IconField>
-        //     </div>
-        //     <DataView value={basket} listTemplate={listTemplate} layout={layout} header={header()} />
-        // </div>
-    // );
+    );
 };
 
 export default Basket;

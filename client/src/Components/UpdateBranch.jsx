@@ -58,6 +58,8 @@ const UpdateBranch = () => {
     };
 
     return (
+        <div style={{ paddingTop: '60px' }}>
+
         <div className="form-demo">
             <Dialog visible={showMessage} onHide={() => setShowMessage(false)} position="top" footer={<Button label="Close" onClick={() => setShowMessage(false)} />} showHeader={false} breakpoints={{ '960px': '80vw' }} style={{ width: '40vw' }}>
                 <div className="flex justify-content-center flex-column pt-6 px-3">
@@ -147,6 +149,7 @@ const UpdateBranch = () => {
                 </div>
             </div>
         </div>
+           </div>
     );
 }
 
