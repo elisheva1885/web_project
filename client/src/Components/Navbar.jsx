@@ -24,9 +24,9 @@ const Navbar = () => {
 
     const { token } = useSelector((state) => state.token)
 
-    const {userDetails} = useSelector((state) => state.userDetails);
-    console.log("userDetails Navbar",userDetails)
-    console.log("token Navbar",token)
+    const { userDetails } = useSelector((state) => state.userDetails);
+    console.log("userDetails Navbar", userDetails)
+    console.log("token Navbar", token)
 
     const acItems = [
         {
@@ -64,9 +64,9 @@ const Navbar = () => {
         {
             // {/* {userDetalis!=null ?userDetalis.role === 'user'?<Button onClick={ ()=>goToAddOverhead("Overhead")}>add overhead</Button>: <></> : <></>} */}
             // label: token != null ?'התנתקות' : 'התחברות',
-            label:userDetails?.username? userDetails?.username:'התחברות',
+            label: userDetails?.username ? userDetails?.username : 'התחברות',
             icon: 'pi pi-user',
-            url: userDetails?.username? '/userAccount': '/login'
+            url: userDetails?.username ? '/userAccount' : '/login'
         }
         ,
         {
@@ -91,9 +91,9 @@ const Navbar = () => {
         }
         ,
         {
-           label:userDetails?.role==='admin'? 'לאתר הניהול':'',
-           icon: userDetails?.role==='admin'?<img src="admin.png" style={{ width: '24px', height: '24px' }} />:'' ,
-           url: userDetails?.role==='admin'?'/admin' :'/'
+            label: userDetails?.role === 'admin' ? 'לאתר הניהול' : '',
+            icon: userDetails?.role === 'admin' ? <img src="admin.png" style={{ width: '24px', height: '24px' }} /> : '',
+            url: userDetails?.role === 'admin' ? '/admin' : '/'
         }
 
 
@@ -116,8 +116,8 @@ const Navbar = () => {
         <>
             <Routes>
                 <Route path='/branch' element={<Suspense fallback="Loading..."><Branch /></Suspense>}></Route>
-                <Route path='/branch/add' element={<Suspense fallback="Loading..."><AddBranch/></Suspense>}></Route>
-                <Route path='/branch/update' element={<Suspense fallback="Loading..."><UpdateBranch/></Suspense>}></Route>
+                <Route path='/branch/add' element={<Suspense fallback="Loading..."><AddBranch /></Suspense>}></Route>
+                <Route path='/branch/update' element={<Suspense fallback="Loading..."><UpdateBranch /></Suspense>}></Route>
                 <Route path='/about' element={<Suspense fallback="Loading..."><About /></Suspense>}></Route>
                 <Route path='/overheads' element={<Suspense fallback="Loading..."><Overheads /></Suspense>}>        </Route>
                 <Route path={`/overheads/overhead/:product`} element={<Suspense fallback="Loading..."><Overhead /></Suspense>}></Route>
@@ -125,18 +125,39 @@ const Navbar = () => {
                 <Route path='/register' element={<Suspense fallback="Loading..."><Register /></Suspense>}></Route>
                 <Route path='/overheads/add' element={<Suspense fallback="Loading..."><Add_AirConditioner /></Suspense>}></Route>
                 <Route path='/basket' element={<Suspense fallback="Loading..."><Basket /></Suspense>}></Route>
-                <Route path='/admin' element={<Suspense fallback="Loading..."><Admin/></Suspense>}></Route>
-                <Route path='/userAccount' element={<Suspense fallback="Loading..."><UserAccont/></Suspense>}></Route>
-                <Route path='/admin/register' element={<Suspense fallback="Loading..."><AdminRegister/></Suspense>}></Route>
-                <Route path='/basket/Payment' element={<Suspense fallback="Loading..."><Payment/></Suspense>}></Route>
+                <Route path='/admin' element={<Suspense fallback="Loading..."><Admin /></Suspense>}></Route>
+                <Route path='/userAccount' element={<Suspense fallback="Loading..."><UserAccont /></Suspense>}></Route>
+                <Route path='/admin/register' element={<Suspense fallback="Loading..."><AdminRegister /></Suspense>}></Route>
+                <Route path='/basket/Payment' element={<Suspense fallback="Loading..."><Payment /></Suspense>}></Route>
             </Routes>
-            <div className="flex align-items-center gap-2">
-                <Menubar model={items} start={start} end={end} style={{ position: 'fixed', top: 0 }} />
-                {hoverMenuVisible && (
-                    <div  onMouseEnter={() => setHoverMenuVisible(true)} onMouseLeave={() => setHoverMenuVisible(false)}>
-                        <MegaMenu model={acItems} orientation="vertical" breakpoint="960px" />
-                    </div>
-                )}
+            <div className="flex align-items-center gap-2"
+>
+                <div style={{ position: "relative" }}
+                    >
+
+                    <Menubar model={items} start={start} end={end} style={{ position: "fixed", top: 0, width: "100%", zIndex: 999 }} />
+
+                    {hoverMenuVisible && (
+                        <div
+                            onMouseEnter={() => setHoverMenuVisible(true)}
+                            onMouseLeave={() => setHoverMenuVisible(false)}
+                            style={{
+                                position: "fixed",
+                                top: "50px",  // Ensures it appears just below the navbar
+                                left: "22px", // Adjust this if necessary
+                                width: "auto", // Prevents it from taking full width
+                                minWidth: "80px", // Adjust based on the menu size
+                                zIndex: 1000,
+                                background: "white",
+                                boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+                                borderRadius: "4px",
+                                overflow: "visible"
+                            }}
+                        >
+                            <MegaMenu model={acItems} orientation="vertical" breakpoint="960px" />
+                        </div>
+                    )}
+                </div>
             </div>
         </>
 

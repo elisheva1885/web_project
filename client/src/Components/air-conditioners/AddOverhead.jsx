@@ -79,7 +79,7 @@ const AddOverheadForm = () => {
 
                         <div className="field">
                             <span className="p-float-label">
-                                <Controller name="imagepath" control={control} rules={{ required: 'Image path is required.' }} render={({ field, fieldState }) => (
+                                <Controller name="image" control={control} rules={{ required: 'Image is required.' }} render={({ field, fieldState }) => (
                                     <InputText id={field.name} {...field} className={classNames({ 'p-invalid': fieldState.invalid })} />
                                 )} />
                                 <label htmlFor="imagepath" className={classNames({ 'p-error': errors.imagepath })}>*Image Path</label>
