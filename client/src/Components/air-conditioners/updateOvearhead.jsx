@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import Overhead from './Overhead';
 import { setMiniCenterals } from '../../store/air-conditioner/miniCenteralsSlice';
 import { setOverheads } from '../../store/air-conditioner/overHeadsSlice';
+import { Toast } from 'primereact/toast';
 
 const UpdateOverheadAC = () => {
     const location = useLocation();
@@ -17,6 +18,13 @@ const UpdateOverheadAC = () => {
     const {token }= useSelector((state)=> state.token)
     const {overheads }= useSelector((state)=> state.overheads)
     const dispatch = useDispatch()
+    const toast = useRef(null);
+    const massages = {
+        INVALID_OVERHEAD_ID: "מזהה לא תקין",
+        OVERHEAD_NOT_FOUND: "לא נמצא מזגן תקרה עם מזהה זה",
+        OVERHEAD_UPDATED: "מזגן תקרה עודכן בהצלחה",
+        INTERNAL_ERROR: "שגיאה פנימית",
+    }
 
     const { control, handleSubmit, formState: { errors } } = useForm({
         defaultValues: o // Set defaultValues to o
@@ -77,22 +85,25 @@ const UpdateOverheadAC = () => {
             const res = await axios.put(`http://localhost:8000/api/air-conditioner/overhead`, overheadAC, {headers});
             if (res.status === 200) {
                 setShowMessage(true);
-                console.log(res.data);
                 const unUpdatedOverheads = overheads.filter(overhead=> overhead._id != res.data._id)
                 dispatch(setOverheads([...unUpdatedOverheads , res.data]))
+                toast.current.show({ severity: 'success', summary: 'Success', detail: massages.OVERHEAD_UPDATED, life: 3000 });
                 navigate('/overheads');
             }
         } catch (error) {
-            console.error(error);
+            console.error("Error updating overhead AC:", error);
+            if (error.response) {
+                const errorMessage = massages[error.response.data.message] || massages.INTERNAL_ERROR;
+                toast.current.show({ severity: 'error', summary: 'Error', detail: errorMessage, life: 3000 });
+            } else {
+                toast.current.show({ severity: 'error', summary: 'Error', detail: massages.INTERNAL_ERROR, life: 3000 });
+            }
         }
     };
 
-    // const getFormErrorMessage = (name) => {
-    //     return errors[name] ? <small className="p-error">{errors[name].message}</small> : null;
-    // };
-
     return (
         <div style={{ paddingTop: '60px' }}>
+            <Toast ref={toast} position="top-right" />
             <Dialog visible={showMessage} onHide={() => setShowMessage(false)} position="top" footer={<Button label="Close" onClick={() => setShowMessage(false)} />} showHeader={false} breakpoints={{ '960px': '80vw' }} style={{ width: '40vw' }}>
                 <div className="flex justify-content-center flex-column pt-6 px-3">
                     <i className="pi pi-check-circle" style={{ fontSize: '5rem', color: 'var(--green-500)' }}></i>

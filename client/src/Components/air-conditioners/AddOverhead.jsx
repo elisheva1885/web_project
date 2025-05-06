@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
@@ -10,43 +10,64 @@ import { Dropdown } from 'primereact/dropdown';
 import { setOverheads } from '../../store/air-conditioner/overHeadsSlice';
 import { useNavigate } from 'react-router-dom';
 import { FileUpload } from 'primereact/fileupload';
+import { Toast } from 'primereact/toast';
 
 
 const AddOverhead = () => {
     const { control, handleSubmit, formState: { errors } } = useForm();
     const [showMessage, setShowMessage] = useState(false);
     const [formData, setFormData] = useState({});
-    const {overheads} = useSelector((state) => state.overheads)
-    const {companies} = useSelector((state) => state.companies)
-const token = useSelector((state) => state.token);
-const navigate = useNavigate();
-const dispatch = useDispatch();
+    const { overheads } = useSelector((state) => state.overheads)
+    const { companies } = useSelector((state) => state.companies)
+    const token = useSelector((state) => state.token);
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const toast = useRef(null);
+
+    const massages = {
+        INVALID_OTHER_DATA: "מידע לא תקין",
+        REQUIRED_FIELDS_MISSING: "שדות חובה חסרים",
+        INVALID_IMAGE: "תמונה לא תקינה",
+        OVERHEAD_ALREADY_EXISTS: "מזגן קיים כבר",
+        OVERHEAD_CREATION_FAILED: "יצירת מזגן נכשלה",
+        INTERNAL_ERROR: "שגיאה פנימית בשרת",
+        NO_OVERHEADS_FOUND: "לא נמצאו מזגנים",
+        INVALID_TITLE: "כותרת לא תקינה",
+        INVALID_OTHER_DATA_FORMAT: "פורמט מידע לא תקין",
+    }
 
     const onSubmit = async (data) => {
         const formData = new FormData(); // Create an empty FormData object      
         // Append the file to the FormData object
         if (data.imagepath instanceof File) {
-          formData.append('imagepath', data.imagepath);
+            formData.append('imagepath', data.imagepath);
         } else {
-          console.error("Error: imagepath is not a valid file.");
-          return;
+            console.error("Error: imagepath is not a valid file.");
+            return;
         }
-          formData.append('otherData', JSON.stringify(data));
+        formData.append('otherData', JSON.stringify(data));
         try {
             const headers = {
                 'Authorization': `Bearer ${token}`, // If you have authentication
                 'Content-Type': 'multipart/form-data'
             };
             const res = await axios.post('http://localhost:8000/api/air-conditioner/overhead', formData, { headers });
-            if(res.status===201){
+            if (res.status === 201) {
                 setFormData(data);
-            setShowMessage(true);
+                setShowMessage(true);
                 dispatch(setOverheads([...overheads, res.data]));
+                toast.current.show({ severity: 'success', summary: 'Success', detail: 'Overhead Air Conditioner Added Successfully!', life: 3000 });
                 navigate('/overheads');
             }
-            
+
         } catch (error) {
-            console.error(error);
+            if (error.response) {
+                const errorMessage = massages[error.response.data.message] || "התרחשה שגיאה";
+                toast.current.show({ severity: 'error', summary: 'Error', detail: errorMessage, life: 3000 });
+            } else {
+                console.error("Error:", error);
+                toast.current.show({ severity: 'error', summary: 'Error', detail: 'התרחשה שגיאה לא צפויה', life: 3000 });
+            }
         }
     };
 
@@ -56,25 +77,26 @@ const dispatch = useDispatch();
 
     return (
         <div className="form-demo">
+            <Toast ref={toast} position="top-right" />
             <Dialog visible={showMessage} onHide={() => setShowMessage(false)} position="top" footer={<Button label="Close" onClick={() => setShowMessage(false)} />} showHeader={false} breakpoints={{ '960px': '80vw' }} style={{ width: '40vw' }}>
                 <div className="flex justify-content-center flex-column pt-6 px-3">
                     <i className="pi pi-check-circle" style={{ fontSize: '5rem', color: 'var(--green-500)' }}></i>
-                    <h5>Overhead Air Conditioner Added Successfully!</h5>
+                    <h5>מזגן עילי נוסף בהצלחה</h5>
                     <p style={{ lineHeight: 1.5, textIndent: '1rem' }}>
-                        Air Conditioner <b>{formData.title}</b> has been successfully added.
+                        מזגן <b>{formData.title}</b> נוסף בהצלחה למערכת.
                     </p>
                 </div>
             </Dialog>
             <div className="flex justify-content-center">
                 <div className="card" style={{ width: '100%', maxWidth: '600px' }}>
-                    <h5 className="text-center">Add Overhead Air Conditioner</h5>
+                    <h5 className="text-center">הוספת מזגן עילי</h5>
                     <form onSubmit={handleSubmit(onSubmit)} className="p-fluid">
                         <div className="field">
                             <span className="p-float-label">
                                 <Controller name="company" control={control} render={({ field }) => (
                                     <Dropdown id={field.id} value={field.value} onChange={(e) => field.onChange(e.value)} options={companies} optionLabel="name" />
                                 )} />
-                                <label htmlFor="company">Company</label>
+                                <label htmlFor="company">חברה</label>
                             </span>
                             {getFormErrorMessage('company')}
                         </div>
@@ -84,7 +106,7 @@ const dispatch = useDispatch();
                                 <Controller name="title" control={control} rules={{ required: 'Title is required.' }} render={({ field, fieldState }) => (
                                     <InputText id={field.name} {...field} className={classNames({ 'p-invalid': fieldState.invalid })} />
                                 )} />
-                                <label htmlFor="title" className={classNames({ 'p-error': errors.title })}>*Title</label>
+                                <label htmlFor="title" className={classNames({ 'p-error': errors.title })}>*כותרת</label>
                             </span>
                             {getFormErrorMessage('title')}
                         </div>
@@ -94,7 +116,7 @@ const dispatch = useDispatch();
                                 <Controller name="describe" control={control} rules={{ required: 'Description is required.' }} render={({ field, fieldState }) => (
                                     <InputText id={field.name} {...field} className={classNames({ 'p-invalid': fieldState.invalid })} />
                                 )} />
-                                <label htmlFor="describe" className={classNames({ 'p-error': errors.describe })}>*Description</label>
+                                <label htmlFor="describe" className={classNames({ 'p-error': errors.describe })}>*תיאור</label>
                             </span>
                             {getFormErrorMessage('describe')}
                         </div>
@@ -103,15 +125,15 @@ const dispatch = useDispatch();
                             <span className="p-float-label">
                                 <Controller name="imagepath" control={control} rules={{ required: 'Image path is required.' }} render={({ field, fieldState }) => (
                                     <FileUpload
-                                            id="imagepath"
-                                            name="imagepath"
-                                            accept="image/*"
-                                            customUpload
-                                            uploadHandler={(e) => field.onChange(e.files[0])} // Attach the file to the form
-                                            auto
-                                            mode="basic" // Use 'basic' mode for a simpler layout
-                                            className={classNames({ 'p-invalid': fieldState.invalid })}
-                                        />                                   )} />
+                                        id="imagepath"
+                                        name="imagepath"
+                                        accept="image/*"
+                                        customUpload
+                                        uploadHandler={(e) => field.onChange(e.files[0])} // Attach the file to the form
+                                        auto
+                                        mode="basic" // Use 'basic' mode for a simpler layout
+                                        className={classNames({ 'p-invalid': fieldState.invalid })}
+                                    />)} />
                                 <label htmlFor="imagepath" className={classNames({ 'p-error': errors.imagepath })}>*Image Path</label>
                             </span>
                             {getFormErrorMessage('imagepath')}
@@ -122,7 +144,7 @@ const dispatch = useDispatch();
                                 <Controller name="stock" control={control} render={({ field }) => (
                                     <InputText id={field.name} type="number" {...field} />
                                 )} />
-                                <label htmlFor="stock">Stock</label>
+                                <label htmlFor="stock">מלאי</label>
                             </span>
                         </div>
 
@@ -131,7 +153,7 @@ const dispatch = useDispatch();
                                 <Controller name="price" control={control} rules={{ required: 'Price is required.' }} render={({ field, fieldState }) => (
                                     <InputText id={field.name} type="number" {...field} className={classNames({ 'p-invalid': fieldState.invalid })} />
                                 )} />
-                                <label htmlFor="price" className={classNames({ 'p-error': errors.price })}>*Price</label>
+                                <label htmlFor="price" className={classNames({ 'p-error': errors.price })}>*מחיר</label>
                             </span>
                             {getFormErrorMessage('price')}
                         </div>
@@ -203,8 +225,8 @@ const dispatch = useDispatch();
                         </div>
                         <div className="field">
                             <span className="p-float-label">
-                                <Controller name="recommended_model_C" control={control}  render={({ field }) => (
-                                    <InputText id="recommended_model_C" {...field}  />
+                                <Controller name="recommended_model_C" control={control} render={({ field }) => (
+                                    <InputText id="recommended_model_C" {...field} />
                                 )} />
                                 <label htmlFor="recommended_model_C" >recommended_model_C</label>
                             </span>
@@ -338,7 +360,7 @@ const dispatch = useDispatch();
                             <Controller name="night_mode" control={control} render={({ field }) => (
                                 <div>
                                     <input type="checkbox" id="night_mode" {...field} checked={field.value} />
-                                    <label htmlFor="night_mode">Night Mode</label>
+                                    <label htmlFor="night_mode">מצב לילה</label>
                                 </div>
                             )} />
                         </div>
@@ -346,7 +368,7 @@ const dispatch = useDispatch();
                             <Controller name="timer" control={control} render={({ field }) => (
                                 <div>
                                     <input type="checkbox" id="timer" {...field} checked={field.value} />
-                                    <label htmlFor="timer">Timer</label>
+                                    <label htmlFor="timer">טיימר</label>
                                 </div>
                             )} />
                         </div>
@@ -354,7 +376,7 @@ const dispatch = useDispatch();
                             <Controller name="sabbath_command" control={control} render={({ field }) => (
                                 <div>
                                     <input type="checkbox" id="sabbath_command" {...field} checked={field.value} />
-                                    <label htmlFor="sabbath_command">Sabbath Command</label>
+                                    <label htmlFor="sabbath_command">פיקוד שבת</label>
                                 </div>
                             )} />
                         </div>

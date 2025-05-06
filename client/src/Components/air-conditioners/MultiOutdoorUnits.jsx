@@ -260,7 +260,7 @@ const MultiOutdoorUnits = () => {
                 <div className="flex justify-content-end">
                     <IconField iconPosition="left">
                         <InputIcon className="pi pi-search" />
-                        <InputText placeholder="Search by name" onChange={(c) => getMultiOutdoorUnitByTitle(c)} value={value} />
+                        <InputText placeholder="חיפוש לפי שם מזגן" onChange={(c) => getMultiOutdoorUnitByTitle(c)} value={value} />
                     </IconField>
                 </div>
                 <DataView value={multiOutdoorUnits} listTemplate={listTemplate} layout={layout} />

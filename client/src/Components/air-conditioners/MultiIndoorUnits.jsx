@@ -262,7 +262,7 @@ return (
             <div className="flex justify-content-end">
                 <IconField iconPosition="left">
                     <InputIcon className="pi pi-search" />
-                    <InputText placeholder="Search by name" onChange={(c) => getMultiIndoorUnitByTitle(c)} value={value} />
+                    <InputText placeholder="חיפוש לפי שם מזגן" onChange={(c) => getMultiIndoorUnitByTitle(c)} value={value} />
                 </IconField>
             </div>
             <DataView value={multiIndoorUnits} listTemplate={listTemplate} layout={layout} />

@@ -297,7 +297,7 @@ const MiniCenterals = () => {
                 <div className="flex justify-content-end">
                     <IconField iconPosition="left">
                         <InputIcon className="pi pi-search" />
-                        <InputText placeholder="Search by name" onChange={(c) => getMiniCenteralByTitle(c)} value={value} />
+                        <InputText placeholder="חיפוש לפי שם מזגן" onChange={(c) => getMiniCenteralByTitle(c)} value={value} />
                     </IconField>
                 </div>
                 <DataView value={miniCenterals} listTemplate={listTemplate} layout={layout} />

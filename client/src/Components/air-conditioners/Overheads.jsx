@@ -245,7 +245,7 @@ const Overheads = () => {
 
     const listTemplate = (products, layout) => {
         if (!Array.isArray(overheads) || overheads.length === 0) {
-            return <h1>No overheads available</h1>; // Fallback UI          
+            return <h1>אין מזגנים עיליים זמינים</h1>; // Fallback UI          
         }
         return <div className="grid grid-nogutter">{overheads.map((product, index) => itemTemplate(product, layout, index))}</div>;
     };
@@ -258,7 +258,7 @@ const Overheads = () => {
                 <div className="flex justify-content-end">
                     <IconField iconPosition="left">
                         <InputIcon className="pi pi-search" />
-                        <InputText placeholder="Search by name" onChange={(c) => getOverheadByTitle(c)} value={value} />
+                        <InputText placeholder="חיפוש לפי שם מזגן" onChange={(c) => getOverheadByTitle(c)} value={value} />
                     </IconField>
                 </div>
                 <DataView value={overheads} listTemplate={listTemplate} layout={layout} />
