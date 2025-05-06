@@ -26,50 +26,31 @@ const mailOptions = {
 };
 
 const createDelivery = async (req, res) => {
-    const user_id = req.user._id
+    const user_id = req.user?._id
     const { address, purchase, status } = req.body
-    console.log("createDelivery", address, purchase, status)
-    if (!user_id || !address || !purchase) {
-        return res.status(400).json({ message: "user_id, address and purchase are required" })
+    if (!user_id) {
+        return res.status(400).json({ message: "USER_REQUIRED" });
+    }
+    if (!address || typeof address !== "object" || !address.city || !address.street || !address.zipCode) {
+        return res.status(400).json({ message: "INVALID_ADDRESS" });
     }
     if (!purchase || typeof purchase !== "string" || purchase.length !== 24) {
-        console.error("Invalid purchase ObjectId:", purchase);
-        return res.status(400).json({ message: "invalid purchase id" });
+        return res.status(400).json({ message: "INVALID_PURCHASE_ID" });
     }
-    let delivery = null;
-    if (!status) {
-        delivery = await Delivery.create({ user_id, address, purchase })
+    if (status && typeof status !== "string") {
+        return res.status(400).json({ message: "INVALID_STATUS" });
     }
-    else {
-        delivery = await Delivery.create({ user_id, address, purchase, status })
-    }
-    if (delivery) {
-        sendDeliveryCreatedEmail(delivery._id)
-        // const user = await User.findById(user_id).lean()
-        // if (!user) {
-        //     return res.status(404).json({ message: "user not found" })
-        // }
-
-        // console.log("user", user)
-        // const deliveries = await Delivery.find().lean()
-        // console.log("createDelivery")
-        // const mailOptions = {
-        //     from: 'eli7saf@gmail.com',
-        //     to: user.email,
-        //     subject: ' ההזמנה שלך נכנסה למערכת ותשלח אליך בקרוב',
-        //     text: `שלום ${user.name} ,\n\n ההזמנה שלך נכנסה למערכת ותשלח אליך בקרוב.\n\n פרטי ההזמנה:\n כתובת: ${address}\n סטטוס: ${status}\n\n תודה על רכישתך!\n צוות השירות שלנו`,
-        // };
-        // transporter.sendMail(mailOptions, function (error, info) {
-        //     if (error) {
-        //         console.log('שגיאה:', error);
-        //     } else {
-        //         console.log('אימייל נשלח:', info.response);
-        //     }
-        // });
-        return res.status(201).json(delivery)
-    }
-    else {
-        return res.status(400).json({ message: "invalid delivery" })
+    try {
+        const delivery = await Delivery.create({ user_id, address, purchase, status });
+        if (delivery) {
+            sendDeliveryCreatedEmail(delivery._id);
+            return res.status(201).json(delivery);
+        } else {
+            return res.status(400).json({ message: "DELIVERY_CREATION_FAILED" });
+        }
+    } catch (error) {
+        console.error("Error creating delivery:", error);
+        return res.status(500).json({ message: "INTERNAL_ERROR" });
     }
 }
 
@@ -154,6 +135,7 @@ const sendDeliveryUpdatedEmail = async (deliveryId) => {
 
     }
 }
+
 const readDeliveries = async (req, res) => {
     try {
         const deliveries = await Delivery.find()
@@ -171,96 +153,122 @@ const readDeliveries = async (req, res) => {
             .lean();
 
         if (!deliveries?.length) {
-            return res.status(404).json({ message: "No deliveries found" });
+            return res.status(404).json({ message: "NO_DELIVERIES_FOUND" });
         }
 
         return res.status(200).json(deliveries);
     } catch (error) {
         console.error("Error fetching deliveries:", error);
-        return res.status(500).json({ message: "An error occurred while fetching deliveries" });
+        return res.status(500).json({ message: "INTERNAL_ERROR" });
     }
 }
 
 const readDeliveriesByUserId = async (req, res) => {
-    const user_id = req.user._id
-    if (!user_id) {
-        return res.status(400).json({ message: "user required" })
+    const user_id = req.user?._id
+    if (!user_id || typeof user_id !== "string" || user_id.length !== 24) {
+        return res.status(400).json({ message: "INVALID_USER_ID" });
     }
-    const deliveries = await Delivery.find({ user_id: user_id })
-        .populate('user_id', 'username')
-        .populate({
-            path: 'purchase',
-            populate: {
-                path: 'products',
+    try {
+        const deliveries = await Delivery.find({ user_id: user_id })
+            .populate('user_id', 'username')
+            .populate({
+                path: 'purchase',
                 populate: {
-                    path: 'product_id', // Populate the product details
+                    path: 'products',
+                    populate: {
+                        path: 'product_id',
+                    },
                 },
-            },
-        })
-        .populate('address')
-        .lean()
+            })
+            .populate('address')
+            .lean()
 
-    if (!deliveries)
-        return res.status(404).json({ message: "no delivery for this user" })
-    return res.status(200).json(deliveries)
+        if (!deliveries?.length) {
+            return res.status(404).json({ message: "NO_DELIVERIES_FOR_USER" });
+        }
+        return res.status(200).json(deliveries)
+    } catch (error) {
+        console.error("Error fetching deliveries for user:", error);
+        return res.status(500).json({ message: "INTERNAL_ERROR" });
+    }
 }
 
-const readDeliveriesByUserName = async (req, res) => {
-    const { username } = req.params
-    console.log("username ", username)
-    if (!username) {
-        return res.status(400).json({ message: "user required" })
-    }
-    const user = await User.findOne({ username: username });
-    console.log("user ", user)
-    if (!user) {
-        return res.status(401).json({ message: "user anauthorized" })
-    }
-    const deliveries = await Delivery.find({ user_id: user._id }).populate('address').populate('purchase').lean()
-    if (!deliveries)
-        return res.status(404).json({ message: "no deliveries for this user" })
-    return res.status(200).json(deliveries)
-}
+// const readDeliveriesByUserName = async (req, res) => {
+//     const { username } = req.params
+//     console.log("username ", username)
+//     if (!username) {
+//         return res.status(400).json({ message: "user required" })
+//     }
+//     const user = await User.findOne({ username: username });
+//     console.log("user ", user)
+//     if (!user) {
+//         return res.status(401).json({ message: "user anauthorized" })
+//     }
+//     const deliveries = await Delivery.find({ user_id: user._id }).populate('address').populate('purchase').lean()
+//     if (!deliveries)
+//         return res.status(404).json({ message: "no deliveries for this user" })
+//     return res.status(200).json(deliveries)
+// }
 
 const updateDelivery = async (req, res) => {
     const { _id, address, purchase, status } = req.body
-    if (!_id) {
-        return res.status(400).json({ message: "error on updating, no id passed" })
+    if (!_id || typeof _id !== "string" || _id.length !== 24) {
+        return res.status(400).json({ message: "INVALID_DELIVERY_ID" });
     }
+
+    if (address && (typeof address !== "object" || !address.city || !address.street || !address.zipCode)) {
+        return res.status(400).json({ message: "INVALID_ADDRESS" });
+    }
+
+    if (purchase && (typeof purchase !== "string" || purchase.length !== 24)) {
+        return res.status(400).json({ message: "INVALID_PURCHASE_ID" });
+    }
+
+    if (status && typeof status !== "string") {
+        return res.status(400).json({ message: "INVALID_STATUS" });
+    }
+
     try {
         const delivery = await Delivery.findById(_id).exec()
         if (!delivery) {
-            return res.status(400).json({ message: "no such delivery" })
+            return res.status(400).json({ message: "DELIVERY_NOT_FOUND" })
         }
-        delivery.address = address ? address : delivery.address
-        delivery.purchase = purchase ? purchase : delivery.purchase
-        delivery.status = status ? status : delivery.status
+        delivery.address = address || delivery.address;
+        delivery.purchase = purchase || delivery.purchase;
+        delivery.status = status || delivery.status;
 
         const updateddelivery = await delivery.save()
-        if(updateddelivery && status)
-        {
+        if (updateddelivery && status) {
             sendDeliveryUpdatedEmail(_id)
         }
         const deliveries = await Delivery.find().lean()
         return res.status(200).json(deliveries)
     } catch (error) {
-        return res.status(404).json({ message: "unable to update", error: error })
+        console.error("Error updating delivery:", error);
+        return res.status(500).json({ message: "INTERNAL_ERROR"});
     }
 
 }
 
 const deleteDelivery = async (req, res) => {
     const { _id } = req.body
+    if (!_id || typeof _id !== "string" || _id.length !== 24) {
+        return res.status(400).json({ message: "INVALID_DELIVERY_ID" });
+    }
+    try {
     const delivery = await Delivery.findById(_id).exec()
     if (!delivery) {
-        return res.status(404).json({ message: "delivery not found" })
+        return res.status(404).json({ message: "DELIVERY_NOT_FOUND" });
     }
     const result = await delivery.deleteOne()
     const deliveries = await Delivery.find().lean()
     if (!deliveries?.length)
-        return res.status(404).json({ message: "no deliveries found" })
+        return res.status(404).json({ message: "NO_DELIVERIES_FOUND" });
     return res.status(200).json(deliveries)
-
+    } catch (error) {
+        console.error("Error deleting delivery:", error);
+        return res.status(500).json({ message: "INTERNAL_ERROR" });
+    }
 }
 
 module.exports = { createDelivery, readDeliveries, readDeliveriesByUserId, updateDelivery, deleteDelivery }

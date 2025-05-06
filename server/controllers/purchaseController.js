@@ -6,160 +6,159 @@ const Overhead = require("../models/airconditioners/Overhead");
 const MiniCenteral = require("../models/airconditioners/MiniCenteral");
 
 const createPurchase = async (req, res) => {
-    const user_id = req.user._id
-    const { products , paymentType} = req.body
- 
+    const user_id = req.user?._id
+    const { products, paymentType } = req.body
+
     if (!user_id || !products?.length || !paymentType) {
-        return res.status(400).json({ message: "all details are required" })
+        return res.status(400).json({ message: "REQUIRED_FIELDS_MISSING" })
     }
-    
+    try {
         const result = await checkProductsStock(products)
-        console.log("result in the main", result);
-        if(result.status===200){
-        const purchase = await Purchase.create({user_id, products,paymentType})
-        if (purchase) {
-            // const purchases = await Purchase.find().lean()
-            // console.log("here", purchase);
-            return res.status(201).json(purchase)
+        if (result.status === 200) {
+            const purchase = await Purchase.create({ user_id, products, paymentType })
+            if (purchase) {
+                return res.status(201).json(purchase)
+            }
+            else {
+                return res.status(400).json({ message: "PURCHASE_CREATION_FAILED" })
+            }
         }
-        else {   
-            return res.status(400).json({ message: "invalid purchase" })
+        else {
+            return res.status(result.status).json({ message: result.message })
         }
+    } catch (error) {
+        console.error("Error creating purchase:", error);
+        return res.status(500).json({ message: "INTERNAL_ERROR" });
     }
-    else{
-        return res.status(result.status).json({message: result.message})
-    }
-    
 }
 
 
-const checkProductsStock = async (products)=>{  
+const checkProductsStock = async (products) => {
     try {
         const results = await Promise.all(
-          products.map(async (product) => {
-            const productDetails = await ShoppingBag.findById(product).lean();
-            console.log("ppppp",productDetails);
-            const result = await changeProductStockByIdAndType(
-              productDetails.product_id,
-              productDetails.type,
-              productDetails.amount
-            );
-            if (result.status == 400) {
-              return {status:400,message:`${productDetails} is out of stock from ${productDetails.type}`};
-            }
-            if(result.status===200){
-                return { status: 200 ,message:'Ok',  product: productDetails };
-            }
-          })
+            products.map(async (product) => {
+                const productDetails = await ShoppingBag.findById(product).lean();
+                if (!productDetails) {
+                    return { status: 404, message: "PRODUCT_NOT_FOUND" };
+                }
+                const result = await changeProductStockByIdAndType(
+                    productDetails.product_id,
+                    productDetails.type,
+                    productDetails.amount
+                );
+                if (result.status == 400) {
+                    return { status: 400, message: "PRODUCT_OUT_OF_STOCK" };
+                }
+                return { status: 200, message: 'OK', product: productDetails };
+            })
         );
-        console.log(results);
-        return {status:200, message: 'All products are in stock', results };
-      } catch (error) {
+        const badResult = results.find((result) => result.status !== 200);
+        if (badResult) {
+            return badResult;
+        }
+        return { status: 200, message: 'ALL_PRODUCTS_IN_STOCK', results };
+    } catch (error) {
         console.error('Error checking stock:', error.message);
-        return {error:error, message: error.message };
-        // return {status:error.status, message: error.message };
-
-      }
-} 
-
-const changeProductStockByIdAndType = async (_id, type, amount)=>{
-    const Model = mongoose.model(type);
-    const airConditioner = await Model.findOne({ _id: _id }).populate("company").exec()
-    if (airConditioner.stock < amount) {
-        return { status: 400, message: `not enough, there is only ${airConditioner.stock} in the stock` };
+        return { status: 500, message: "INTERNAL_ERROR" };
     }
-    airConditioner.stock = airConditioner.stock - amount
-    const updatedAirConditioner = await airConditioner.save()
-    return { status: 200, message: `Ok` }
-    // switch (type) {
-    //     case "overhead":
-    //         const overhead = await Overhead.findById({ _id: _id }).populate("company").exec()
-    //         if(overhead){
-    //             if (overhead.stock < amount) {
-    //                 console.log("in error");
-    //                 return {status:400,message:`not enough, there is only ${overhead.stock} in the stock`};
-    //             }
-    //             overhead.stock = overhead.stock - amount
-    //             const updatedOverhead = await overhead.save()
-    //             return {status:200, message : `Ok`}
-    //         }
-    //         else{
-    //             return {status:404,message: `not found`}
-    //         }
-    //         //delete from the basket
-    //         break;
-    //     case "miniCenteral":
-    //         const miniCenteral = await MiniCenteral.findById({ _id:_id}).populate("company").exec()
-    //         if(miniCenteral){
-    //             if (miniCenteral.stock < amount) {
-    //                 return {message:`not enough, there is only ${miniCenteral.stock} in the stock`};
-    //             }
-    //             miniCenteral.stock = miniCenteral.stock - amount
-    //             const updatedMiniCenteral = await miniCenteral.save()
-    //             return { status:200,message : `Ok`}
-    //         }
-    //         else{
-    //             return {status:404,message: `not found`}
-    //         }
-            
-    //         //delete from the basket
-    //         break;
-    //     default:
-    //         break;
-    // }
 }
 
+const changeProductStockByIdAndType = async (_id, type, amount) => {
+    try {
+        const Model = mongoose.model(type);
+        const airConditioner = await Model.findOne({ _id: _id }).populate("company").exec()
+        if (!airConditioner) {
+            return { status: 404, message: `PRODUCT_NOT_FOUND` };
+        }
+        if (airConditioner.stock < amount) {
+            return { status: 400, message: `OUT_OF_STOCK` };
+        }
+        airConditioner.stock -= amount
+        const updatedAirConditioner = await airConditioner.save()
+        return { status: 200, message: `STOCK_UPDATED_SUCCESSFULLY` }
+    } catch (error) {
+        console.error('Error changing product stock:', error.message);
+        return { status: 500, message: "INTERNAL_ERROR" };
+    }
+}
 
 const readPurchases = async (req, res) => {
-    const purchases = await Purchase.find().lean()
-    if (!purchases?.length)
-        return res.status(404).json({ message: "no purchases found" })
-    return res.status(200).json(purchases)
+    try {
+        const purchases = await Purchase.find().lean()
+        if (!purchases?.length)
+            return res.status(404).json({ message: "NO_PURCHASES_FOUND" })
+        return res.status(200).json(purchases)
+    } catch (error) {
+        console.error("Error reading purchases:", error);
+        return res.status(500).json({ message: "INTERNAL_ERROR" });
+    }
 }
 
-const readPurchasesByUserId = async (req,res) => {
-    const user_id = req.user._id
-    if (!user_id) {
-        return res.status(400).json({ message: "user required" })
+const readPurchasesByUserId = async (req, res) => {
+    const user_id = req.user?._id
+    if (!user_id || typeof user_id !== "string" || user_id.length !== 24) {
+        return res.status(400).json({ message: "INVALID_USER_ID" });
     }
-    const purchases = await Purchase.findById(user_id).lean()
 
-    if(!purchases)
-        return res.status(404).json({ message: "no purchase for this user" })
-    return res.status(200).json(purchases)
+    try {
+        const purchases = await Purchase.findById(user_id).lean()
+        if (!purchases?.length) {
+            return res.status(404).json({ message: "NO_PURCHASES_FOR_USER" });
+        }
+        return res.status(200).json(purchases);
+    } catch (error) {
+        console.error("Error fetching purchases for user:", error);
+        return res.status(500).json({ message: "INTERNAL_ERROR" });
+    }
 }
 
 const updatePurchase = async (req, res) => {
-    const { _id, products ,paymentType} = req.body
-    if(!_id){
-        return res.status(400).json({message: "error on updating"})
+    const { _id, products, paymentType } = req.body
+    if (!_id || typeof _id !== "string" || _id.length !== 24) {
+        return res.status(400).json({ message: "INVALID_PURCHASE_ID" });
     }
-    if (!products) {
-        return res.status(400).json({ message: "nothing changed" })
+
+    if (!products && !paymentType) {
+        return res.status(400).json({ message: "NO_FIELDS_TO_UPDATE" });
     }
-    const purchase = await Purchase.findById(_id).exec()
-    if (!purchase) {
-        return res.status(400).json({ message: "no such purchase" })
+
+    try {
+        const purchase = await Purchase.findById(_id).exec()
+        if (!purchase) {
+            return res.status(404).json({ message: "PURCHASE_NOT_FOUND" })
+        }
+        if (products) {
+            purchase.products = products;
+        }
+        if (paymentType) {
+            purchase.paymentType = paymentType;
+        }
+        const updatedPurchase = await purchase.save()
+        const purchases = await Purchase.find().lean()
+        return res.status(200).json(purchases)
+    } catch (error) {
+        console.error("Error updating purchase:", error);
+        return res.status(500).json({ message: "INTERNAL_ERROR" });
     }
-    purchase.products = products
-    
-    const updatedPurchase = await purchase.save()
-    const purchases = await Purchase.find().lean()
-    return res.status(200).json(purchases)  
 }
 
-const deletePurchase = async (req,res)=> {
-    const {_id} = req.body
-    const purchase = await Purchase.findById(_id).exec()
-    if(!purchase){
-        return res.status(404).json({ message: "purchase not found" })
+const deletePurchase = async (req, res) => {
+    const { _id } = req.body
+    if (!_id || typeof _id !== "string" || _id.length !== 24) {
+        return res.status(400).json({ message: "INVALID_PURCHASE_ID" });
     }
-    const result = await purchase.deleteOne()
-    const purchases = await Purchase.find().lean()
-    if (!purchases?.length)
-        return res.status(404).json({ message: "no purchases found" })
-    return res.status(200).json(purchases)
 
+    try {
+        const purchase = await Purchase.findById(_id).exec()
+        if (!purchase) {
+            return res.status(404).json({ message: "PURCHASE_NOT_FOUND" })
+        }
+        const result = await purchase.deleteOne()
+        return res.status(200).json({ message: "PURCHASE_DELETED_SUCCESSFULLY" });
+    } catch (error) {
+        console.error("Error deleting purchase:", error);
+        return res.status(500).json({ message: "INTERNAL_ERROR"});
+    }
 }
 
-module.exports = {createPurchase, readPurchases, readPurchasesByUserId, updatePurchase, deletePurchase}
+module.exports = { createPurchase, readPurchases, readPurchasesByUserId, updatePurchase, deletePurchase }
