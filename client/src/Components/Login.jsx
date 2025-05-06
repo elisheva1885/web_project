@@ -1,4 +1,4 @@
-import React, {useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
@@ -10,17 +10,21 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { clearToken, setToken } from '../store/tokenSlice';
 import myStore from '../store/store';
-import { setBasket ,clearBasket  } from '../store/basketSlice';
+import { setBasket, clearBasket } from '../store/basketSlice';
 import { clearUserDetails, setUserDetails } from '../store/userDetailsSlice';
 import Basket from './Basket';
 import { clearUserDeliveries } from '../store/userDeliveriesSlice';
 
-const Login  =() => {
-    const {token} = useSelector((state) => state.token)
+const Login = () => {
+    const { token } = useSelector((state) => state.token)
     // const {basket} = useSelector((state) => state.basket)
-    const {userDetails} = useSelector((state) => state.userDetails);
+    const { userDetails } = useSelector((state) => state.userDetails);
     // const {role} = useSelector((state) => state.userDetails.role)
-
+    const errorMessages = {
+        INVALID_CREDENTIALS: "שליחת הנתונים נכשלה. אנא בדוק את החיבור שלך ונסה שוב.",
+        UNAUTHORIZED: "השם המשתמש או הסיסמה אינם נכונים. אנא בדוק ונסה שוב.",
+        INTERNAL_ERROR: "שגיאה פנימית בשרת. אנא נסה שוב מאוחר יותר."
+    };
     const navigate = useNavigate();
     const [showMessage, setShowMessage] = useState(false);
     const [formData, setFormData] = useState({});
@@ -35,13 +39,13 @@ const Login  =() => {
         navigate('/');
     };
 
-    const signOut = ()=> {
+    const signOut = () => {
         clearToken()
         clearBasket()
         clearUserDeliveries()
     }
 
-  
+
 
     const onSubmit = async (data) => {
         setFormData(data);
@@ -50,23 +54,24 @@ const Login  =() => {
             password: data.password
         }
         try {
-            const res = await axios.post(`http://localhost:8000/api/auth/login`,user)
-            if(res.status===200){
+            const res = await axios.post(`http://localhost:8000/api/auth/login`, user)
+            if (res.status === 200) {
                 console.log(res.data);
                 dispatch(setToken(res.data.token))
                 console.log(token);
-                dispatch(setUserDetails({name:res.data.name,username:res.data.username,email:res.data.email,phone:res.data.phone,role:res.data.role}))
+                dispatch(setUserDetails({ name: res.data.name, username: res.data.username, email: res.data.email, phone: res.data.phone, role: res.data.role }))
                 setShowMessage(true);
-                // getShoppingBag();
                 goToHome()
             }
         }
 
         catch (error) {
-            console.error(error)
-            if(error.status===401){
-                    alert("Unauthorized")
-                }
+            if (error.response && error.response.data?.code) {
+                const code = error.response.data.code;
+                alert(errorMessages[code] || "שגיאה לא צפויה");
+            } else {
+                alert("שגיאה כללית, נסי שוב מאוחר יותר");
+            }
         }
     };
 
@@ -79,50 +84,41 @@ const Login  =() => {
     const dialogFooter = <div className="flex justify-content-center"><Button label="OK" className="p-button-text" autoFocus onClick={() => setShowMessage(false)} /></div>;
 
     return (
-          <div style={{ paddingTop: '60px' }}>
+        <div style={{ paddingTop: '60px' }}>
 
-        <div className="form-demo">
-        {/* //     <Dialog visible={showMessage} onHide={() => setShowMessage(false)} position="top" footer={dialogFooter} showHeader={false} breakpoints={{ '960px': '80vw' }} style={{ width: '30vw' }}>
-        //         <div className="flex justify-content-center flex-column pt-6 px-3">
-        //             <i className="pi pi-check-circle" style={{ fontSize: '5rem', color: 'var(--green-500)' }}></i>
-        //             <h5>Login Successful!</h5>
-        //             <p style={{ lineHeight: 1.5, textIndent: '1rem' }}>
-        //             !!התחברת בהצלחה {userDetails} שלום  <b></b>  
-        //             </p>
-        //         </div>
-        //     </Dialog> */}
-            <div className="flex justify-content-center">
-                <div className="card">
-                    <h5 className="text-center">התחבר</h5>
-                    <form onSubmit={handleSubmit(onSubmit)} className="p-fluid">
-                        
-                    <p>?לא רשומים באתר</p>
-                    <Link to={`/register` }>לחצו כאן</Link>
-                    <br/><br/><br/>
-                        <div className="field">
-                            <span className="p-float-label">
-                                <Controller name="username" control={control} rules={{ required: 'Name is required.' }} render={({ field, fieldState }) => (
-                                    <InputText id={field.name} {...field} autoFocus className={classNames({ 'p-invalid': fieldState.invalid })} />
-                                )} />
-                                <label htmlFor="name" className={classNames({ 'p-error': errors.name })}>*שם משתמש</label>
-                            </span>
-                            {getFormErrorMessage('name')}
-                        </div>
-                        <div className="field">
-                            <span className="p-float-label">
-                                <Controller name="password" control={control} rules={{ required: 'Password is required.' }} render={({ field, fieldState }) => (
-                                    <InputText id={field.name} {...field} autoFocus className={classNames({ 'p-invalid': fieldState.invalid })} />
-                                )} />
-                                <label htmlFor="password" className={classNames({ 'p-error': errors.password })}>*סיסמה</label>
-                            </span>
-                            {getFormErrorMessage('password')}
-                        </div>
-                        <Button type="submit" label="Submit" className="mt-2" />
-                    </form>
+            <div className="form-demo">
+                <div className="flex justify-content-center">
+                    <div className="card">
+                        <h5 className="text-center">התחבר</h5>
+                        <form onSubmit={handleSubmit(onSubmit)} className="p-fluid">
+
+                            <p>?לא רשומים באתר</p>
+                            <Link to={`/register`}>לחצו כאן</Link>
+                            <br /><br /><br />
+                            <div className="field">
+                                <span className="p-float-label">
+                                    <Controller name="username" control={control} rules={{ required: 'יש להזין שם משתמש.', }} render={({ field, fieldState }) => (
+                                        <InputText id={field.name} {...field} autoFocus className={classNames({ 'p-invalid': fieldState.invalid })} />
+                                    )} />
+                                    <label htmlFor="name" className={classNames({ 'p-error': errors.name })}>*שם משתמש</label>
+                                </span>
+                                {getFormErrorMessage('name')}
+                            </div>
+                            <div className="field">
+                                <span className="p-float-label">
+                                    <Controller name="password" control={control} rules={{ required: 'יש להזין סיסמה.', }} render={({ field, fieldState }) => (
+                                        <InputText id={field.name} {...field} autoFocus className={classNames({ 'p-invalid': fieldState.invalid })} />
+                                    )} />
+                                    <label htmlFor="password" className={classNames({ 'p-error': errors.password })}>*סיסמה</label>
+                                </span>
+                                {getFormErrorMessage('password')}
+                            </div>
+                            <Button type="submit" label="להתחברות" className="mt-2" />
+                        </form>
+                    </div>
                 </div>
-            </div>
 
-        </div>
+            </div>
         </div>
 
     );
