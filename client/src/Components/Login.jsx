@@ -23,7 +23,9 @@ const Login = () => {
     const errorMessages = {
         INVALID_CREDENTIALS: "שליחת הנתונים נכשלה. אנא בדוק את החיבור שלך ונסה שוב.",
         UNAUTHORIZED: "השם המשתמש או הסיסמה אינם נכונים. אנא בדוק ונסה שוב.",
-        INTERNAL_ERROR: "שגיאה פנימית בשרת. אנא נסה שוב מאוחר יותר."
+        INTERNAL_ERROR: "שגיאה פנימית בשרת. אנא נסה שוב מאוחר יותר.",
+        Access_denied: "אינך מורשה לבצע פעולה זו.",
+        Forbidden: "אינך מורשה לבצע פעולה זו."
     };
     const navigate = useNavigate();
     const [showMessage, setShowMessage] = useState(false);
