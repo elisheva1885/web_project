@@ -24,7 +24,6 @@ import useAddToBasket from "../../hooks/useAddToBasket";
 const MiniCenterals = () => {
 
     const { token } = useSelector((state) => state.token)
-    // const {companies} = useSelector((state) => state.companies)
     const { basket } = useSelector((state) => state.basket)
     const { userDetails } = useSelector((state) => state.userDetails);
     const { miniCenterals } = useSelector((state) => state.miniCenterals);
@@ -38,8 +37,6 @@ const MiniCenterals = () => {
     const { control, handleSubmit, formState: { errors }, watch } = useForm()
     const { getFilePath } = useGetFilePath()
 
-    // const [showDialog, setShowDialog] = useState([]);
-
     const navigate = useNavigate();
     const dispatch = useDispatch();
     console.log(miniCenterals);
@@ -51,8 +48,6 @@ const MiniCenterals = () => {
         INVALID_USER_ID: "המזהה שלך אינו תקין. נסי להתחבר מחדש.",
         INVALID_PRODUCT_ID: "מזהה המוצר אינו תקין.",
         INVALID_AMOUNT: "כמות המוצר חייבת להיות מספר חיובי.",
-        "Invalid type: MiniCenteral. Must be one of Overhead, MiniCenteral, MultiIndoorUnit, MultiOutdoorUnit":
-            "סוג המוצר אינו תקין. אנא נסי שוב.",
         INTERNAL_ERROR: "שגיאת שרת פנימית. נסי שוב מאוחר יותר.",
         INVALID_TITLE: "הכותרת שסיפקת אינה תקינה. נסי שנית.",
         NO_MINICENTERALS_FOUND: "לא נמצאו מזגנים תואמים.",
@@ -85,26 +80,38 @@ const MiniCenterals = () => {
                 headers: headers,
                 data: _id
             });
+    
             if (res.status === 200) {
-                const updatedMiniCenterals = miniCenterals.filter(miniCenteral => miniCenteral._id != product._id)
-                dispatch(setMiniCenterals(updatedMiniCenterals))
+                toast.current.show({
+                    severity: "success",
+                    summary: "הצלחה",
+                    detail: "המזגן נמחק בהצלחה.",
+                });
+                const updatedMiniCenterals = miniCenterals.filter(miniCenteral => miniCenteral._id !== product._id);
+                dispatch(setMiniCenterals(updatedMiniCenterals));
             }
-        } catch (e) {
-            console.log(e);
+        } catch (error) {    
+            if (error.response && error.response.data?.message) {
+                const message = error.response.data.message;
+                toast.current.show({
+                    severity: "error",
+                    summary: "שגיאה",
+                    detail: errorMessages[message] || "שגיאה בלתי צפויה. נסי שוב מאוחר יותר.",
+                });
+            } else {
+                toast.current.show({
+                    severity: "error",
+                    summary: "שגיאה",
+                    detail: "ודאי שיש חיבור לאינטרנט ונסי שוב.",
+                });
+            }
         }
     };
 
-    // Function to open the dialog
     const openPriceUpdateDialog = (product) => {
         setSelectedProduct(product);
         setPriceVisible(true);
     };
-
-    const openStockUpdateDialog = (product) => {
-        setSelectedProduct(product);
-        setStockVisible(true);
-    };
-
 
     const updatePrice = async (data) => {
         try {
@@ -124,13 +131,10 @@ const MiniCenterals = () => {
                 });
                 const updatedMiniCenterals = miniCenterals.filter(minicenteral => minicenteral._id !== res.data._id);
                 dispatch(setMiniCenterals([...updatedMiniCenterals, res.data])); // Update Redux state
-                setPriceVisible(false); // Hide the price modal
+                setPriceVisible(false); 
             }
         }
         catch (error) {
-            console.error("Error updating MiniCenteral price:", error);
-
-            // Handle server-side errors
             if (error.response && error.response.data?.message) {
                 const message = error.response.data.message;
                 toast.current.show({
@@ -145,12 +149,11 @@ const MiniCenterals = () => {
                     detail: "ודאי שיש חיבור לאינטרנט ונסי שוב.",
                 });
             }
-            setPriceVisible(false); // Hide the price modal
+            setPriceVisible(false); 
         }
     }
 
     const UpdateMiniCenteral = async (mc) => {
-        alert("updateMiniCenteral");
         const navigationData = {
             type: mc,
         };
@@ -168,7 +171,6 @@ const MiniCenterals = () => {
     }
 
     const getMiniCenteralByTitle = async (c) => {
-       
             const title = c.target.value
             setValue(c.target.value)
             
@@ -193,9 +195,7 @@ const MiniCenterals = () => {
                     detail: "ודאי שיש חיבור לאינטרנט ונסי שוב.",
                 });
             }
-        
-        }
-        
+        }       
     }
 
 

@@ -169,7 +169,7 @@ const updatMultiIndoorUnitPrice = async (req, res) => {
         return res.status(400).json({ message: "INVALID_MULTIINDOORUNIT_ID" });
     }
 
-    if (price === undefined || typeof price !== "number" || price <= 0) {
+    if (price === undefined  || price <= 0) {
         return res.status(400).json({ message: "INVALID_PRICE" });
     }
 

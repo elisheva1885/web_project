@@ -76,6 +76,7 @@ const AddMiniCentral = () => {
                 setShowMessage(true);
                 dispatch(setMiniCenterals([...miniCenterals, res.data]));
                 showToast('success', 'הצלחה', messages.MINICENTERAL_CREATED_SUCCESSFULLY);
+                navigate('/miniCenterals');
             }
         } catch (error) {
             const serverMessage = error.response?.data?.message || 'default';

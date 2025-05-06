@@ -143,7 +143,7 @@ const updateOverheadStock = async (req, res) => {
         if (overhead.stock < amount) {
             return res.status(400).json({ message: "INSUFFICIENT_STOCK" });
         }
-        overhead.stock -= amount;
+        overhead.stock = overhead.stock - amount;
         const updated = await overhead.save()
         return res.status(200).json(updated)
     } catch (error) {
@@ -158,7 +158,7 @@ const updatOverheadPrice = async (req, res) => {
         return res.status(400).json({ message: "INVALID_OVERHEAD_ID" });
     }
 
-    if (price === undefined || typeof price !== "number" || price <= 0) {
+    if (price === undefined || price <= 0) {
         return res.status(400).json({ message: "INVALID_PRICE" });
     }
     try {

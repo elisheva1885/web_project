@@ -10,6 +10,7 @@ const createShoppingBag = async (req, res) => {
     try {
         const user_id = req.user._id
         const { product_id, type, amount } = req.body
+    
         if (!user_id) {
             return res.status(400).json({ message: "INVALID_USER_ID" });
         }

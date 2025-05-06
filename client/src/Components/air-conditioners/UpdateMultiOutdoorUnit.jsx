@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
@@ -7,6 +7,7 @@ import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { setMultiOutdoorUnits } from '../../store/air-conditioner/multiOutdoorUnitsSlice'; // חשוב שתעדכני גם את הסלייס
+import { Toast } from 'primereact/toast';
 
 const UpdateMultiOutdoorUnit = () => {
     const location = useLocation();
@@ -16,20 +17,32 @@ const UpdateMultiOutdoorUnit = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const [showMessage, setShowMessage] = useState(false);
+    const toast = useRef(null); // Reference for Toast
 
     const { control, handleSubmit, formState: { errors } } = useForm({
         defaultValues: m
     });
+    const messages = {
+        INVALID_MULTIOUTDOORUNIT_ID: "מזהה היחידה אינו תקין. ודא שהמזהה הוא מחרוזת באורך 24 תווים.",
+        MULTIOUTDOORUNIT_NOT_FOUND: "לא נמצאה יחידה תואמת במערכת.",
+        INTERNAL_ERROR: "שגיאת שרת פנימית. נסה שוב מאוחר יותר.",
+    };
 
+    const showToast = (severity, summary, detail) => {
+        toast.current.show({
+            severity, // סוג ההודעה: success, info, warn, error
+            summary, // כותרת ההודעה
+            detail, // תוכן ההודעה
+            life: 3000, // משך זמן הצגת ההודעה במילישניות
+        });
+    };
     const onSubmit = async (data) => {
         const updatedUnit = {
             _id: data._id,
             company: data.company, // Ensure this is immutable
             title: data.title,
             describe: data.describe,
-            imagepath: data.imagepath,
             stock: data.stock,
-            price: data.price,
             BTU_output: {
                 cool: data.BTU_output?.cool,
                 heat: data.BTU_output?.heat
@@ -50,33 +63,32 @@ const UpdateMultiOutdoorUnit = () => {
             onof_auto: data.onof_auto
         };
 
+
         try {
             const headers = { 'Authorization': `Bearer ${token}` };
             const res = await axios.put(`http://localhost:8000/api/air-conditioner/multiOutdoorUnit`, updatedUnit, { headers });
             if (res.status === 200) {
-                setShowMessage(true);
-                console.log(res.data);
+                showToast('success', 'הצלחה', `${res.data.title} עודכנה בהצלחה!`);
                 const updatedUnits = multiOutdoorUnits.filter(u => u._id !== res.data._id);
                 dispatch(setMultiOutdoorUnits([...updatedUnits, res.data]));
                 navigate('/multiOutdoorunits');
             }
         } catch (error) {
-            console.error(error);
+            const serverMessage = error.response?.data?.message || 'default';
+            showToast('error', 'שגיאה', messages[serverMessage] || "שגיאה בלתי צפויה. נסה שוב מאוחר יותר.");
+            console.error("Error updating Multi Outdoor Unit:", error);
         }
     };
 
     return (
         <div style={{ paddingTop: '60px' }}>
-            <Dialog visible={showMessage} onHide={() => setShowMessage(false)} position="top" footer={<Button label="Close" onClick={() => setShowMessage(false)} />} showHeader={false} breakpoints={{ '960px': '80vw' }} style={{ width: '40vw' }}>
-                <div className="flex justify-content-center flex-column pt-6 px-3">
-                    <i className="pi pi-check-circle" style={{ fontSize: '5rem', color: 'var(--green-500)' }}></i>
-                    <h5>Multi Indoor Unit Updated Successfully!</h5>
-                </div>
-            </Dialog>
+            <Toast ref={toast} />
+
+
 
             <div className="flex justify-content-center">
                 <div className="card" style={{ width: '100%', maxWidth: '600px' }}>
-                    <h5 className="text-center">Update Multi Indoor Unit</h5>
+                    <h5 className="text-center">עדכון מעבה מולטי</h5>
                     <form onSubmit={handleSubmit(onSubmit)} className="p-fluid">
 
                         {/* Title */}
@@ -99,16 +111,6 @@ const UpdateMultiOutdoorUnit = () => {
                             </span>
                         </div>
 
-                        {/* Image Path */}
-                        <div className="field">
-                            <span className="p-float-label">
-                                <Controller name="imagepath" control={control} render={({ field }) => (
-                                    <InputText id="imagepath" {...field} />
-                                )} />
-                                <label htmlFor="imagepath">Image Path</label>
-                            </span>
-                        </div>
-
                         {/* Stock */}
                         <div className="field">
                             <span className="p-float-label">
@@ -116,16 +118,6 @@ const UpdateMultiOutdoorUnit = () => {
                                     <InputText id="stock" type="number" {...field} />
                                 )} />
                                 <label htmlFor="stock">Stock</label>
-                            </span>
-                        </div>
-
-                        {/* Price */}
-                        <div className="field">
-                            <span className="p-float-label">
-                                <Controller name="price" control={control} render={({ field }) => (
-                                    <InputText id="price" type="number" {...field} />
-                                )} />
-                                <label htmlFor="price">Price</label>
                             </span>
                         </div>
 
