@@ -11,6 +11,9 @@ import { Dropdown } from 'primereact/dropdown';
 import { useNavigate } from 'react-router-dom';
 import { setMiniCenterals } from '../../store/air-conditioner/miniCenteralsSlice';
 import { FileUpload } from 'primereact/fileupload';
+import { Toast } from 'primereact/toast';
+import { useRef } from 'react';
+
 
 const AddMiniCentral = () => {
     const { control, handleSubmit, formState: { errors } } = useForm();
@@ -19,21 +22,47 @@ const AddMiniCentral = () => {
     const { companies } = useSelector((state) => state.companies);
     const { miniCenterals } = useSelector((state) => state.miniCenterals)
     const { token } = useSelector((state) => state.token)
+    const toast = useRef(null); // Initialize the Toast reference
 
+    const messages = {
+        // Error Messages
+        INVALID_IMAGE: "תמונת המיני מרכזי אינה תקינה.",
+        INVALID_OTHER_DATA: "נתונים אחרים אינם תקינים.",
+        INVALID_OTHER_DATA_FORMAT: "פורמט הנתונים אינו תקין.",
+        REQUIRED_FIELDS_MISSING: "שדות חובה חסרים.",
+        MINICENTERAL_ALREADY_EXISTS: "מיני מרכזי עם שם זה כבר קיים.",
+        MINICENTERAL_CREATION_FAILED: "יצירת המיני מרכזי נכשלה.",
+        INVALID_MINICENTERAL_ID: "מזהה המיני מרכזי אינו תקין.",
+        MINICENTERAL_NOT_FOUND: "המיני מרכזי לא נמצא.",
+        INVALID_STOCK_AMOUNT: "כמות המלאי אינה תקינה.",
+        INSUFFICIENT_STOCK: "אין מלאי מספיק.",
+        INVALID_PRICE: "מחיר אינו תקין.",
+        INTERNAL_ERROR: "שגיאה פנימית בשרת. נסה שוב מאוחר יותר.",
+
+        // Success Messages
+        MINICENTERAL_CREATED_SUCCESSFULLY: "המיני מרכזי נוסף בהצלחה.",
+        MINICENTERAL_DELETED_SUCCESSFULLY: "המיני מרכזי נמחק בהצלחה.",
+
+        // Default
+        default: "אירעה שגיאה לא צפויה. נסה שוב."
+    };
     const navigate = useNavigate()
     const dispatch = useDispatch()
+    const showToast = (severity, summary, detail) => {
+        toast.current.show({ severity, summary, detail, life: 3000 });
+    };
     const onSubmit = async (data) => {
         const formData = new FormData(); // Create an empty FormData object      
         // Append the file to the FormData object
         if (data.imagepath instanceof File) {
-          formData.append('imagepath', data.imagepath);
+            formData.append('imagepath', data.imagepath);
         } else {
-          console.error("Error: imagepath is not a valid file.");
-          return;
+            showToast('error', 'שגיאה', messages.INVALID_IMAGE);
+            return;
         }
-       
+
         formData.append('otherData', JSON.stringify(data));
-        console.log(data)
+
         try {
             const headers = {
                 'Authorization': `Bearer ${token}`, // If you have authentication
@@ -46,10 +75,12 @@ const AddMiniCentral = () => {
                 setFormData(data);
                 setShowMessage(true);
                 dispatch(setMiniCenterals([...miniCenterals, res.data]));
-                // navigate("/miniCenterals");
+                showToast('success', 'הצלחה', messages.MINICENTERAL_CREATED_SUCCESSFULLY);
             }
         } catch (error) {
-            console.error(error);
+            const serverMessage = error.response?.data?.message || 'default';
+            showToast('error', 'שגיאה', messages[serverMessage]);
+            console.error("Error adding Mini Central:", error);
         }
     };
 
@@ -59,6 +90,7 @@ const AddMiniCentral = () => {
 
     return (
         <div className="form-demo">
+            <Toast ref={toast} />
             <Dialog visible={showMessage} onHide={() => setShowMessage(false)} position="top" footer={<Button label="Close" onClick={() => setShowMessage(false)} />} showHeader={false} breakpoints={{ '960px': '80vw' }} style={{ width: '40vw' }}>
                 <div className="flex justify-content-center flex-column pt-6 px-3">
                     <i className="pi pi-check-circle" style={{ fontSize: '5rem', color: 'var(--green-500)' }}></i>
@@ -74,7 +106,7 @@ const AddMiniCentral = () => {
                     <form onSubmit={handleSubmit(onSubmit)} className="p-fluid">
                         <div className="field">
                             <span className="p-float-label">
-                            <Controller name="company" control={control} render={({ field }) => (
+                                <Controller name="company" control={control} render={({ field }) => (
                                     <Dropdown id={field.id} value={field.value} onChange={(e) => field.onChange(e.value)} options={companies} optionLabel="name" />
                                 )} />
                                 <label htmlFor="company">Company</label>

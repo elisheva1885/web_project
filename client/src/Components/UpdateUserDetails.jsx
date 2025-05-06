@@ -9,6 +9,8 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Dialog } from "primereact/dialog";
+import { Toast } from "primereact/toast";
+import { useRef } from "react";
 
 const UpdateUserDetails = () => {
     const { userDetails } = useSelector((state) => state.userDetails);
@@ -16,11 +18,26 @@ const UpdateUserDetails = () => {
     const [showMessage, setShowMessage] = useState(false);
     const navigate = useNavigate();
     const dispatch = useDispatch()
+    const messages = {
+        // Error Messages
+        INVALID_USER_ID: "מזהה משתמש לא תקין.",
+        NO_FIELDS_TO_UPDATE: "אין שדות לעדכן.",
+        USER_NOT_FOUND: "המשתמש לא נמצא.",
+        INTERNAL_ERROR: "שגיאה פנימית בשרת. נסה שוב מאוחר יותר.",
 
+        // Success Messages
+        USER_UPDATED_SUCCESSFULLY: "הפרטים עודכנו בהצלחה.",
+
+        // Default
+        default: "אירעה שגיאה לא צפויה. נסה שוב."
+    };
+    const toast = useRef(null); // Initialize the Toast reference
+    const showToast = (severity, summary, detail) => {
+        toast.current.show({ severity, summary, detail, life: 3000 });
+    };
     const defaultValues = {
-
-        email: userDetails.email ,
-        phone: userDetails.phone ,
+        email: userDetails.email,
+        phone: userDetails.phone,
     };
 
     const {
@@ -29,24 +46,23 @@ const UpdateUserDetails = () => {
         formState: { errors },
     } = useForm({ defaultValues });
 
-    const onSubmit = async(data) => {
-        console.log("Updated Data:", data);
+    const onSubmit = async (data) => {
         try {
             const headers = {
                 'Authorization': `Bearer ${token}`
             }
-            const res = await axios.put(`http://localhost:8000/api/user`, data, {headers});
+            const res = await axios.put(`http://localhost:8000/api/user`, data, { headers });
             if (res.status === 200) {
+                showToast('success', 'הצלחה', messages.USER_UPDATED_SUCCESSFULLY);
                 setShowMessage(true);
-                console.log(res.data);
-                // const unUpdatedOverheads = userDetails.filter(overhead=> overhead._id != res.data._id)
                 dispatch(setUserDetails(res.data))
                 navigate('/userAcount');
             }
         } catch (error) {
-            console.error(error);
+            const serverMessage = error.response?.data?.message || 'default';
+            showToast('error', 'שגיאה', messages[serverMessage]);
+            console.error("Error updating user details:", error);
         }
-
     };
 
     const getFormErrorMessage = (name) => {
@@ -55,7 +71,8 @@ const UpdateUserDetails = () => {
 
     return (
         <div style={{ paddingTop: "60px" }}>
-             <Dialog visible={showMessage} onHide={() => setShowMessage(false)} position="top" footer={<Button label="Close" onClick={() => setShowMessage(false)} />} showHeader={false} breakpoints={{ '960px': '80vw' }} style={{ width: '40vw' }}>
+            <Toast ref={toast} />
+            <Dialog visible={showMessage} onHide={() => setShowMessage(false)} position="top" footer={<Button label="Close" onClick={() => setShowMessage(false)} />} showHeader={false} breakpoints={{ '960px': '80vw' }} style={{ width: '40vw' }}>
                 <div className="flex justify-content-center flex-column pt-6 px-3">
                     <i className="pi pi-check-circle" style={{ fontSize: '5rem', color: 'var(--green-500)' }}></i>
                     <h5>  {userDetails.name} עודכן בהצלחה! </h5>
@@ -111,8 +128,8 @@ const UpdateUserDetails = () => {
                                 </span>
                             </div>
                             <div className="field-checkbox">
-                                
-                               
+
+
                             </div>
                             <Button type="submit" label="עדכן פרטים" className="mt-2" />
                         </form>

@@ -12,8 +12,31 @@ import { Card } from "primereact/card";
 import { Timeline } from "primereact/timeline";
 import { Image } from "primereact/image";
 import { Divider } from "primereact/divider";
+import { Toast } from 'primereact/toast';
+import { useRef } from 'react';
 
 const MyOrders = () => {
+    const dispatch = useDispatch();
+    const { userDeliveries } = useSelector((state) => state.userDeliveries);
+    const { token } = useSelector((state) => state.token);
+    const [orders, setOrders] = useState([]);
+    const toast = useRef(null);
+    const errorMessages = {
+        USER_REQUIRED: "משתמש נדרש.",
+        INVALID_ADDRESS: "כתובת לא חוקית.",
+        INVALID_PURCHASE_ID: "מזהה רכישה לא חוקי.",
+        NO_DELIVERIES_FOUND: "לא נמצאו הזמנות.",
+        NO_DELIVERIES_FOR_USER: "לא נמצאו הזמנות עבור המשתמש.",
+        DELIVERY_CREATION_FAILED: "יצירת המשלוח נכשלה.",
+        DELIVERY_NOT_FOUND: "המשלוח לא נמצא.",
+        INTERNAL_ERROR: "שגיאה פנימית בשרת. אנא נסה שוב מאוחר יותר.",
+        UNAUTHORIZED: "אין לך הרשאות לצפות בהזמנות.",
+        default: "שגיאה כללית. אנא נסה שוב מאוחר יותר."
+    };
+
+    const showToast = (severity, summary, detail) => {
+        toast.current.show({ severity, summary, detail, life: 3000 });
+    };
 
     const sortData = (data) => {
         if (!data || data.length === 0) {
@@ -30,12 +53,6 @@ const MyOrders = () => {
         return data.filter(delivery => delivery.status !== "recieved");
     };
 
-    const dispatch = useDispatch();
-    const { userDeliveries } = useSelector((state) => state.userDeliveries);
-    const { token } = useSelector((state) => state.token);
-    const [orders, setOrders] = useState([]);
-
-
     const getUserDeliveries = async () => {
         const headers = {
             'Authorization': `Bearer ${token}`
@@ -46,18 +63,12 @@ const MyOrders = () => {
                 console.log("res.status === 200. UserDeliveries from server:", res.data)
                 dispatch(setUserDeliveries(res.data))
                 console.log("userDeliveries", userDeliveries)
-                // setOrders(res.data)
             }
         } catch (error) {
-            if (error.status === 404) {
-                console.log("error 404:", error)
-                alert("not found")
-            }
-            console.error(error)
-            if (error.status === 401) {
-                console.log("error 401:", error)
-                alert("Unauthorized")
-            }
+            const serverMessage = error.response?.data?.message; // Get server error message
+            const translatedMessage = errorMessages[serverMessage] || errorMessages["default"]; // Translate message
+            showToast('error', 'שגיאה', translatedMessage); // Show toast with translated message
+            console.error("Error fetching user deliveries:", error);
         }
         const filteredOrders = filterData(userDeliveries)
         const sortedOrders = sortData(filteredOrders)
@@ -169,6 +180,7 @@ const MyOrders = () => {
 
     return (
         <div className="my-orders">
+            <Toast ref={toast} />
             <h2 style={{
                 fontSize: "2rem",
                 fontWeight: "bold",
