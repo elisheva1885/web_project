@@ -10,6 +10,8 @@ import { Dropdown } from 'primereact/dropdown';
 import { useNavigate } from 'react-router-dom';
 import { setMultiIndoorUnits } from '../../store/air-conditioner/multiIndoorUnitsSlice';
 import { FileUpload } from 'primereact/fileupload';
+import { Toast } from 'primereact/toast';
+import { useRef } from 'react';
 
 const AddMultiIndoorUnit = () => {
     const { control, handleSubmit, formState: { errors } } = useForm();
@@ -18,18 +20,43 @@ const AddMultiIndoorUnit = () => {
     const { companies } = useSelector((state) => state.companies);
     const { multiIndoorUnits } = useSelector((state) => state.multiIndoorUnits)
     const { token } = useSelector((state) => state.token)
+    const toast = useRef(null); // Initialize the Toast reference
 
+    const messages = {
+        // Error Messages
+        INVALID_OTHER_DATA: "נתונים אחרים אינם תקינים.",
+        INVALID_OTHER_DATA_FORMAT: "פורמט הנתונים אינו תקין.",
+        REQUIRED_FIELDS_MISSING: "שדות חובה חסרים.",
+        INVALID_IMAGE: "תמונת היחידה הפנימית אינה תקינה.",
+        MULTIINDOORUNIT_ALREADY_EXIST: "יחידה פנימית עם שם זה כבר קיימת.",
+        MULTIINDOORUNIT_CREATION_FAILED: "יצירת היחידה הפנימית נכשלה.",
+        INVALID_MULTIINDOORUNIT_ID: "מזהה היחידה הפנימית אינו תקין.",
+        MULTIINDOORUNIT_NOT_FOUND: "היחידה הפנימית לא נמצאה.",
+        INVALID_STOCK_AMOUNT: "כמות המלאי אינה תקינה.",
+        INSUFFICIENT_STOCK: "אין מלאי מספיק.",
+        INVALID_PRICE: "מחיר אינו תקין.",
+        INTERNAL_ERROR: "שגיאה פנימית בשרת. נסה שוב מאוחר יותר.",
+    
+        // Success Messages
+        MULTIINDOORUNIT_CREATED_SUCCESSFULLY: "היחידה הפנימית נוספה בהצלחה.",
+        MULTIINDOORUNIT_DELETED_SUCCESSFULLY: "היחידה הפנימית נמחקה בהצלחה.",
+    
+        // Default
+        default: "אירעה שגיאה לא צפויה. נסה שוב."
+    };
     const navigate = useNavigate()
     const dispatch = useDispatch()
-    console.log("multiIndoorUnits", multiIndoorUnits);
+
+    const showToast = (severity, summary, detail) => {
+        toast.current.show({ severity, summary, detail, life: 3000 });
+    };
     const onSubmit = async (data) => {
-        console.log("data before adjustment", data);
         const formData = new FormData(); // Create an empty FormData object      
         // Append the file to the FormData object
         if (data.imagepath instanceof File) {
             formData.append('imagepath', data.imagepath);
         } else {
-            console.error("Error: imagepath is not a valid file.");
+            showToast('error', 'שגיאה', messages.INVALID_IMAGE);
             return;
         }
        
@@ -44,11 +71,13 @@ const AddMultiIndoorUnit = () => {
                 setFormData(data);
                 setShowMessage(true);
                 dispatch(setMultiIndoorUnits([...multiIndoorUnits, res.data]));
+                showToast('success', 'הצלחה', messages.MULTIINDOORUNIT_CREATED_SUCCESSFULLY);
                 navigate("/multiIndoorUnits");
             }
         } catch (error) {
-            console.error(error);
-        }
+            const serverMessage = error.response?.data?.message || 'default';
+            showToast('error', 'שגיאה', messages[serverMessage]);
+            console.error("Error adding Multi Indoor Unit:", error);        }
     };
 
     const getFormErrorMessage = (name) => {
@@ -57,6 +86,7 @@ const AddMultiIndoorUnit = () => {
 
     return (
         <div className="form-demo">
+            <Toast ref={toast} />
             <Dialog visible={showMessage} onHide={() => setShowMessage(false)} position="top" footer={<Button label="Close" onClick={() => setShowMessage(false)} />} showHeader={false} breakpoints={{ '960px': '80vw' }} style={{ width: '40vw' }}>
                 <div className="flex justify-content-center flex-column pt-6 px-3">
                     <i className="pi pi-check-circle" style={{ fontSize: '5rem', color: 'var(--green-500)' }}></i>

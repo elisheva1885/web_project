@@ -22,7 +22,6 @@ const Home = () => {
     const {basket} = useSelector((state) => state.basket);
     console.log("HomeBasket",basket);
     const dispatch = useDispatch();
-    // console.log("userDetails",userDetails.username)
     const AirConditionerTypes = () => {
         const acTypes = [
             { id: 1, name: 'מזגן עילי', imageUrl: '/overheads/overhead-room.jpg' },
@@ -71,108 +70,6 @@ const Home = () => {
             </>
         );
     };
-
-    const getOverheads = async () => {
-        try {
-            // const headers = {
-            //     'Authorization': `Bearer ${token}`
-            // }
-            // const res = await axios.get('http://localhost:8000/api/air-conditioner/overhead',{headers})
-            const res = await axios.get('http://localhost:8000/api/air-conditioner/overhead')
-            if (res.status === 200) {
-                dispatch(setOverheads(res.data));
-                console.log(overheads);
-            }
-        }
-        catch (e) {
-            console.error(e)
-        }
-    }
-
-
-    const getShoppingBag = async () => {
-        try {
-            const headers = {
-                'Authorization': `Bearer ${token}`
-            }
-            const res = await axios.get('http://localhost:8000/api/user/shoppingBag', { headers })
-            if (res.status === 200) {
-                console.log("res.data ",res.data);
-                dispatch(setBasket(res.data))
-                // setShoppingBags(res.data)
-                // console.log("res.data", res.data);
-            }
-        }
-        catch (e) {
-            console.error(e)
-        }
-    }
-
-    const getMultiIndoorUnit = async () => {
-        try {
-            const res = await axios.get('http://localhost:8000/api/air-conditioner/multiIndoorUnit')
-            if (res.status === 200) {
-                dispatch(setMultiIndoorUnits(res.data));
-                // console.log(overheads);
-            }
-        }
-        catch (e) {
-            console.error(e)
-        }
-    }
-
-    const getMultiOutdoorUnit = async () => {
-        try {
-            const res = await axios.get('http://localhost:8000/api/air-conditioner/multiOutdoorUnit')
-            if (res.status === 200) {
-                dispatch(setMultiOutdoorUnits(res.data));
-                // console.log(overheads);
-            }
-        }
-        catch (e) {
-            console.error(e)
-        }
-    }
-
-    const getMiniCenterals = async () => {
-        try {
-            // const headers = {
-            //     'Authorization': `Bearer ${token}`
-            // }
-            // const res = await axios.get('http://localhost:8000/api/air-conditioner/overhead',{headers})
-            const res = await axios.get('http://localhost:8000/api/air-conditioner/miniCenteral')
-            if (res.status === 200) {
-                dispatch(setMiniCenterals(res.data));
-                console.log(miniCenterals);
-            }
-        }
-        catch (e) {
-            console.error(e)
-        }
-    }
-
-
-    const getCompanies = async()=>{
-        try{
-            const res = await axios.get('http://localhost:8000/api/company')
-            if(res.status === 200){
-                console.log("in getCompanies");
-                dispatch(setCompanies(res.data))
-            }
-        }
-        catch (e) {
-            console.error(e)
-        }
-    }
-
-    useEffect(() => {
-        getOverheads()
-        getCompanies()
-        getMiniCenterals()
-        getMultiIndoorUnit()
-        getShoppingBag()
-        getMultiOutdoorUnit()
-    }, [])
 
     return (
         <>

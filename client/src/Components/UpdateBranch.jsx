@@ -1,156 +1,220 @@
-import React, { useState } from 'react';
-import { useForm, Controller } from 'react-hook-form';
-import { Dialog } from 'primereact/dialog';
-import { InputText } from 'primereact/inputtext';
-import { Button } from 'primereact/button';
-import axios from 'axios';
-import classNames from 'classnames';
-import { useDispatch, useSelector } from 'react-redux';
-import { Navigate, useLocation, useNavigate } from 'react-router-dom';
-import Branches from './Branch';
+import React, { useRef, useState } from 'react';
+ import { useForm, Controller } from 'react-hook-form';
+ import { Dialog } from 'primereact/dialog';
+ import { InputText } from 'primereact/inputtext';
+ import { Button } from 'primereact/button';
+ import axios from 'axios';
+ import classNames from 'classnames';
+ import { useDispatch, useSelector } from 'react-redux';
+ import { Navigate, useLocation, useNavigate } from 'react-router-dom';
+ import Branches from './Branch';
+ import { Toast } from 'primereact/toast';
 
+ 
+ const UpdateBranch = () => {
+     const { control, handleSubmit, formState: { errors } } = useForm();
+     const [showMessage, setShowMessage] = useState(false);
+     const [formData, setFormData] = useState({});
+     const location = useLocation();
+     const { data: branch } = location.state || {};     const navigate = useNavigate();
+     const toast = useRef(null);
+     const { token } = useSelector((state) => state.token)
+     const errorMessages = {
+        INVALID_ADDRESS: "כתובת לא תקינה. ודאי שמולאו עיר, רחוב ומספר.",
+        INVALID_PHONE: "מספר הטלפון שהוזן אינו תקין.",
+        INVALID_OPENING_HOUR: "שעת פתיחה אינה תקינה.",
+        INVALID_CLOSING_HOUR: "שעת סגירה אינה תקינה.",
+        BRANCH_EXISTS: "סניף עם כתובת זו כבר קיים.",
+        INTERNAL_ERROR: "שגיאה פנימית בשרת. נסי שוב מאוחר יותר.",
 
-const UpdateBranch = () => {
-    const { control, handleSubmit, formState: { errors } } = useForm();
-    const [showMessage, setShowMessage] = useState(false);
-    const [formData, setFormData] = useState({});
-    // const {companies} = useSelector((state) => state.companies)
-    const location = useLocation();
-    const { type } = location.state || {};
-    const navigate = useNavigate();
-    console.log(control);
-
-    // console.log(type);
-    const onSubmit = async (data) => {
-        if(data.openingHour<7 || data.openingHour>9){
-            alert("openingHour is not fitting")
-        }
-        if(data.closingHour.weekdays<16 || data.closingHour.fridays>13){
-            alert("closingHour is not fitting")
-        }
-        const branch = {
-            _id: type._id,
-            address: data.address,
-            phoneNumber: data.phoneNumber,
-            openingHour: data.openingHour,
-            closingHour : data.closingHour
-        }
-        try {
-            const response = await axios.put('http://localhost:8000/api/branches', branch);
-            if(response.status===201)
-            {
-            setFormData(data);
-            setShowMessage(true);
-            const navigationData = {
-                data: response.data,
-                // You can add any other data you may want to send
+    };
+     const onSubmit = async (data) => {
+         const updateBranch = {
+             _id: branch._id,
+             address: data.address,
+             phoneNumber: data.phoneNumber,
+             openingHour: data.openingHour,
+             closingHour : data.closingHour
+         }
+         try {
+            const headers = {
+                'Authorization': `Bearer ${token}`
             };
-            navigate('/branch' , { state: navigationData })
+             const response = await axios.put('http://localhost:8000/api/branches', updateBranch, {headers});
+             if(response.status===200)
+             {
+             setFormData(data);
+             setShowMessage(true);
+             navigate('/branch' )
+             }
+             
+         }  catch (error) {
+            if (error.response && error.response.data?.message) {
+                const message = error.response.data.message;
+                toast.current.show({
+                    severity: 'error',
+                    summary: 'שגיאה',
+                    detail: errorMessages[message] || "שגיאה לא צפויה. נסי שוב מאוחר יותר."
+                });
+            } else {
+                toast.current.show({
+                    severity: 'error',
+                    summary: 'שגיאה כללית',
+                    detail: "ודאי שיש חיבור לאינטרנט ונסי שוב."
+                });
             }
-            
-        } catch (error) {
-            console.error(error);
         }
-    };
+     };
+ 
+     const getFormErrorMessage = (name) => {
+         return errors[name] ? <small className="p-error">{errors[name].message}</small> : null;
+     };
+ 
 
-    const getFormErrorMessage = (name) => {
-        return errors[name] ? <small className="p-error">{errors[name].message}</small> : null;
-    };
-
-    return (
+   
+     return (
         <div style={{ paddingTop: '60px' }}>
-
-        <div className="form-demo">
-            <Dialog visible={showMessage} onHide={() => setShowMessage(false)} position="top" footer={<Button label="Close" onClick={() => setShowMessage(false)} />} showHeader={false} breakpoints={{ '960px': '80vw' }} style={{ width: '40vw' }}>
-                <div className="flex justify-content-center flex-column pt-6 px-3">
-                    <i className="pi pi-check-circle" style={{ fontSize: '5rem', color: 'var(--green-500)' }}></i>
-                    <h5>Branch Updated Successfully!</h5>
-                    <p style={{ lineHeight: 1.5, textIndent: '1rem' }}>
-                        Branch  has been successfully update.
-                    </p>
-                </div>
-            </Dialog>
+            <Toast ref={toast} />
             <div className="flex justify-content-center">
                 <div className="card" style={{ width: '100%', maxWidth: '600px' }}>
-                    <h5 className="text-center">Add Branch</h5>
+                    <h5 className="text-center">עדכון סניף</h5>
                     <form onSubmit={handleSubmit(onSubmit)} className="p-fluid">
+
                         <div className="field">
                             <span className="p-float-label">
-                                <Controller name="address.city" control={control}  render={({ field, fieldState }) => (
-                                    <InputText id={field.name} {...field} className={classNames({ 'p-invalid': fieldState.invalid })} />
-                                )} />
-                                <label htmlFor="address.city" className={classNames({ 'p-error': errors.address?.city })}>{type?.address?.city}</label>
+                                <Controller
+                                    name="address.city"
+                                    control={control}
+                                    defaultValue={branch?.address?.city || ''}
+                                    rules={{ required: 'יש להזין עיר' }}
+                                    render={({ field, fieldState }) => (
+                                        <InputText id={field.name} {...field} className={classNames({ 'p-invalid': fieldState.invalid })} />
+                                    )}
+                                />
+                                <label htmlFor="address.city" className={classNames({ 'p-error': errors.address?.city })}>*עיר</label>
                             </span>
+                            {getFormErrorMessage('address.city')}
                         </div>
 
                         <div className="field">
                             <span className="p-float-label">
-                                <Controller name="address.street" control={control}  render={({ field, fieldState }) => (
-                                    <InputText id={field.name} {...field} className={classNames({ 'p-invalid': fieldState.invalid })} />
-                                )} />
-                                <label htmlFor="address.street" className={classNames({ 'p-error': errors.address?.street })}>{type?.address?.street}</label>
+                                <Controller
+                                    name="address.street"
+                                    control={control}
+                                    defaultValue={branch?.address?.street || ''}
+                                    rules={{ required: 'יש להזין רחוב' }}
+                                    render={({ field, fieldState }) => (
+                                        <InputText id={field.name} {...field} className={classNames({ 'p-invalid': fieldState.invalid })} />
+                                    )}
+                                />
+                                <label htmlFor="address.street" className={classNames({ 'p-error': errors.address?.street })}>*רחוב</label>
                             </span>
-                        </div>
-
-
-
-                        <div className="field">
-                            <span className="p-float-label">
-                                <Controller name="address.streetNum" control={control}  render={({ field, fieldState }) => (
-                                    <InputText id={field.name} {...field} className={classNames({ 'p-invalid': fieldState.invalid })} />
-                                )} />
-                                <label htmlFor="address.streetNum" className={classNames({ 'p-error': errors.address?.streetNum })}>{type?.address?.streetNum}</label>
-                            </span>
+                            {getFormErrorMessage('address.street')}
                         </div>
 
                         <div className="field">
                             <span className="p-float-label">
-                                <Controller name="phoneNumber" control={control} render={({ field }  ) => (
-                                    <InputText id={field.name} type="number" {...field} />
-                                )} />
-                                <label htmlFor="phoneNumber">{type?.phoneNumber}</label>
+                                <Controller
+                                    name="address.streetNum"
+                                    control={control}
+                                    defaultValue={branch?.address?.streetNum || ''}
+                                    rules={{ required: 'יש להזין מספר בית' }}
+                                    render={({ field }) => (
+                                        <InputText id={field.name} type="number" {...field} />
+                                    )}
+                                />
+                                <label htmlFor="address.streetNum">*מספר בית</label>
                             </span>
+                            {getFormErrorMessage('address.streetNum')}
                         </div>
 
                         <div className="field">
                             <span className="p-float-label">
-                                <Controller name="openingHour" control={control}  render={({ field }) => (
-                                    <InputText id={field.name} type="number" {...field} />
-                                )} />
-                                <label htmlFor="openingHour" className={classNames({ 'p-error': errors.openingHour })}>{type?.openingHour}</label>
+                                <Controller
+                                    name="phoneNumber"
+                                    control={control}
+                                    defaultValue={branch?.phoneNumber || ''}
+                                    rules={{
+                                        required: 'יש להזין מספר טלפון',
+                                        validate: value =>
+                                            /^0[2-9]\d{7}$/.test(value) || 'מספר טלפון קווי לא חוקי. חייב להכיל 8 ספרות ולהתחיל בקידומת תקינה'
+                                    }}
+                                    render={({ field }) => (
+                                        <InputText id={field.name} type="text" {...field} />
+                                    )}
+                                />
+                                <label htmlFor="phoneNumber">*מספר טלפון</label>
                             </span>
+                            {getFormErrorMessage('phoneNumber')}
+                        </div>
+
+                        <div className="field">
+                            <span className="p-float-label">
+                                <Controller
+                                    name="openingHour"
+                                    control={control}
+                                    defaultValue={branch?.openingHour || ''}
+                                    rules={{
+                                        required: 'יש להזין שעת פתיחה',
+                                        validate: value => value >= 7 && value <= 9 || 'שעת הפתיחה חייבת להיות בין 7 ל־9'
+                                    }}
+                                    render={({ field }) => (
+                                        <InputText id={field.name} type="number" {...field} />
+                                    )}
+                                />
+                                <label htmlFor="openingHour">*שעת פתיחה</label>
+                            </span>
+                            {getFormErrorMessage('openingHour')}
                         </div>
 
                         <div className="field">
                             <div className="flex">
                                 <div style={{ flex: '1', marginRight: '10px' }}>
                                     <span className="p-float-label">
-                                        <Controller name="closingHour.weekdays" control={control} render={({ field }) => (
-                                            <InputText id="closingHour.weekdays" {...field} />
-                                        )} />
-                                        <label htmlFor="closingHour.weekdays">{type?.closingHour?.weekdays}</label>
+                                        <Controller
+                                            name="weekdaysClosingHour"
+                                            control={control}
+                                            defaultValue={branch?.closingHour?.weekdays || ''}
+                                            rules={{
+                                                required: 'יש להזין שעת סגירה לימי חול',
+                                                validate: value => value >= 16 && value <= 18 || 'שעת הסגירה בימי חול חייבת להיות בין 16 ל־18'
+                                            }}
+                                            render={({ field }) => (
+                                                <InputText id={field.name} type="number" {...field} />
+                                            )}
+                                        />
+                                        <label htmlFor="weekdaysClosingHour">*סגירה - ימי חול</label>
                                     </span>
+                                    {getFormErrorMessage('weekdaysClosingHour')}
                                 </div>
+
                                 <div style={{ flex: '1', marginLeft: '10px' }}>
                                     <span className="p-float-label">
-                                        <Controller name="closingHour.fridays" control={control} render={({ field }) => (
-                                            <InputText id="closingHour.fridays" {...field} />
-                                        )} />
-                                        <label htmlFor="closingHour.fridays">{type?.closingHour?.fridays}</label>
+                                        <Controller
+                                            name="fridaysClosingHour"
+                                            control={control}
+                                            defaultValue={branch?.closingHour?.fridays || ''}
+                                            rules={{
+                                                required: 'יש להזין שעת סגירה לימי שישי',
+                                                validate: value => value >= 11 && value <= 13 || 'שעת הסגירה בימי שישי חייבת להיות בין 11 ל־13'
+                                            }}
+                                            render={({ field }) => (
+                                                <InputText id={field.name} type="number" {...field} />
+                                            )}
+                                        />
+                                        <label htmlFor="fridaysClosingHour">*סגירה - שישי</label>
                                     </span>
+                                    {getFormErrorMessage('fridaysClosingHour')}
                                 </div>
                             </div>
                         </div>
 
-                        
-
-                        <Button type="submit" label="Update Branch" className="mt-2" />
+                        <Button type="submit" label="עדכן סניף" className="mt-2" />
                     </form>
                 </div>
             </div>
         </div>
-           </div>
     );
-}
-
-export default UpdateBranch
+ }
+ 
+ export default UpdateBranch

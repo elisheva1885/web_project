@@ -131,7 +131,7 @@ const Navbar = () => {
             <Routes>
                 <Route path='/branch' element={<Suspense fallback="Loading..."><Branch /></Suspense>}></Route>
                 <Route path='/branch/add' element={<Suspense fallback="Loading..."><AddBranch /></Suspense>}></Route>
-                <Route path='/branch/update' element={<Suspense fallback="Loading..."><UpdateBranch /></Suspense>}></Route>
+                <Route path='/branch/update' element={<Suspense fallback="Loading..."><UpdateBranch/></Suspense>}></Route>
                 <Route path='/about' element={<Suspense fallback="Loading..."><About /></Suspense>}></Route>
                 <Route path='/overheads' element={<Suspense fallback="Loading..."><Overheads /></Suspense>}>        </Route>
                 <Route path='/miniCenterals' element={<Suspense fallback="Loading..."><MiniCenterals /></Suspense>}>        </Route>

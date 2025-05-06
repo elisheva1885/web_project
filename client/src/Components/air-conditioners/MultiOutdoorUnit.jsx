@@ -9,6 +9,9 @@ import { setBasket } from '../../store/basketSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import useGetFilePath from '../../hooks/useGetFilePath';
+import useAddToBasket from "../../hooks/useAddToBasket";
+import { Toast } from 'primereact/toast';
+import { Button } from 'primereact/button';
 
 const MultiOutdoorUnit = () => {
   const { product: productId } = useParams();
@@ -18,34 +21,14 @@ const MultiOutdoorUnit = () => {
   const stepperRef = useRef(null);
   const dispatch = useDispatch();
   const { getFilePath } = useGetFilePath();
-
+  const { addToBasket, toast } = useAddToBasket();
   const { basket } = useSelector((state) => state.basket);
   const { token } = useSelector((state) => state.token);
 
-  const addToBasket = async () => {
-    if (!token) {
-      alert('כדי להוסיף לסל חובה להכינס לאיזור האישי');
-    } else {
-      const shoppingBagDetails = {
-        product_id: product._id,
-        type: "MultiOutdoorUnit",
-        amount: 1
-      };
-      try {
-        const headers = {
-          'Authorization': `Bearer ${token}`
-        };
-        const res = await axios.post('http://localhost:8000/api/user/shoppingBag', shoppingBagDetails, { headers });
-        if (res.status === 201 || res.status === 200) {
-          dispatch(setBasket([...basket, res.data]));
-          alert('המוצר נוסף לעגלה');
-        }
-      } catch (e) {
-        console.error(e);
-      }
-    }
-  };
-
+ 
+  const addtoBasket = async () => {
+    addToBasket(product, "MultiOutdoorUnit");
+}
   const getMultiOutdoorUnit = async () => {
     setLoading(true);
     setError(null);
@@ -104,11 +87,13 @@ const MultiOutdoorUnit = () => {
           )}
         </div>
         <h2 style={styles.price}>₪{product.price}</h2>
-        <button style={styles.addToCartButton} onClick={addToBasket}>הוספה לסל</button>
-      </div>
+        <Button style={styles.addToCartButton} onClick={addtoBasket} disabled={
+          product.stock === 0
+        }>הוספה לסל</Button>      </div>
 
       {/* Stepper for Tables */}
       <div style={styles.stepperContainer}>
+      <Toast ref={toast} />
         <Stepper ref={stepperRef} style={{ direction: 'rtl' }} activeIndex={0}>
           <StepperPanel header="תפוקה ונתונים טכניים">
             <table style={{ ...styles.table, direction: 'rtl' }}>

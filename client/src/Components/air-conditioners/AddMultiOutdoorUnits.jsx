@@ -11,6 +11,8 @@ import { useNavigate } from 'react-router-dom';
 import { setMultiOutdoorUnits } from '../../store/air-conditioner/multiOutdoorUnitsSlice';
 import { Checkbox } from 'primereact/checkbox';
 import { FileUpload } from 'primereact/fileupload';
+import { Toast } from 'primereact/toast';
+import { useRef } from 'react';
 
 const AddMultiOutdoorUnits = () => {
     const { control, handleSubmit, formState: { errors } } = useForm();
@@ -21,17 +23,40 @@ const AddMultiOutdoorUnits = () => {
     const token = useSelector((state) => state.token);
     const navigate = useNavigate()
     const dispatch = useDispatch()
-    console.log("multiOutdoorUnits", multiOutdoorUnits);
+    const toast = useRef(null); // Initialize the Toast reference
+
+    const messages = {
+        // Error Messages
+        INVALID_OTHER_DATA: "נתונים אחרים אינם תקינים.",
+        INVALID_OTHER_DATA_FORMAT: "פורמט הנתונים אינו תקין.",
+        REQUIRED_FIELDS_MISSING: "שדות חובה חסרים.",
+        INVALID_IMAGE: "תמונת היחידה החיצונית אינה תקינה.",
+        MULTIOUTDOORUNIT_ALREADY_EXISTS: "יחידה חיצונית עם שם זה כבר קיימת.",
+        MULTIOUTDOORUNIT_CREATION_FAILED: "יצירת היחידה החיצונית נכשלה.",
+        INVALID_MULTIOUTDOORUNIT_ID: "מזהה היחידה החיצונית אינו תקין.",
+        MULTIOUTDOORUNIT_NOT_FOUND: "היחידה החיצונית לא נמצאה.",
+        INVALID_STOCK_AMOUNT: "כמות המלאי אינה תקינה.",
+        INSUFFICIENT_STOCK: "אין מספיק מלאי.",
+        INVALID_PRICE: "מחיר אינו תקין.",
+        INTERNAL_ERROR: "שגיאה פנימית בשרת. נסה שוב מאוחר יותר.",
+
+        // Success Messages
+        MULTIOUTDOORUNIT_CREATED_SUCCESSFULLY: "היחידה החיצונית נוספה בהצלחה.",
+        MULTIOUTDOORUNIT_DELETED_SUCCESSFULLY: "היחידה החיצונית נמחקה בהצלחה.",
+
+        // Default
+        default: "אירעה שגיאה לא צפויה. נסה שוב."
+    };
     const onSubmit = async (data) => {
         const formData = new FormData(); // Create an empty FormData object      
         // Append the file to the FormData object
         if (data.imagepath instanceof File) {
-          formData.append('imagepath', data.imagepath);
+            formData.append('imagepath', data.imagepath);
         } else {
-          console.error("Error: imagepath is not a valid file.");
-          return;
+            showToast('error', 'שגיאה', messages.INVALID_IMAGE);
+            return;
         }
-     
+
         formData.append('otherData', JSON.stringify(data));
 
         try {
@@ -45,19 +70,24 @@ const AddMultiOutdoorUnits = () => {
                 setFormData(data);
                 setShowMessage(true);
                 dispatch(setMultiOutdoorUnits([...multiOutdoorUnits, res.data]));
+                showToast('success', 'הצלחה', messages.MULTIOUTDOORUNIT_CREATED_SUCCESSFULLY);
                 navigate("/multiOutdoorUnits");
             }
         } catch (error) {
-            console.error(error);
-        }
+            const serverMessage = error.response?.data?.message || 'default';
+            showToast('error', 'שגיאה', messages[serverMessage]);
+            console.error("Error adding Multi Outdoor Unit:", error);        }
     };
-
+    const showToast = (severity, summary, detail) => {
+        toast.current.show({ severity, summary, detail, life: 3000 });
+    };
     const getFormErrorMessage = (name) => {
         return errors[name] ? <small className="p-error">{errors[name].message}</small> : null;
     };
 
     return (
         <div className="form-demo">
+            <Toast ref={toast} />
             <Dialog visible={showMessage} onHide={() => setShowMessage(false)} position="top" footer={<Button label="Close" onClick={() => setShowMessage(false)} />} showHeader={false} breakpoints={{ '960px': '80vw' }} style={{ width: '40vw' }}>
                 <div className="flex justify-content-center flex-column pt-6 px-3">
                     <i className="pi pi-check-circle" style={{ fontSize: '5rem', color: 'var(--green-500)' }}></i>
@@ -67,12 +97,12 @@ const AddMultiOutdoorUnits = () => {
                     </p>
                 </div>
             </Dialog>
-    
+
             <div className="flex justify-content-center">
                 <div className="card" style={{ width: '100%', maxWidth: '600px' }}>
                     <h5 className="text-center">Add Multi Outdoor Unit</h5>
                     <form onSubmit={handleSubmit(onSubmit)} className="p-fluid">
-                        
+
                         {/* Company */}
                         <div className="field">
                             <span className="p-float-label">
@@ -83,7 +113,7 @@ const AddMultiOutdoorUnits = () => {
                             </span>
                             {getFormErrorMessage('company')}
                         </div>
-    
+
                         {/* Title */}
                         <div className="field">
                             <span className="p-float-label">
@@ -94,7 +124,7 @@ const AddMultiOutdoorUnits = () => {
                             </span>
                             {getFormErrorMessage('title')}
                         </div>
-    
+
                         {/* Description */}
                         <div className="field">
                             <span className="p-float-label">
@@ -105,26 +135,26 @@ const AddMultiOutdoorUnits = () => {
                             </span>
                             {getFormErrorMessage('describe')}
                         </div>
-    
+
                         {/* Image Path */}
                         <div className="field">
                             <span className="p-float-label">
                                 <Controller name="imagepath" control={control} rules={{ required: 'Image path is required.' }} render={({ field, fieldState }) => (
                                     <FileUpload
-                                            id="imagepath"
-                                            name="imagepath"
-                                            accept="image/*"
-                                            customUpload
-                                            uploadHandler={(e) => field.onChange(e.files[0])} // Attach the file to the form
-                                            auto
-                                            mode="basic" // Use 'basic' mode for a simpler layout
-                                            className={classNames({ 'p-invalid': fieldState.invalid })}
-                                        />                                )} />
+                                        id="imagepath"
+                                        name="imagepath"
+                                        accept="image/*"
+                                        customUpload
+                                        uploadHandler={(e) => field.onChange(e.files[0])} // Attach the file to the form
+                                        auto
+                                        mode="basic" // Use 'basic' mode for a simpler layout
+                                        className={classNames({ 'p-invalid': fieldState.invalid })}
+                                    />)} />
                                 <label htmlFor="imagepath" className={classNames({ 'p-error': errors.imagepath })}>*Image Path</label>
                             </span>
                             {getFormErrorMessage('imagepath')}
                         </div>
-    
+
                         {/* Stock */}
                         <div className="field">
                             <span className="p-float-label">
@@ -135,7 +165,7 @@ const AddMultiOutdoorUnits = () => {
                             </span>
                             {getFormErrorMessage('stock')}
                         </div>
-    
+
                         {/* Price */}
                         <div className="field">
                             <span className="p-float-label">
@@ -146,7 +176,7 @@ const AddMultiOutdoorUnits = () => {
                             </span>
                             {getFormErrorMessage('price')}
                         </div>
-    
+
                         {/* BTU Output */}
                         <div className="field">
                             <div className="flex">
@@ -168,7 +198,7 @@ const AddMultiOutdoorUnits = () => {
                                 </div>
                             </div>
                         </div>
-    
+
                         {/* Working Current */}
                         <div className="field">
                             <div className="flex">
@@ -190,7 +220,7 @@ const AddMultiOutdoorUnits = () => {
                                 </div>
                             </div>
                         </div>
-    
+
                         {/* Condenser Unit Dimensions */}
                         <div className="field">
                             <div className="flex">
@@ -220,7 +250,7 @@ const AddMultiOutdoorUnits = () => {
                                 </div>
                             </div>
                         </div>
-    
+
                         {/* Booleans */}
                         <div className="field-checkbox">
                             <Controller name="quiet" control={control} render={({ field }) => (
@@ -228,40 +258,40 @@ const AddMultiOutdoorUnits = () => {
                             )} />
                             <label htmlFor="quiet">Quiet</label>
                         </div>
-    
+
                         <div className="field-checkbox">
                             <Controller name="wifi" control={control} render={({ field }) => (
                                 <Checkbox inputId="wifi" checked={field.value} onChange={(e) => field.onChange(e.checked)} />
                             )} />
                             <label htmlFor="wifi">WiFi</label>
                         </div>
-    
+
                         <div className="field-checkbox">
                             <Controller name="timer" control={control} render={({ field }) => (
                                 <Checkbox inputId="timer" checked={field.value} onChange={(e) => field.onChange(e.checked)} />
                             )} />
                             <label htmlFor="timer">Timer</label>
                         </div>
-    
+
                         <div className="field-checkbox">
                             <Controller name="sabbath_command" control={control} render={({ field }) => (
                                 <Checkbox inputId="sabbath_command" checked={field.value} onChange={(e) => field.onChange(e.checked)} />
                             )} />
                             <label htmlFor="sabbath_command">Sabbath Command</label>
                         </div>
-    
+
                         <div className="field-checkbox">
                             <Controller name="onof_auto" control={control} render={({ field }) => (
                                 <Checkbox inputId="onof_auto" checked={field.value} onChange={(e) => field.onChange(e.checked)} />
                             )} />
                             <label htmlFor="onof_auto">Auto ON/OFF</label>
                         </div>
-    
+
                         <Button type="submit" label="Add Outdoor Unit" className="mt-2" />
                     </form>
                 </div>
             </div>
         </div>
-    );    
+    );
 }
 export default AddMultiOutdoorUnits

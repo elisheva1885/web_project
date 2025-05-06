@@ -6,96 +6,121 @@ const Overhead = require("../models/airconditioners/Overhead")
 const mongoose = require('mongoose');
 
 
-//לבדוק בפוסטמן
 const createShoppingBag = async (req, res) => {
-    const user_id = req.user._id
-    // console.log("user", user_id);
-    const { product_id, type, amount } = req.body
+    try {
+        const user_id = req.user._id
+        const { product_id, type, amount } = req.body
+        if (!user_id) {
+            return res.status(400).json({ message: "INVALID_USER_ID" });
+        }
+        if (!product_id) {
+            return res.status(400).json({ message: "INVALID_PRODUCT_ID" });
+        }
+        const validTypes = ["Overhead", "MiniCenteral", "MultiIndoorUnit", "MultiOutdoorUnit"];
+        if (!validTypes.includes(type)) {
+            return res.status(400).json({ message: `Invalid type: ${type}. Must be one of ${validTypes.join(', ')}` });
+        }
+        if (!amount || typeof amount !== "number" || amount <= 0) {
+            return res.status(400).json({ message: "INVALID_AMOUNT" });
+        }
+        const duplicate = await ShoppingBag.findOne({
+            user_id: user_id,
+            product_id: product_id,
+        }).exec()
 
-    // console.log(product_id,type, amount)
-    if (!user_id || !product_id || !type) {
-        return res.status(400).json({ message: "all details are required" })
-    }
-    // console.log("user, pro", user_id, product_id)
-    const duplicate = await ShoppingBag.findOne({
-        user_id: user_id,
-        product_id: product_id,
-    }).exec()
+        if (duplicate) {
+            duplicate.amount++
+            const updatedShoppingBag = await duplicate.save()
+            return res.status(200).json({ message: "UPDATE_AMOUNT" })
+        }
 
-    // console.log("duplicate", duplicate)
-    if (duplicate) {
-        console.log("duplicate product ", duplicate);
-        duplicate.amount++
-        const updatedShoppingBag = await duplicate.save()
-        console.log("in here")
-        return res.status(200).json({ message: "update amount" })
-        // return res.status(409).json({ message: "already exist in the basket" })
+        const shoppingBag = await ShoppingBag.create({ user_id, product_id, type, amount })
+        if (shoppingBag) {
+            return res.status(201).json(shoppingBag)
+        }
+        return res.status(400).json({ message: "INTERNAL_ERROR" });
     }
-    
-    const shoppingBag = await ShoppingBag.create({ user_id, product_id, type, amount })
-    if (shoppingBag) {
-        return res.status(201).json(shoppingBag)
+    catch (err) {
+        return res.status(500).json({ message: "INTERNAL_ERROR" })
     }
-    return res.status(400).json({message: "error on adding shoppingBag object"})
 }
 
 const readShoppingBagByUserId = async (req, res) => {
-    // console.log("readShoppingBagByUserId");
-    const user_id = req.user._id
-    if (!user_id) {
-        return res.status(400).json({ message: "reqired" })
-    }
-    const shoppingBags = await ShoppingBag.find({ user_id: user_id }).lean()
-    if (!shoppingBags) {
-        return res.status(400).json({ message: "shopping bag is empty" })
-    }
-    const promises = shoppingBags.map(async (shoppingBag) => {
-        // console.log(shoppingBag.type)
-        // switch (shoppingBag.type) {
-            const Model = mongoose.model(shoppingBag.type);
-            const airConditioner = await Model.findOne({ _id: shoppingBag.product_id }).populate("company").lean()
-                 if (airConditioner.stock >= 0) {
-                    return { product: airConditioner, amount: shoppingBag.amount, type: shoppingBag.type, shoppingBagId: shoppingBag._id };
-                }
+    try {
+        const user_id = req.user._id
+        if (!user_id) {
+            return res.status(400).json({ message: "INVALID_USER_ID" });
         }
-    // }
-    );
-    const results = await Promise.all(promises)
-    const userShoppingBags = results.filter(result => result !== null).flat(); //filter null values and flatten the array.
-    // console.log(userShoppingBags);
-    return res.status(200).json(userShoppingBags)
+        const shoppingBags = await ShoppingBag.find({ user_id: user_id }).lean()
+        if (!shoppingBags || shoppingBags.length === 0) {
+            return res.status(404).json({ message: "SHOPPING_BAG_EMPTY" });
+        }
+        const promises = shoppingBags.map(async (shoppingBag) => {
+            try {
+                const validTypes = ["Overhead", "MiniCenteral", "MultiIndoorUnit", "MultiOutdoorUnit"];
+                if (!validTypes.includes(shoppingBag.type)) {
+                    throw new Error(`INVALID_TYPE: ${shoppingBag.type}`);
+                }
+
+                const Model = mongoose.model(shoppingBag.type); // Dynamically get the model based on type
+                const airConditioner = await Model.findOne({ _id: shoppingBag.product_id }).populate("company").lean()
+                if (airConditioner.stock < 0) {
+                    throw new Error(`OUT_OF_STOCK: ${shoppingBag.product_id}`);
+                }
+                return {
+                    product: airConditioner,
+                    amount: shoppingBag.amount,
+                    type: shoppingBag.type,
+                    shoppingBagId: shoppingBag._id,
+                };
+            }
+            catch (err) {
+                console.error(err.message);
+                return null; // Catch individual errors but allow other promises to resolve
+            }
+        }
+        );
+        const results = (await Promise.all(promises)).filter((item) => item !== null);
+        if (results.length === 0) {
+            return res.status(404).json({ message: "NO_VALID_PRODUCTS_IN_SHOPPING_BAG" });
+        }
+        return res.status(200).json(results);
+    } catch (err) {
+        console.error(err); // Log the error for debugging purposes
+        return res.status(500).json({ message: "INTERNAL_ERROR" });
+    }
 }
 
 const updateShoppingBagAmount = async (req, res) => {
-    const user_id = req.user._id
-    const { product_id, amount } = req.body
-    // console.log(product_id, amount);
-    if (!product_id) {
-        return res.status(400).json({ message: "error on updating" })
+    try {
+        const user_id = req.user._id
+        const { product_id, amount } = req.body
+        if (!user_id) {
+            return res.status(400).json({ message: "INVALID_USER_ID" });
+        }
+        if (!product_id) {
+            return res.status(400).json({ message: "INVALID_PRODUCT_ID" });
+        }
+        if (!amount || typeof amount !== "number" || amount <= 0) {
+            return res.status(400).json({ message: "INVALID_AMOUNT" });
+        }
+        const shoppingBag = await ShoppingBag.findOne({ product_id: product_id, user_id: user_id }).exec()
+        if (!shoppingBag) {
+            return res.status(404).json({ message: "NOT_FOUND_IN_SHOPPING_BAG" });
+        }
+        const response = await checkProductStockByIdAndType(shoppingBag.product_id, shoppingBag.type, amount);
+        if (response.status !== 200) {
+            console.log(response.message);
+            return res.status(response.status).json({ message: response.message });
+        }
+        shoppingBag.amount = amount;
+        const updatedShoppingBag = await shoppingBag.save();
+        return res.status(200).json({ updatedShoppingBag });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: "INTERNAL_ERROR" });
     }
-    if (!amount) {
-        return res.status(400).json({ message: "nothing changed" })
-    }
-    const shoppingBag = await ShoppingBag.findOne({ product_id: product_id, user_id: user_id }).exec()
-    // console.log("sh",shoppingBag);
-    if (!shoppingBag) {
-        return res.status(400).json({ message: "not fount in shopping bag" })
-    }
-    // console.log(shoppingBag);
-    const response = await checkProductStockByIdAndType(shoppingBag.product_id, shoppingBag.type, amount)
-    console.log(response);
-    // console.log("respone",response);
-    if (response.status === 200) {
-        // console.log(shoppingBag.amount);
-        shoppingBag.amount = amount
-        // console.log(amount);
-        const updatedShoppingBag = await shoppingBag.save()
-        // console.log("update",updatedShoppingBag);
-        return res.status(200).json({ updatedShoppingBag })
-    }
-    else {
-        return res.status(response.status).json({ message: response.message })
-    }
+
 }
 
 // const checkProductStock = async (product , amount)=>{
@@ -111,73 +136,50 @@ const updateShoppingBagAmount = async (req, res) => {
 // }
 
 const checkProductStockByIdAndType = async (_id, type, amount) => {
-    console.log(type);
-
-    const Model = mongoose.model(type);
-    const airConditioner = await Model.findOne({ _id: _id }).populate("company").lean()
-    if (airConditioner.stock < amount) {
-        return { status: 400, message: `not enough, there is only ${airConditioner.stock} in the stock` };
+    try {
+        const Model = mongoose.model(type);
+        const airConditioner = await Model.findOne({ _id: _id }).populate("company").lean()
+        if (!airConditioner) {
+            return { status: 404, message: `PRODUCT_NOT_FOUND` };
+        }
+        if (airConditioner.stock < amount) {
+            return { status: 400, message: `NOT_ENOUGH_STOCK` };
+        }
+        return { status: 200, message: `Ok` }
+    } catch (err) {
+        console.error(err); // Log the error for debugging purposes
+        return { status: 500, message: "INTERNAL_ERROR" };
     }
-    return { status: 200, message: `Ok` }
-    // switch (type) {
-    //     case "Overhead":
-    //         const overhead = await Overhead.findById({ _id: _id }).populate("company").lean()
-    //         if (overhead.stock < amount) {
-    //             return { status: 400, message: `not enough, there is only ${overhead.stock} in the stock` };
-    //         }
-    //         return { status: 200, message: `Ok` }
-    //         //delete from the basket
-    //         break;
-    //     case "MiniCenteral":
-    //         const miniCenteral = await MiniCenteral.findById({ _id: _id }).populate("company").lean()
-    //         if (miniCenteral.stock < amount) {
-    //             return { status: 400, message: `not enough, there is only ${miniCenteral.stock} in the stock` };
-    //         }
-    //         return { status: 200, message: `Ok` }
-    //     case "MultiIndoorUnit":
-    //         const multiIndoorUnit = await MultiIndoorUnit.findById({ _id: _id }).populate("company").lean()
-    //         if (multiIndoorUnit.stock < amount) {
-    //             return { status: 400, message: `not enough, there is only ${multiIndoorUnit.stock} in the stock` };
-    //         }
-    //         return { status: 200, message: `Ok` }
-    //     case "MultiOutdoorUnit":
-    //         const multiOutdoorUnit = await MultiOutdoorUnit.findById({ _id: _id }).populate("company").lean()
-    //         if (multiOutdoorUnit.stock < amount) {
-    //             return { status: 400, message: `not enough, there is only ${multiOutdoorUnit.stock} in the stock` };
-    //         }
-    //         return { status: 200, message: `Ok` }
-    //     //delete from the basket
-    //     default:
-    //         break;
-    // }
+
 }
 
 
 
 const deleteShoppingBag = async (req, res) => {
-    const { product_id } = req.body
-    const user_id = req.user._id
-    // console.log(user_id);
-    const shoppingBagByProduct = await ShoppingBag.findOne({ product_id: product_id }).exec()
-    if (!shoppingBagByProduct) {
-        return res.status(404).json({ message: "no such product" })
+    try {
+        const { product_id } = req.body
+        const user_id = req.user._id
+        if (!user_id) {
+            return res.status(400).json({ message: "INVALID_USER_ID" });
+        }
+        if (!product_id || typeof product_id !== "string") {
+            return res.status(400).json({ message: "INVALID_PRODUCT_ID" });
+        }
+        const shoppingBagByProduct = await ShoppingBag.findOne({ product_id: product_id }).exec()
+        if (!shoppingBagByProduct) {
+            return res.status(404).json({ message: "PRODUCT_NOT_FOUND_IN_SHOPPING_BAG" });
+        }
+        const shoppingBag = await ShoppingBag.findById(shoppingBagByProduct._id).exec();
+        if (!shoppingBag) {
+            return res.status(404).json({ message: "SHOPPING_BAG_ITEM_NOT_FOUND" });
+        }
+        const result = await shoppingBag.deleteOne()
+        return res.status(200).json({ message: "PRODUCT_DELETED_FROM_SHOPPING_BAG" });
     }
-    // console.log(shoppingBagByProduct);
-    const _id = shoppingBagByProduct._id
-    // console.log(_id);
-    const shoppingBag = await ShoppingBag.findById(_id).exec()
-
-    if (!shoppingBag) {
-        return res.status(404).json({ message: "not fount in shopping bag" })
+    catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: "INTERNAL_ERROR" });
     }
-    // console.log(shoppingBag)
-
-    const result = await shoppingBag.deleteOne()
-
-    // readShoppingBagByUserId()
-    // return res.status(200).json({shoppingBags})
-    return res.status(200).json(result)
-
 }
 
 module.exports = { createShoppingBag, readShoppingBagByUserId, updateShoppingBagAmount, deleteShoppingBag, checkProductStockByIdAndType }

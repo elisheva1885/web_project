@@ -16,22 +16,26 @@ import { Navigate, useNavigate } from 'react-router-dom';
 const Register = () => {
     const [showMessage, setShowMessage] = useState(false);
     const [formData, setFormData] = useState({});
-    const {userDetails} = useSelector((state) => state.userDetails);
     const [errorMessage, setErrorMessage] = useState('');
-
     const navigate = useNavigate()
+    const errorMessages = {
+        INVALID_USERNAME: "שם המשתמש לא תקין או חסר",
+        USERNAME_TAKEN: "שם המשתמש כבר תפוס",
+        INVALID_PASSWORD: "הסיסמה חייבת להכיל לפחות 8 תווים כולל אות גדולה, קטנה, מספר ותו מיוחד",
+        INVALID_EMAIL: "כתובת המייל לא תקינה",
+        INVALID_PHONE: "מספר הטלפון לא תקין",
+        INTERNAL_ERROR: "שגיאה בשרת, נסי שוב מאוחר יותר",
+        Access_denied: "אינך מורשה לבצע פעולה זו.",
+        Forbidden: "אינך מורשה לבצע פעולה זו."
+    };
     const defaultValues = {
         name: '',
         username: '',
         password: '',
         email: '',
-        phone: '',
-        accept: false
-    }
-
+        phone: ''
+    };
     const { control, formState: { errors }, handleSubmit, reset } = useForm({ defaultValues });
-
-  
     const onSubmit = async (data) => {
         setFormData(data);
         const user = {
@@ -42,17 +46,17 @@ const Register = () => {
             phone: data.phone
         }
         try {
-            const res = await axios.post(`http://localhost:8000/api/auth/register`,user)
-            if(res.status===201){
-                console.log("res");
-                navigate('/')
+            const res = await axios.post(`http://localhost:8000/api/auth/register`, user)
+            if (res.status === 201) {
                 setShowMessage(true);
+                navigate('/')
             }
         } catch (error) {
-            if (error.response) {
-                setErrorMessage(error.response.data.message);
+            if (error.response && error.response.data?.message) {
+                const message = error.response.data.message;
+                alert(errorMessages[message] || "שגיאה לא צפויה");
             } else {
-                setErrorMessage("Something went wrong. Please try again later.");
+                alert("שגיאה כללית, נסי שוב מאוחר יותר");
             }
         }
         reset();
@@ -63,105 +67,144 @@ const Register = () => {
     };
 
     const dialogFooter = <div className="flex justify-content-center"><Button label="OK" className="p-button-text" autoFocus onClick={() => setShowMessage(false)} /></div>;
-    const passwordHeader = <h6>Pick a password</h6>;
+    const passwordHeader = <h6>בחר סיסמה חזקה</h6>;
     const passwordFooter = (
         <React.Fragment>
-            <Divider />
-            <p className="mt-2">Suggestions</p>
-            <ul className="pl-2 ml-2 mt-0" style={{ lineHeight: '1.5' }}>
-                <li>At least one lowercase</li>
-                <li>At least one uppercase</li>
-                <li>At least one numeric</li>
-                <li>Minimum 8 characters</li>
+            <ul>
+                <li>לפחות אות אחת קטנה</li>
+                <li>לפחות אות אחת גדולה</li>
+                <li>לפחות פסרה אחת</li>
+                <li>לפחות סימן אחד</li>
+                <li>מינימום 8 ספרות</li>
             </ul>
         </React.Fragment>
     );
-
     return (
-        <div style={{ paddingTop: '60px' }}>
-
         <div className="form-demo">
-            <Dialog visible={showMessage} onHide={() => setShowMessage(false)} position="top" footer={dialogFooter} showHeader={false} breakpoints={{ '960px': '80vw' }} style={{ width: '30vw' }}>
-                <div className="flex justify-content-center flex-column pt-6 px-3">
-                    <i className="pi pi-check-circle" style={{ fontSize: '5rem', color: 'var(--green-500)' }}></i>
-                    <h5>!הרישום בוצע בהצלחה</h5>
-                    <p style={{ lineHeight: 1.5, textIndent: '1rem' }}>
-                        החשבון שלך תחת שם משתמש:  <b>{formData.name}</b> ; מיילים ישלחו לכתובת    <b>{formData.email}</b> ברוכים הבאים.
-                    </p>
-                </div>
-            </Dialog>
             <div className="flex justify-content-center">
                 <div className="card">
-                    <h5 className="text-center">הירשם</h5>
+                    <h2 className="text-center">הרשמה</h2>
                     <form onSubmit={handleSubmit(onSubmit)} className="p-fluid">
+
+                        {/* שם */}
                         <div className="field">
                             <span className="p-float-label">
-                                <Controller name="name" control={control} rules={{ required: 'Name is required.' }} render={({ field, fieldState }) => (
-                                    <InputText id={field.name} {...field} autoFocus className={classNames({ 'p-invalid': fieldState.invalid })} />
-                                )} />
-                                <label htmlFor="name" className={classNames({ 'p-error': errors.name })}>Name*</label>
+                                <Controller
+                                    name="name"
+                                    control={control}
+                                    rules={{
+                                        required: 'יש להזין שם.',
+                                        minLength: { value: 2, message: 'השם חייב להכיל לפחות 2 תווים.' },
+                                        validate: value => value.trim() !== '' || 'השם לא יכול להיות ריק או להכיל רווחים בלבד.'
+                                    }}
+                                    render={({ field, fieldState }) => (
+                                        <InputText id={field.name} {...field}
+                                            className={classNames({ 'p-invalid': fieldState.invalid })} />
+                                    )}
+                                />
+                                <label htmlFor="name" className={classNames({ 'p-error': errors.name })}>שם*</label>
                             </span>
                             {getFormErrorMessage('name')}
                         </div>
+
+                        {/* שם משתמש */}
                         <div className="field">
                             <span className="p-float-label">
-                                <Controller name="username" control={control} rules={{ required: 'Username is required.' }} render={({ field, fieldState }) => (
-                                    <InputText id={field.name} {...field} autoFocus className={classNames({ 'p-invalid': fieldState.invalid })} />
-                                )} />
-                                <label htmlFor="username" className={classNames({ 'p-error': errors.name })}>UserName*</label>
+                                <Controller
+                                    name="username"
+                                    control={control}
+                                    rules={{
+                                        required: 'יש להזין שם משתמש.',
+                                        minLength: { value: 3, message: 'שם המשתמש חייב להכיל לפחות 3 תווים.' },
+                                        validate: value => value.trim() !== '' || 'שם המשתמש לא יכול להיות ריק או להכיל רווחים בלבד.'
+                                    }}
+                                    render={({ field, fieldState }) => (
+                                        <InputText id={field.name} {...field}
+                                            className={classNames({ 'p-invalid': fieldState.invalid })} />
+                                    )}
+                                />
+                                <label htmlFor="username" className={classNames({ 'p-error': errors.username })}>שם משתמש*</label>
                             </span>
                             {getFormErrorMessage('username')}
                         </div>
+
+                        {/* אימייל */}
                         <div className="field">
                             <span className="p-float-label">
-                                <Controller name="password" control={control} rules={{ required: 'Password is required.' }} render={({ field, fieldState }) => (
-                                    <Password id={field.name} {...field} toggleMask className={classNames({ 'p-invalid': fieldState.invalid })} header={passwordHeader} footer={passwordFooter} />
-                                )} />
-                                <label htmlFor="password" className={classNames({ 'p-error': errors.password })}>Password*</label>
-                            </span>
-                            {getFormErrorMessage('password')}
-                        </div>
-                        <div className="field">
-                            <span className="p-float-label p-input-icon-right">
-                                {/* <i className="pi pi-envelope" /> */}
-                                <Controller name="email" control={control}
-                                    rules={{ required: 'Email is required.', pattern: { value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i, message: 'Invalid email address. E.g. example@email.com' } }}
+                                <Controller
+                                    name="email"
+                                    control={control}
+                                    rules={{
+                                        required: 'יש להזין כתובת אימייל.',
+                                        pattern: {
+                                            value: /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/,
+                                            message: 'כתובת אימייל לא תקינה.'
+                                        }
+                                    }}
                                     render={({ field, fieldState }) => (
-                                        <InputText id={field.name} {...field} className={classNames({ 'p-invalid': fieldState.invalid })} />
-                                    )} />
-                                <label htmlFor="email" className={classNames({ 'p-error': !!errors.email })}>Email</label>
+                                        <InputText id={field.name} {...field}
+                                            className={classNames({ 'p-invalid': fieldState.invalid })} />
+                                    )}
+                                />
+                                <label htmlFor="email" className={classNames({ 'p-error': errors.email })}>אימייל*</label>
                             </span>
                             {getFormErrorMessage('email')}
                         </div>
+
+                        {/* טלפון */}
                         <div className="field">
                             <span className="p-float-label">
-                                <Controller name="phone" control={control} render={({ field, fieldState }) => (
-                                    <InputText id={field.name} {...field} autoFocus className={classNames({ 'p-invalid': fieldState.invalid })} />
-                                )} />
-                                <label htmlFor="phone" className={classNames({ 'p-error': errors.name })}>phone</label>
+                                <Controller
+                                    name="phone"
+                                    control={control}
+                                    rules={{
+                                        pattern: {
+                                            value: /^05\d{8}$/,
+                                            message: 'מספר הטלפון חייב להיות בפורמט ישראלי).'
+                                        }
+                                    }}
+                                    render={({ field, fieldState }) => (
+                                        <InputText id={field.name} {...field}
+                                            className={classNames({ 'p-invalid': fieldState.invalid })} />
+                                    )}
+                                />
+                                <label htmlFor="phone" className={classNames({ 'p-error': errors.phone })}>טלפון</label>
                             </span>
                             {getFormErrorMessage('phone')}
                         </div>
-                        <div className="field-checkbox">
-                            <Controller name="accept" control={control} rules={{ required: true }} render={({ field, fieldState }) => (
-                                <Checkbox inputId={field.name} onChange={(e) => field.onChange(e.checked)} checked={field.value} className={classNames({ 'p-invalid': fieldState.invalid })} />
-                            )} />
-                            <label htmlFor="accept" className={classNames({ 'p-error': errors.accept })}>I agree to the terms and conditions*</label>
+
+                        {/* סיסמה */}
+                        <div className="field">
+                            <span className="p-float-label">
+                                <Controller
+                                    name="password"
+                                    control={control}
+                                    rules={{
+                                        required: 'יש להזין סיסמה.',
+                                        pattern: {
+                                            value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}$/,
+                                            message: 'הסיסמה חייבת להכיל לפחות 8 תווים, כולל אות קטנה, אות גדולה, ספרה ותו מיוחד.'
+                                        }
+                                    }}
+                                    render={({ field, fieldState }) => (
+                                        <Password id={field.name} {...field}
+                                            toggleMask
+                                            className={classNames({ 'p-invalid': fieldState.invalid })}
+                                            header={passwordHeader}
+                                            footer={passwordFooter}
+                                        />
+                                    )}
+                                />
+                                <label htmlFor="password" className={classNames({ 'p-error': errors.password })}>סיסמה*</label>
+                            </span>
+                            {getFormErrorMessage('password')}
                         </div>
-                        <Button type="submit" label="הירשם" className="mt-2" />
-                        {/* {userDetails?.role==="user"?<Button type="button"label="הוספת מזכירה" className="mt-2" onClick={registerOfficial()} />: <></> } */}
 
-            {/* Display error message if it exists */}
-            {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
-
-            {/* Success message */}
-            {showMessage && <p style={{ color: 'green' }}>Registration successful! Redirecting...</p>}
+                        <Button type="submit" label="הרשמה" className="mt-2" />
                     </form>
                 </div>
             </div>
         </div>
-           </div>
     );
 }
-
-export default Register
+export default Register;    
