@@ -25,6 +25,8 @@ const Register = () => {
         INVALID_EMAIL: "כתובת המייל לא תקינה",
         INVALID_PHONE: "מספר הטלפון לא תקין",
         INTERNAL_ERROR: "שגיאה בשרת, נסי שוב מאוחר יותר",
+        Access_denied: "אינך מורשה לבצע פעולה זו.",
+        Forbidden: "אינך מורשה לבצע פעולה זו."
     };
     const defaultValues = {
         name: '',

@@ -28,10 +28,11 @@ const Branches = () => {
         BRANCH_NOT_FOUND: "הסניף לא נמצא.",
         NO_BRANCHES_FOUND: "לא נמצאו סניפים.",
         NO_BRANCH_IN_CITY: "לא נמצאו סניפים בעיר המבוקשת.",
+        INVALID_CITY: "שם העיר אינו תקין.",
         INTERNAL_ERROR: "שגיאה פנימית בשרת. נסי שוב מאוחר יותר.",
-        UNAUTHORIZED: "אינך מורשה לבצע פעולה זו.",
+        Access_denied: "אינך מורשה לבצע פעולה זו.",
+        Forbidden: "אינך מורשה לבצע פעולה זו."
     };
-    
     const sortData = (data) => {
         data.sort((a, b) => {
             if (a.address.city < b.address.city) return -1;
@@ -52,8 +53,13 @@ const Branches = () => {
                 setBranches(res.data);
                 setFilteredBranches(res.data); // Initialize filtered branches
             }
-        } catch (e) {
-            console.error(e);
+        } catch (error) {
+            if (error.response && error.response.data?.message) {
+                const message = error.response.data.message;
+                alert(errorMessages[message] || "שגיאה לא צפויה");
+            } else {
+                alert("שגיאה כללית, נסי שוב מאוחר יותר");
+            }
         }
     };
 
@@ -70,11 +76,18 @@ const Branches = () => {
                 data: _id
             });
             if (res.status === 200) {
-                setBranches(res.data);
-                setFilteredBranches(res.data); // Update filtered branches after deletion
+                // const filteredBranches = branches.filter(branch => branch._id !== branchToDelete._id);
+                // setBranches(filteredBranches);
+                // setFilteredBranches(filteredBranches); // Update filtered branches after deletion
+                await getBranches()
             }
-        } catch (e) {
-            console.error(e);
+        } catch (error) {
+            if (error.response && error.response.data?.message) {
+                const message = error.response.data.message;
+                alert(errorMessages[message] || "שגיאה לא צפויה");
+            } else {
+                alert("שגיאה כללית, נסי שוב מאוחר יותר");
+            }
         }
     };
 
@@ -82,7 +95,7 @@ const Branches = () => {
         navigate('/branch/update', { state: { data: branchToUpdate } });
     };
 
-    const getInMap = (branch)=> {
+    const getInMap = (branch) => {
         const lat = 32.0853; // קו רוחב (Latitude)
         const lng = 34.7818; // קו אורך (Longitude)
         const address = encodeURIComponent(`${branch.address.city}, ${branch.address.street},${branch.address.streetNum}`); // כתובת בעברית או אנגלית
@@ -116,7 +129,9 @@ const Branches = () => {
                     <div style={{ ...styles.listAddress, lineHeight: '1.5', letterSpacing: '0.01em' }}>{`${branch.address.street} ${branch.address.streetNum}`}</div>
                     <div style={{ ...styles.listHours, lineHeight: '1.5', letterSpacing: '0.01em' }}>
                         <span>שעות פתיחה:</span>
+                        <br />
                         <span>א'-ה': {`${branch.openingHour} - ${branch.closingHour.weekdays}`}</span>
+                        <br />
                         <span>ו' וערבי חג: {`${branch.openingHour} - ${branch.closingHour.fridays}`}</span>
                     </div>
                     <div style={{ ...styles.listContact, lineHeight: '1.5', letterSpacing: '0.01em' }}>ליצירת קשר: {branch.phoneNumber}</div>
@@ -160,6 +175,8 @@ const Branches = () => {
         getBranches();
     }, []);
 
+
+
     return (
         <div style={styles.branchesPage}>
             <div style={styles.pageHeader}>
@@ -171,7 +188,13 @@ const Branches = () => {
 
             <Panel header={renderHeader()} className="branches-panel" style={styles.branchesPanel}>
                 <div className="card">
-                    <DataView value={filteredBranches} itemTemplate={itemTemplate} layout="list" />
+                    {filteredBranches.length === 0 ? (
+                        <div style={{ textAlign: 'center', padding: '20px', fontSize: '18px', color: '#888' }}>
+                            אין סניפים להצגה
+                        </div>
+                    ) : (
+                        <DataView value={filteredBranches} itemTemplate={itemTemplate} layout="list" />
+                    )}
                 </div>
             </Panel>
         </div>

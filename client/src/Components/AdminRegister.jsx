@@ -23,6 +23,8 @@ const AdminRegister = () => {
         INVALID_EMAIL: "כתובת המייל לא תקינה",
         INVALID_PHONE: "מספר הטלפון לא תקין",
         INTERNAL_ERROR: "שגיאה בשרת, נסי שוב מאוחר יותר",
+        Access_denied: "אינך מורשה לבצע פעולה זו.",
+        Forbidden: "אינך מורשה לבצע פעולה זו."
     };
     const defaultValues = {
         name: '',
@@ -74,7 +76,7 @@ const AdminRegister = () => {
             <ul>
                 <li>לפחות אות אחת קטנה</li>
                 <li>לפחות אות אחת גדולה</li>
-                <li>לפחות פסרה אחת</li>
+                <li>לפחות ספרה אחת</li>
                 <li>לפחות סימן אחד</li>
                 <li>מינימום 8 ספרות</li>
             </ul>
