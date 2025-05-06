@@ -35,6 +35,7 @@ const readBranch = async (req, res) => {
 
 const readBranchByCity = async (req,res) => {
     const {city} = req.params
+    
     const branches = await Branch.find({"address.city":{"$regex":`^${city}`, "$options": "i"}}).lean()
 
     if(!branches)
