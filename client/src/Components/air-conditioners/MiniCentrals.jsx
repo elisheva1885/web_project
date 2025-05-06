@@ -18,7 +18,8 @@ import UpdateMiniCenteral from './UpdateMiniCenteral';
 import { Dialog } from 'primereact/dialog';
 import { Controller, useForm } from 'react-hook-form';
 import useGetFilePath from '../../hooks/useGetFilePath';
-
+import { Toast } from 'primereact/toast'; // Import the Toast component
+import useAddToBasket from "../../hooks/useAddToBasket";
 
 const MiniCenterals = () => {
 
@@ -35,7 +36,7 @@ const MiniCenterals = () => {
     const [stockVisible, setStockVisible] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const { control, handleSubmit, formState: { errors }, watch } = useForm()
-    const {getFilePath} = useGetFilePath()
+    const { getFilePath } = useGetFilePath()
 
     // const [showDialog, setShowDialog] = useState([]);
 
@@ -44,50 +45,33 @@ const MiniCenterals = () => {
     console.log(miniCenterals);
     const priceValue = watch('price');
     const stockValue = watch('stock');
+    const { addToBasket, toast } = useAddToBasket();
+
+    const errorMessages = {
+        INVALID_USER_ID: "המזהה שלך אינו תקין. נסי להתחבר מחדש.",
+        INVALID_PRODUCT_ID: "מזהה המוצר אינו תקין.",
+        INVALID_AMOUNT: "כמות המוצר חייבת להיות מספר חיובי.",
+        "Invalid type: MiniCenteral. Must be one of Overhead, MiniCenteral, MultiIndoorUnit, MultiOutdoorUnit":
+            "סוג המוצר אינו תקין. אנא נסי שוב.",
+        INTERNAL_ERROR: "שגיאת שרת פנימית. נסי שוב מאוחר יותר.",
+        INVALID_TITLE: "הכותרת שסיפקת אינה תקינה. נסי שנית.",
+        NO_MINICENTERALS_FOUND: "לא נמצאו מזגנים תואמים.",
+        INVALID_MINICENTERAL_ID: "מזהה המזגן אינו תקין.",
+        INVALID_PRICE: "המחיר חייב להיות מספר חיובי.",
+        MINICENTERAL_NOT_FOUND: "המזגן לא נמצא.",
+    };
 
     const goToAddMiniCenteral = (type) => {
         const navigationData = {
             type: type,
-            // You can add any other data you may want to send
         };
         navigate('/air_conditioner/add', { state: navigationData });
     };
 
-    const addToBasket = async (product) => {
-        console.log(token);
-        if (token === null) {
-            alert('כדי להוסיף לסל חובה להיכנס לאיזור האישי')
-        }
-        else {
-            const shoppingBagDetails = {
-                product_id: product._id,
-                type: "MiniCenteral"
-            }
-            try {
-                const headers = {
-                    'Authorization': `Bearer ${token}`
-                }
-                const res = await axios.post('http://localhost:8000/api/user/shoppingBag', shoppingBagDetails, { headers },)
-                if (res.status === 201) {
-                    dispatch(setBasket([...basket, res.data]))
-                    console.log("res.data", res.data);
-                    console.log("useState", shoppingBags);
-                    alert(` המוצר נוסף לעגלה`)
-
-                }
-                if (res.status == 200) {
-                    alert(` המוצר נוסף לעגלה`)
-                }
-            }
-            catch (e) {
-                console.error(e)
-            }
-        }
+    const addtoBasket =  async (product) => {
+        addToBasket(product, "MiniCenteral");
     }
-
-    // alert("shoping")
-
-
+   
 
     const deleteMiniCentral = async (product) => {
         try {
@@ -132,43 +116,38 @@ const MiniCenterals = () => {
                 price: priceValue
             }
             const res = await axios.put(`http://localhost:8000/api/air-conditioner/miniCenteral/price`, details, { headers });
-            console.log(res);
             if (res.status === 200) {
-                alert(`${selectedProduct.title} price updated`)
-                const unUpdatedMiniCenterals = miniCenterals.filter(minicenteral => minicenteral._id != res.data._id)
-                dispatch(setMiniCenterals([...unUpdatedMiniCenterals, res.data]))
-                setPriceVisible(false);
+                toast.current.show({
+                    severity: "success",
+                    summary: "הצלחה",
+                    detail: `${selectedProduct.title} עודכן בהצלחה.`,
+                });
+                const updatedMiniCenterals = miniCenterals.filter(minicenteral => minicenteral._id !== res.data._id);
+                dispatch(setMiniCenterals([...updatedMiniCenterals, res.data])); // Update Redux state
+                setPriceVisible(false); // Hide the price modal
             }
         }
         catch (error) {
-            console.error(error);
-            setPriceVisible(false);
+            console.error("Error updating MiniCenteral price:", error);
+
+            // Handle server-side errors
+            if (error.response && error.response.data?.message) {
+                const message = error.response.data.message;
+                toast.current.show({
+                    severity: "error",
+                    summary: "שגיאה",
+                    detail: errorMessages[message] || "שגיאה בלתי צפויה. נסי שוב מאוחר יותר.",
+                });
+            } else {
+                toast.current.show({
+                    severity: "error",
+                    summary: "שגיאה",
+                    detail: "ודאי שיש חיבור לאינטרנט ונסי שוב.",
+                });
+            }
+            setPriceVisible(false); // Hide the price modal
         }
     }
-
-    // const updateStock = async (data) => {
-    //     try {
-    //         const headers = {
-    //             'Authorization': `Bearer ${token}`
-    //         }
-    //         const details = {
-    //             _id: selectedProduct._id,
-    //             stock: stockValue
-    //         }
-    //         const res = await axios.put(`http://localhost:8000/api/air-conditioner/miniCenteral/stock`, details, { headers });
-    //         console.log(res);
-    //         if (res.status === 200) {
-    //             alert(`${selectedProduct.title} stock updated`)
-    //             const unUpdatedMiniCenterals = miniCenterals.filter(minicenteral=> minicenteral._id != res.data._id)
-    //             dispatch(setMiniCenterals([...unUpdatedMiniCenterals , res.data]))
-    //             setStockVisible(false);
-    //         }
-    //     }
-    //     catch (error) {
-    //         console.error(error);
-    //         setStockVisible(false);
-    //     }
-    // }
 
     const UpdateMiniCenteral = async (mc) => {
         alert("updateMiniCenteral");
@@ -179,19 +158,6 @@ const MiniCenterals = () => {
         navigate('/miniCenterals/miniCenteral/update', { state: navigationData })
     }
 
-    // const getCompanies = async()=>{
-    //     try{
-    //         const res = await axios.get('http://localhost:8000/api/company')
-    //         if(res.status === 200){
-    //             console.log("company:",res.data);
-    //             dispatch(setCompanies(res.data))
-    //             // console.log(companies);
-    //         }
-    //     }
-    //     catch (e) {
-    //         console.error(e)
-    //     }
-    // }
 
     const sortData = (data) => {
         data.sort((a, b) => {
@@ -201,35 +167,37 @@ const MiniCenterals = () => {
         })
     }
 
-    // const getMiniCenterals = async () => {
-    //     try {
-    //         const headers = {
-    //             'Authorization': `Bearer ${token}`
-    //         }
-    //         console.log(headers);
-    //         const res = await axios.get('http://localhost:8000/api/air-conditioner/MiniCenteral',{headers})
-    //         if (res.status === 200) {
-    //             sortData(res.data)
-    //             setMiniCenterals(res.data)
-    //         }
-    //     }
-    //     catch (e) {
-    //         console.error(e)
-    //     }
-    // }
-
     const getMiniCenteralByTitle = async (c) => {
-        try {
+       
+            const title = c.target.value
             setValue(c.target.value)
-            const res = await axios.get(`http://localhost:8000/api/air-conditioner/MiniCenteral/${c.target.value}`)
+            
+            try{      
+            const res = await axios.get(`http://localhost:8000/api/air-conditioner/MiniCenteral/${title}`)
             if (res.status === 200) {
                 dispatch(setMiniCenterals(res.data))
             }
         }
         catch (e) {
-            console.error(e)
+            if (e.response && e.response.data?.message) {
+                const message = e.response.data.message;
+                toast.current.show({
+                    severity: "error",
+                    summary: "שגיאה",
+                    detail: errorMessages[message] || "שגיאה בלתי צפויה. נסי שוב מאוחר יותר.",
+                });
+            } else {
+                toast.current.show({
+                    severity: "error",
+                    summary: "שגיאה",
+                    detail: "ודאי שיש חיבור לאינטרנט ונסי שוב.",
+                });
+            }
+        
         }
+        
     }
+
 
     const getSeverity = (s) => {
         if (s >= 50) {
@@ -265,36 +233,24 @@ const MiniCenterals = () => {
         return (
             <div className="col-12 sm:col-6 lg:col-3 p-3" key={product._id}>
                 <div className="border-1 surface-border border-round p-4 shadow-3 h-full flex flex-column justify-content-between gap-4">
-
-                    {/* תמונת החברה - גדולה ובולטת */}
                     <img
-                        src={`/${product?.company?.imagePath}`}
+                        src={getFilePath(product?.company?.imagePath)}
                         alt="Company"
                         className="w-full h-10rem object-contain border-round"
                     />
-
-                    {/* תמונת המוצר - גדולה ורחבה */}
                     <img
                         src={getFilePath(product.imagepath)}
                         alt={product.title}
                         className="w-full h-12rem object-contain border-round"
                     />
-
-                    {/* פרטי המוצר */}
                     <div className="flex flex-column align-items-center text-center gap-2">
                         <Link to={`miniCenteral/${product._id}`}>
                             <div className="text-xl font-bold text-900">{product.title}</div>
                         </Link>
-
                         <Tag value={getSeverityText(product)} severity={getSeverity(product.stock)} />
                         <span className="text-lg font-medium text-primary">₪{product.price}</span>
                         {userDetails?.role === 'official' || userDetails?.role === 'admin' ? <Button onClick={() => UpdateMiniCenteral(product)}><i className="pi pi-pencil" style={{ fontSize: '1rem' }}></i></Button> : <></>}
-                        {/* {userDetails?.role === 'official' || userDetails?.role === 'admin' ? <Button onClick={()=>updateMiniCenteralPrice(product)}><i className="pi pi-pencil" style={{ fontSize: '1rem' }}> עדכון מחיר </i></Button> : <></>} */}
-                        {/* {updateMiniCenteralPrice} */}
-                        {/* <div> */}
                         {userDetails?.role === 'official' || userDetails?.role === 'admin' ? (<Button onClick={() => openPriceUpdateDialog(product)}><i className="pi pi-pencil" style={{ fontSize: '1rem' }}> עדכון מחיר </i> </Button>) : <></>}
-                        {/* </div> */}
-                        {/* {userDetails?.role === 'official' || userDetails?.role === 'admin' ? <Button onClick={() =>openStockUpdateDialog(product)}><i className="pi pi-pencil" style={{ fontSize: '1rem' }}> עדכון מלאי </i></Button> : <></>} */}
                         {userDetails?.role === 'admin' && (
                             <Button icon="pi pi-trash" className="p-button-rounded p-button-danger p-button-sm" onClick={() => deleteMiniCentral(product)} tooltip="מחק" tooltipOptions={{ position: 'bottom' }} />
                         )}
@@ -306,7 +262,7 @@ const MiniCenterals = () => {
                         disabled={
                             getSeverity(product.stock) === "danger"
                         }
-                        onClick={() => addToBasket(product)}
+                        onClick={() => addtoBasket(product)}
                     />
                 </div>
             </div>
@@ -322,7 +278,7 @@ const MiniCenterals = () => {
 
     const listTemplate = (products, layout) => {
         if (!Array.isArray(miniCenterals) || miniCenterals.length === 0) {
-            return <h1>No MiniCenterals available</h1>; // Fallback UI          
+            return <h1>אין מיני מרכזיים זמינים</h1>; 
         }
         return <div className="grid grid-nogutter">{miniCenterals.map((product, index) => itemTemplate(product, layout, index))}</div>;
     };
@@ -335,8 +291,8 @@ const MiniCenterals = () => {
 
     return (
         <>
-            {userDetails.role === 'admin' ? <Button onClick={() => goToAddMiniCenteral("MiniCenteral")}>add MiniCenteral</Button> : <></>}
-            {/* {<Button onClick={ ()=>goToAddMiniCenteral("MiniCenteral")}>add MiniCenteral</Button>} */}
+            {userDetails?.role === 'official' || userDetails?.role === 'admin'? <Button onClick={() => goToAddMiniCenteral("MiniCenteral")}>הוספת מזגן מיני מרכזי</Button> : <></>}
+            <Toast ref={toast} />
             <div className="card">
                 <div className="flex justify-content-end">
                     <IconField iconPosition="left">
@@ -346,7 +302,6 @@ const MiniCenterals = () => {
                 </div>
                 <DataView value={miniCenterals} listTemplate={listTemplate} layout={layout} />
             </div>
-            {/* <SideFillter /> */}
             <Dialog
                 header="עדכון מחיר"
                 visible={priceVisible}
@@ -374,32 +329,6 @@ const MiniCenterals = () => {
                 />
             </Dialog>
 
-            {/* <Dialog
-    header="עדכון מלאי"
-    visible={stockVisible}
-    style={{ width: '50vw' }}
-    onHide={() => setStockVisible(false)}
-    modal
->
-    <h6>מלאי:</h6>
-    <div className="field">
-        <span className="p-float-label">
-            <Controller
-                name="stock"
-                control={control}
-                render={({ field }) => (
-                    <InputText id={field.name} type="number" {...field} />
-                )}
-            />
-            <label htmlFor="stock">{selectedProduct?.stock}</label>
-        </span>
-    </div>
-    <Button
-        label="לעדכון"
-        onClick={handleSubmit(updateStock)}
-        className="p-button-success"
-    />
-</Dialog> */}
         </>
     )
 }

@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { useEffect, useState, lazy } from 'react'
+import { useEffect, useState, lazy, useRef } from 'react'
 import { Button } from 'primereact/button';
 import { DataView, DataViewLayoutOptions } from 'primereact/dataview';
 import { Tag } from 'primereact/tag';
@@ -20,6 +20,8 @@ import { Controller, useForm } from 'react-hook-form';
 import { Dialog } from 'primereact/dialog';
 import { setMultiIndoorUnits } from '../../store/air-conditioner/multiIndoorUnitsSlice';
 import useGetFilePath from '../../hooks/useGetFilePath';
+import { Toast } from 'primereact/toast';
+import useAddToBasket from "../../hooks/useAddToBasket";
 
 
 const Overhead = lazy(() => import('./Overhead'));
@@ -35,20 +37,28 @@ const MultiIndoorUnits = () => {
     const { multiIndoorUnits } = useSelector((state) => state.multiIndoorUnits);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [value, setValue] = useState('')
-    const [shoppingBags, setShoppingBags] = useState([])
-    const [registered, setRegistered] = useState(false);
     const [priceVisible, setPriceVisible] = useState(false);
     const [stockVisible, setStockVisible] = useState(false);
     const { control, handleSubmit, formState: { errors }, watch } = useForm()
-
     const [layout, setLayout] = useState('grid');
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const priceValue = watch('price');
     const stockValue = watch('stock');
     const {getFilePath} = useGetFilePath()
+    const { addToBasket, toast } = useAddToBasket();
 
-    console.log("multiIndoorUnits", multiIndoorUnits);
+    const errorMessages = {
+        INVALID_USER_ID: "המזהה שלך אינו תקין. נסי להתחבר מחדש.",
+        INVALID_PRODUCT_ID: "מזהה המוצר אינו תקין.",
+        INVALID_AMOUNT: "כמות המוצר חייבת להיות מספר חיובי.",
+        "Invalid type: MiniCenteral. Must be one of Overhead, MiniCenteral, MultiIndoorUnit, MultiOutdoorUnit":
+            "סוג המוצר אינו תקין. אנא נסי שוב.",
+        INTERNAL_ERROR: "שגיאת שרת פנימית. נסי שוב מאוחר יותר.",
+        Access_denied: "אינך מורשה לבצע פעולה זו.",
+        Forbidden: "אינך מורשה לבצע פעולה זו.",
+        UNAUTHORIZED: "השם המשתמש או הסיסמה אינם נכונים. אנא בדוק ונסה שוב.",
+    };
 
     const goToAddMultiIndoorUnit = (type) => {
         const navigationData = {
@@ -58,40 +68,9 @@ const MultiIndoorUnits = () => {
         navigate('/air_conditioner/add', { state: navigationData });
     };
 
-    const addToBasket = async (product) => {
-        if(token === null){
-            alert('כדי להוסיף לסל חובה להיכנס לאיזור האישי')
-        }
-        else{
-
-        
-            const shoppingBagDetails = {
-                product_id: product._id,
-                type: "MultiIndoorUnit",
-                amount: 1
-            }
-            try {
-                const headers = {
-                    'Authorization': `Bearer ${token}`
-                }
-                const res = await axios.post('http://localhost:8000/api/user/shoppingBag', shoppingBagDetails, { headers })
-                if (res.status === 201) {
-                    dispatch(setBasket([...basket, res.data]))
-                    alert(` המוצר נוסף לעגלה`)
-                    console.log("res.data", res.data);
-                    console.log("useState", shoppingBags);
-                }
-                if (res.status == 200) {
-                    alert(` המוצר נוסף לעגלה`)
-                }
-            }
-            catch (e) {
-                console.error(e)
-            }
-        }
-
+    const addtoBasket =  async (product) => {
+        addToBasket(product, "MultiIndoorUnit")
     }
-
 
 
 const deleteMultiIndoorUnit = async (product) => {
@@ -150,43 +129,6 @@ const updatePrice = async (data) => {
     }
 }
 
-// const updateStock = async (data) => {
-//     try {
-//         const headers = {
-//             'Authorization': `Bearer ${token}`
-//         }
-//         const details = {
-//             _id: selectedProduct._id,
-//             stock: stockValue
-//         }
-//         const res = await axios.put(`http://localhost:8000/api/air-conditioner/multiIndoorUnit/stock`, details, { headers });
-//         console.log(res);
-//         if (res.status === 200) {
-//             alert(`${selectedProduct.title} stock updated`)
-//             const unUpdatedOverheads = multiIndoorUnits.filter(multiIndoorUnit => multiIndoorUnit._id != res.data._id)
-//             dispatch(setOverheads([...unUpdatedOverheads, res.data]))
-//             setStockVisible(false);
-//         }
-//     }
-//     catch (error) {
-//         console.error(error);
-//         setStockVisible(false);
-//     }
-// }
-
-// const getCompanies = async()=>{
-//     try{
-//         const res = await axios.get('http://localhost:8000/api/company')
-//         if(res.status === 200){
-//             console.log("company:",res.data);
-//             dispatch(setCompanies(res.data))
-//             // console.log(companies);
-//         }
-//     }
-//     catch (e) {
-//         console.error(e)
-//     }
-// }
 
 const sortData = (data) => {
     data.sort((a, b) => {
@@ -196,22 +138,6 @@ const sortData = (data) => {
     })
 }
 
-// const getOverheads = async () => {
-//     try {
-//         const headers = {
-//             'Authorization': `Bearer ${token}`
-//         }
-//         console.log(headers);
-//         const res = await axios.get('http://localhost:8000/api/air-conditioner/multiIndoorUnit',{headers})
-//         if (res.status === 200) {
-//             sortData(res.data)
-//             setOverheads(res.data)
-//         }
-//     }
-//     catch (e) {
-//         console.error(e)
-//     }
-// }
 
 const getMultiIndoorUnitByTitle = async (c) => {
     try {
@@ -255,85 +181,12 @@ const getSeverityText = (product) => {
             return null;
     }
 };
-// const listItem = (product, index) => {
-//     return (
-//         <>
-//             <div className="col-12" key={product._id}>
-//                 <div className={classNames('flex flex-column xl:flex-row xl:align-items-start p-4 gap-4', { 'border-top-1 surface-border': index !== 0 })}>
-//                     <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`/${product?.company?.imagePath}`} />
-//                     <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`${product.imagepath}`} />
-//                     <div className="flex flex-column sm:flex-row justify-content-between align-items-center xl:align-items-start flex-1 gap-4">
-//                         <div className="flex flex-column align-items-center sm:align-items-start gap-3">
-//                             {/* <Link to={{pathName:`/multiIndoorUnits/${product.title}` , state: {product:product} }}><div className="text-2xl font-bold text-900" style={{}} >{product.title}</div></Link> */}
-//                             <Link to={`/multiIndoorUnits/multiIndoorUnit/${product._id}` } params={{ product: product }}><div className="text-2xl font-bold text-900" style={{}} >{product.title}</div></Link>
-//                             <p>{product.imagepath}</p>
-//                             <div className="flex align-items-center gap-3">
-//                                 <Tag value={getSeverityText(product)} severity={getSeverity(product.stock)}></Tag>
-//                             </div>
-//                         </div>
-//                         <div className="flex sm:flex-column align-items-center sm:align-items-end gap-3 sm:gap-2">
-//                             <span className="text-2xl font-semibold">₪{product.price}</span>
-//                             <Button icon="pi pi-shopping-cart" className="p-button-rounded" disabled={getSeverity(product.stock) === "danger"} onClick={()=>addToBasket(product)}></Button>
-//                         </div>
-//                     </div>
-//                 </div>
-//             </div>
-//         </>
-//     );
-// };
-
-// const gridItem = (product, index) => {
-//     return (
-//         <>
-//         <div className="col-12 sm:col-6 lg:col-12 xl:col-4 p-2" key={product._id}>
-//             <div className="p-4 border-1 surface-border surface-card border-round">
-//                 <div className="flex flex-wrap align-items-center justify-content-between gap-2">
-//                     {/* <img className="w-9 shadow-2 border-round" src={`${product.company.imagePath}`} /> */}
-//                     <div className="flex align-items-center gap-2">
-//                         <Link to={"/multiIndoorUnits/multiIndoorUnit"}><div className="text-2xl font-bold text-900" style={{}}>{product.title}</div></Link>
-//                     </div>
-//                 </div>
-//                 <div className="flex flex-column align-items-center gap-3 py-5">
-//                     <img className="w-9 shadow-2 border-round" src={`${product.imagepath}`} />
-//                 </div>
-//                 <Tag value={getSeverityText(product)} severity={getSeverity(product.stock)}></Tag>
-
-//                 <div className="flex align-items-center justify-content-between">
-//                     <span className="text-2xl font-semibold">₪{product.price}</span>
-//                     <Button icon="pi pi-shopping-cart" className="p-button-rounded" disabled={getSeverity(product.stock) === "danger"} onClick={()=>addToBasket(product)}></Button>
-//                 </div>
-//             </div>
-//         </div>
-//         <div className="col-12 sm:col-6 lg:col-12 xl:col-4 p-2" key={product._id}>
-//         <div className={classNames('p-4 border-1 surface-border surface-card border-roun', { 'border-top-1 surface-border': index !== 0 })}>
-//             <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`/${product?.company?.imagePath}`} />
-//             <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`${product.imagepath}`} />
-//             <div className="flex flex-column sm:flex-row justify-content-between align-items-center xl:align-items-start flex-1 gap-4">
-//                 <div className="flex flex-column align-items-center sm:align-items-start gap-3">
-//                     {/* <Link to={{pathName:`/multiIndoorUnits/${product.title}` , state: {product:product} }}><div className="text-2xl font-bold text-900" style={{}} >{product.title}</div></Link> */}
-//                     <Link to={`/multiIndoorUnits/multiIndoorUnit/${product._id}` } params={{ product: product }}><div className="text-2xl font-bold text-900" style={{}} >{product.title}</div></Link>
-//                     <p>{product.imagepath}</p>
-//                     <div className="flex align-items-center gap-3">
-//                         <Tag value={getSeverityText(product)} severity={getSeverity(product.stock)}></Tag>
-//                     </div>
-//                 </div>
-//                 <div className="flex sm:flex-column align-items-center sm:align-items-end gap-3 sm:gap-2">
-//                     <span className="text-2xl font-semibold">₪{product.price}</span>
-//                     <Button icon="pi pi-shopping-cart" className="p-button-rounded" disabled={getSeverity(product.stock) === "danger"} onClick={()=>addToBasket(product)}></Button>
-//                 </div>
-//             </div>
-//         </div>
-//     </div>
-//     </>
-//     );
-// };
 
 const UpdateMultiIndoorUnit = async (m) => {
     const navigationData = {
         type: m,
         // You can add any other data you may want to send
     };
-    console.log("mmmmmmmm", m);
     navigate('/multiIndoorUnits/multiIndoorUnit/update', { state: navigationData })
     // dispatch(setOverheads(res.data))
 }
@@ -378,9 +231,9 @@ const gridItem = (product) => {
                     icon="pi pi-shopping-cart"
                     className="w-full"
                     disabled={
-                        getSeverity(product.stock) === "danger" || registered === false
+                        getSeverity(product.stock) === "danger"
                     }
-                    onClick={() => addToBasket(product)}
+                    onClick={() => addtoBasket(product)}
                 />
             </div>
         </div>
@@ -401,68 +254,10 @@ const listTemplate = (products, layout) => {
     return <div className="grid grid-nogutter">{multiIndoorUnits.map((product, index) => itemTemplate(product, layout, index))}</div>;
 };
 
-// const header = () => {
-//     return (
-//         // <div className="flex justify-content-end">
-//             // <DataViewLayoutOptions layout={layout} onChange={(e) => setLayout(e.value)} />
-//         // </div>
-//         <></>
-//     );
-// };
-
-const filterOverheads = (filters) => {
-    // Filter multiIndoorUnits based on selected criteria
-    let filteredOverheads = multiIndoorUnits;
-    console.log(filteredOverheads)
-
-    // Example filter logic
-    if (filters.companies.length > 0) {
-        filteredOverheads = filteredOverheads.filter(multiIndoorUnit =>
-            filters.companies.includes(multiIndoorUnit.company.name)
-        );
-    }
-    if (filters.shabbatMode) {
-        filteredOverheads = filteredOverheads.filter(multiIndoorUnit => multiIndoorUnit.isShabbatCompatible);
-    }
-    if (filters.wifi) {
-        filteredOverheads = filteredOverheads.filter(multiIndoorUnit => multiIndoorUnit.hasWifi);
-    }
-    if (filters.priceRange) {
-        filteredOverheads = filteredOverheads.filter(multiIndoorUnit =>
-            multiIndoorUnit?.price >= filters.priceRange[0] && multiIndoorUnit.price <= filters.priceRange[1]
-        );
-    }
-    if (filters.btuHeating) {
-        filteredOverheads = filteredOverheads.filter(multiIndoorUnit =>
-            multiIndoorUnit?.btuHeating >= filters.btuHeating
-        );
-    }
-    if (filters.btuCooling) {
-        filteredOverheads = filteredOverheads.filter(multiIndoorUnit =>
-            multiIndoorUnit?.btuCooling >= filters.btuCooling
-        );
-    }
-    if (filters.energyRating) {
-        filteredOverheads = filteredOverheads.filter(multiIndoorUnit =>
-            multiIndoorUnit?.energyRating === filters.energyRating
-        );
-    }
-    console.log(filterOverheads)
-    dispatch(setOverheads(filteredOverheads)); // Update the state with the filtered results
-}
-
-useEffect(() => {
-    // getCompanies()
-
-    if (token) {
-        setRegistered(true)
-    }
-}, [])
-
 return (
     <>
         {userDetails.role === 'admin' ? <Button onClick={() => goToAddMultiIndoorUnit("MultiIndoorUnit")}>add multiIndoorUnit</Button> : <></>}
-        {/* {<Button onClick={ ()=>goToAddOverhead("Overhead")}>add multiIndoorUnit</Button>} */}
+            <Toast ref={toast} />
         <div className="card">
             <div className="flex justify-content-end">
                 <IconField iconPosition="left">
@@ -472,7 +267,6 @@ return (
             </div>
             <DataView value={multiIndoorUnits} listTemplate={listTemplate} layout={layout} />
         </div>
-        <SideFillter onFilter={filterOverheads} />
 
 
         <Dialog
@@ -502,32 +296,6 @@ return (
             />
         </Dialog>
 
-        {/* <Dialog
-    header="עדכון מלאי"
-    visible={stockVisible}
-    style={{ width: '50vw' }}
-    onHide={() => setStockVisible(false)}
-    modal
->
-    <h6>מלאי:</h6>
-    <div className="field">
-        <span className="p-float-label">
-            <Controller
-                name="stock"
-                control={control}
-                render={({ field }) => (
-                    <InputText id={field.name} type="number" {...field} />
-                )}
-            />
-            <label htmlFor="stock">{selectedProduct?.stock}</label>
-        </span>
-    </div>
-    <Button
-        label="לעדכון"
-        onClick={handleSubmit(updateStock)}
-        className="p-button-success"
-    />
-</Dialog> */}
     </>
 )
 }

@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { useEffect, useState, lazy } from 'react'
+import { useEffect, useState, lazy, use, useRef } from 'react'
 import { Button } from 'primereact/button';
 import { DataView, DataViewLayoutOptions } from 'primereact/dataview';
 import { Tag } from 'primereact/tag';
@@ -20,6 +20,8 @@ import { Controller, useForm } from 'react-hook-form';
 import { Dialog } from 'primereact/dialog';
 import { setMultiOutdoorUnits } from '../../store/air-conditioner/multiOutdoorUnitsSlice';
 import useGetFilePath from '../../hooks/useGetFilePath';
+import { Toast } from 'primereact/toast';
+import useAddToBasket from "../../hooks/useAddToBasket";
 
 
 const Overhead = lazy(() => import('./Overhead'));
@@ -47,9 +49,22 @@ const MultiOutdoorUnits = () => {
     const priceValue = watch('price');
     const stockValue = watch('stock');
     const {getFilePath} = useGetFilePath()
+    const { addToBasket, toast } = useAddToBasket();
+    const errorMessages = {
+        INVALID_USER_ID: "המזהה שלך אינו תקין. נסי להתחבר מחדש.",
+        INVALID_PRODUCT_ID: "מזהה המוצר אינו תקין.",
+        INVALID_AMOUNT: "כמות המוצר חייבת להיות מספר חיובי.",
+        "Invalid type: MiniCenteral. Must be one of Overhead, MiniCenteral, MultiIndoorUnit, MultiOutdoorUnit":
+            "סוג המוצר אינו תקין. אנא נסי שוב.",
+        INTERNAL_ERROR: "שגיאת שרת פנימית. נסי שוב מאוחר יותר.",
+        Access_denied: "אינך מורשה לבצע פעולה זו.",
+        Forbidden: "אינך מורשה לבצע פעולה זו.",
+        UNAUTHORIZED: "השם המשתמש או הסיסמה אינם נכונים. אנא בדוק ונסה שוב.",
+    };
 
-    console.log("multiOutdoorUnits",multiOutdoorUnits);
-
+    const addtoBasket =     async (product) => {
+        addToBasket(product, "MultiOutDoorUnit")
+    }
     const goToAddMultiOutdoorUnit = (m) => {
         const navigationData = {
             type: m,
@@ -58,37 +73,9 @@ const MultiOutdoorUnits = () => {
         navigate('/air_conditioner/add', { state: navigationData });
     };
 
-    const addToBasket = async (product) => {
-        if(token === null){
-            alert('כדי להוסיף לסל חובה להיכנס לאיזור האישי')
-        }
-        else{
-        const shoppingBagDetails = {
-            product_id: product._id,
-            type: "MultiOutdoorUnit",
-            amount: 1
-        }
-        try {
-            const headers = {
-                'Authorization': `Bearer ${token}`
-            }
-            const res = await axios.post('http://localhost:8000/api/user/shoppingBag', shoppingBagDetails, { headers })
-            if (res.status === 201) {
-                dispatch(setBasket([...basket, res.data]))
-                alert(` המוצר נוסף לעגלה`)
-            }
-            if(res.status==200){
-                alert(` המוצר נוסף לעגלה`)
-            }
-        }
-        catch (e) {
-            console.error(e)
-        }
-    }
-}
-  
-
     
+    
+     
 
     const deleteMultiOutdoorUnit = async (product) => {
         try {
@@ -114,12 +101,6 @@ const MultiOutdoorUnits = () => {
         setSelectedProduct(product);
         setPriceVisible(true);
     };
-
-    const openStockUpdateDialog = (product) => {
-        setSelectedProduct(product);
-        setStockVisible(true);
-    };
-
 
     const updatePrice = async (data) => {
         try {
@@ -203,7 +184,6 @@ const MultiOutdoorUnits = () => {
             type: m,
             // You can add any other data you may want to send
         };
-        console.log("mmmmmmmm",m);
         navigate('/multiOutdoorUnits/multiOutdoorUnit/update', { state: navigationData })
         // dispatch(setOverheads(res.data))
     }
@@ -237,8 +217,6 @@ const MultiOutdoorUnits = () => {
                         <span className="text-lg font-medium text-primary">₪{product.price}</span>
                         {userDetails?.role === 'official' || userDetails?.role === 'admin' ? <Button onClick={() => UpdateMultiOutdoorUnit(product)}><i className="pi pi-pencil" style={{ fontSize: '1rem' }}></i></Button> : <></>}
                         {userDetails?.role === 'official' || userDetails?.role === 'admin' ? (<Button onClick={() => openPriceUpdateDialog(product)}><i className="pi pi-pencil" style={{ fontSize: '1rem' }}> עדכון מחיר </i> </Button>) : <></>}
-                        {/* {userDetails?.role === 'official' || userDetails?.role === 'admin' ? <Button onClick={() => openStockUpdateDialog(product)}><i className="pi pi-pencil" style={{ fontSize: '1rem' }}> עדכון מלאי </i></Button> : <></>} */}
-
                         {userDetails?.role === 'admin' && (
                             <Button icon="pi pi-trash" className="p-button-rounded p-button-danger p-button-sm" onClick={() => deleteMultiOutdoorUnit(product)} tooltip="מחק" tooltipOptions={{ position: 'bottom' }} />
                         )}
@@ -248,9 +226,9 @@ const MultiOutdoorUnits = () => {
                         icon="pi pi-shopping-cart"
                         className="w-full"
                         disabled={
-                            getSeverity(product.stock) === "danger" || registered === false
+                            getSeverity(product.stock) === "danger"
                         }
-                        onClick={() => addToBasket(product)}
+                        onClick={() => addtoBasket(product)}
                     />
                 </div>
             </div>
@@ -266,73 +244,18 @@ const MultiOutdoorUnits = () => {
 
     const listTemplate = (products, layout) => {
         if (!Array.isArray(multiOutdoorUnits) || multiOutdoorUnits.length === 0) {
-            return <h1>No multiOutdoorUnits available</h1>; // Fallback UI          
+            return <h1>אין מעבים זמינים</h1>; // Fallback UI          
         }
         return <div className="grid grid-nogutter">{multiOutdoorUnits.map((product, index) => itemTemplate(product, layout, index))}</div>;
     };
 
-    // const header = () => {
-    //     return (
-    //         // <div className="flex justify-content-end">
-    //             // <DataViewLayoutOptions layout={layout} onChange={(e) => setLayout(e.value)} />
-    //         // </div>
-    //         <></>
-    //     );
-    // };
+   
 
-    const filterOverheads = (filters) => {
-        // Filter multiOutdoorUnits based on selected criteria
-        let filteredOverheads = multiOutdoorUnits;
-        console.log(filteredOverheads)
-
-        // Example filter logic
-        if (filters.companies.length > 0) {
-            filteredOverheads = filteredOverheads.filter(multiOutdoorUnit =>
-                filters.companies.includes(multiOutdoorUnit.company.name)
-            );
-        }
-        if (filters.shabbatMode) {
-            filteredOverheads = filteredOverheads.filter(multiOutdoorUnit => multiOutdoorUnit.isShabbatCompatible);
-        }
-        if (filters.wifi) {
-            filteredOverheads = filteredOverheads.filter(multiOutdoorUnit => multiOutdoorUnit.hasWifi);
-        }
-        if (filters.priceRange) {
-            filteredOverheads = filteredOverheads.filter(multiOutdoorUnit =>
-                multiOutdoorUnit?.price >= filters.priceRange[0] && multiOutdoorUnit.price <= filters.priceRange[1]
-            );
-        }
-        if (filters.btuHeating) {
-            filteredOverheads = filteredOverheads.filter(multiOutdoorUnit =>
-                multiOutdoorUnit?.btuHeating >= filters.btuHeating
-            );
-        }
-        if (filters.btuCooling) {
-            filteredOverheads = filteredOverheads.filter(multiOutdoorUnit =>
-                multiOutdoorUnit?.btuCooling >= filters.btuCooling
-            );
-        }
-        if (filters.energyRating) {
-            filteredOverheads = filteredOverheads.filter(multiOutdoorUnit =>
-                multiOutdoorUnit?.energyRating === filters.energyRating
-            );
-        }
-        console.log(filterOverheads)
-        dispatch(setOverheads(filteredOverheads)); // Update the state with the filtered results
-    }
-
-    useEffect(() => {
-        // getCompanies()
-
-        if (token) {
-            setRegistered(true)
-        }
-    }, [])
 
     return (
         <>
             {userDetails.role === 'admin' ? <Button onClick={() => goToAddMultiOutdoorUnit("MultiOutdoorUnit")}>add multiOutdoorUnit</Button> : <></>}
-            {/* {<Button onClick={ ()=>goToAddOverhead("Overhead")}>add multiOutdoorUnit</Button>} */}
+            <Toast ref={toast} />
             <div className="card">
                 <div className="flex justify-content-end">
                     <IconField iconPosition="left">
@@ -342,7 +265,6 @@ const MultiOutdoorUnits = () => {
                 </div>
                 <DataView value={multiOutdoorUnits} listTemplate={listTemplate} layout={layout} />
             </div>
-            <SideFillter onFilter={filterOverheads} />
 
 
             <Dialog

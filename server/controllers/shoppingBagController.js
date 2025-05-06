@@ -93,7 +93,6 @@ const readShoppingBagByUserId = async (req, res) => {
 
 const updateShoppingBagAmount = async (req, res) => {
     try {
-        console.log("in function");
         const user_id = req.user._id
         const { product_id, amount } = req.body
         if (!user_id) {
@@ -109,7 +108,6 @@ const updateShoppingBagAmount = async (req, res) => {
         if (!shoppingBag) {
             return res.status(404).json({ message: "NOT_FOUND_IN_SHOPPING_BAG" });
         }
-        console.log("sending");
         const response = await checkProductStockByIdAndType(shoppingBag.product_id, shoppingBag.type, amount);
         if (response.status !== 200) {
             console.log(response.message);
@@ -139,14 +137,12 @@ const updateShoppingBagAmount = async (req, res) => {
 
 const checkProductStockByIdAndType = async (_id, type, amount) => {
     try {
-        console.log("in function");
         const Model = mongoose.model(type);
         const airConditioner = await Model.findOne({ _id: _id }).populate("company").lean()
         if (!airConditioner) {
             return { status: 404, message: `PRODUCT_NOT_FOUND` };
         }
         if (airConditioner.stock < amount) {
-            console.log("in error");
             return { status: 400, message: `NOT_ENOUGH_STOCK` };
         }
         return { status: 200, message: `Ok` }

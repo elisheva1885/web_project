@@ -8,6 +8,8 @@ import { Divider } from 'primereact/divider';
 import { setBasket } from '../../store/basketSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import useGetFilePath from '../../hooks/useGetFilePath';
+import useAddToBasket from "../../hooks/useAddToBasket";
+import { Toast } from 'primereact/toast';
 
 const MiniCenteral = () => {
     const { product: productId } = useParams();
@@ -20,30 +22,11 @@ const MiniCenteral = () => {
     const { token } = useSelector((state) => state.token);
     const { getFilePath } = useGetFilePath()
     const [product, setProduct] = useState(null);
+    const { addToBasket, toast } = useAddToBasket();
 
-    const addToBasket = async () => {
-        if (!token) {
-            alert('כדי להוסיף לסל חובה להכינס לאיזור האישי');
-        } else {
-            const shoppingBagDetails = {
-                product_id: product._id,
-                type: "MiniCenteral",
-                amount: 1
-            };
-            try {
-                const headers = {
-                    'Authorization': `Bearer ${token}`
-                };
-                const res = await axios.post('http://localhost:8000/api/user/shoppingBag', shoppingBagDetails, { headers });
-                if (res.status === 201 || res.status === 200) {
-                    dispatch(setBasket([...basket, res.data]));
-                    alert('המוצר נוסף לעגלה');
-                }
-            } catch (e) {
-                console.error(e);
-            }
-        }
-    };
+    const addtoBasket = async () => {
+        addToBasket(product, "MiniCenteral");
+    }
 
     const getMiniCenteral = async () => {
         setLoading(true);
@@ -82,6 +65,7 @@ const MiniCenteral = () => {
 
     return (
         <div style={styles.container}>
+            <Toast ref={toast} />
             <div style={styles.imageContainer}>
                 <img src={getFilePath(product.imagepath)} alt={product.title} style={styles.productImage} />
                 {product.company?.imagePath && (
@@ -115,8 +99,10 @@ const MiniCenteral = () => {
                     )}
                 </div>
                 <h2 style={styles.price}>₪{product.price}</h2>
-                <button style={styles.addToCartButton} onClick={addToBasket}>הוספה לסל</button>
-            </div>
+                <Button style={styles.addToCartButton} onClick={addtoBasket} disabled={
+                    product.stock === 0
+                }>הוספה לסל</Button>            
+                </div>
 
             {/* Stepper for Tables */}
             <div style={styles.stepperContainer}>

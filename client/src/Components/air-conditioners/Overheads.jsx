@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { useEffect, useState, lazy } from 'react'
+import { useEffect, useState, lazy, useRef } from 'react'
 import { Button } from 'primereact/button';
 import { DataView, DataViewLayoutOptions } from 'primereact/dataview';
 import { Tag } from 'primereact/tag';
@@ -19,6 +19,8 @@ import UpdateOverhead from './updateOvearhead';
 import { Controller, useForm } from 'react-hook-form';
 import { Dialog } from 'primereact/dialog';
 import useGetFilePath from '../../hooks/useGetFilePath';
+import { Toast } from 'primereact/toast';
+import useAddToBasket from "../../hooks/useAddToBasket";
 
 
 const Overhead = lazy(() => import('./Overhead'));
@@ -44,9 +46,20 @@ const Overheads = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const priceValue = watch('price');
-    const stockValue = watch('stock');
-    const {getFilePath} = useGetFilePath()
+    const { getFilePath } = useGetFilePath()
+    const { addToBasket, toast } = useAddToBasket();
 
+    const errorMessages = {
+        INVALID_USER_ID: "המזהה שלך אינו תקין. נסי להתחבר מחדש.",
+        INVALID_PRODUCT_ID: "מזהה המוצר אינו תקין.",
+        INVALID_AMOUNT: "כמות המוצר חייבת להיות מספר חיובי.",
+        "Invalid type: MiniCenteral. Must be one of Overhead, MiniCenteral, MultiIndoorUnit, MultiOutdoorUnit":
+            "סוג המוצר אינו תקין. אנא נסי שוב.",
+        INTERNAL_ERROR: "שגיאת שרת פנימית. נסי שוב מאוחר יותר.",
+        Access_denied: "אינך מורשה לבצע פעולה זו.",
+        Forbidden: "אינך מורשה לבצע פעולה זו.",
+        UNAUTHORIZED: "השם המשתמש או הסיסמה אינם נכונים. אנא בדוק ונסה שוב.",
+    };
 
     const goToAddOverhead = (type) => {
         const navigationData = {
@@ -56,41 +69,9 @@ const Overheads = () => {
         navigate('/air_conditioner/add', { state: navigationData });
     };
 
-    const addToBasket = async (product) => {
-        if(token === null){
-            alert('כדי להוסיף לסל חובה להיכנס לאיזור האישי')
-        }
-    else{
-            const shoppingBagDetails = {
-                product_id: product._id,
-                type: "Overhead",
-                amount: 1
-            }
-            try {
-                const headers = {
-                    'Authorization': `Bearer ${token}`
-                }
-                const res = await axios.post('http://localhost:8000/api/user/shoppingBag', shoppingBagDetails, { headers })
-                if (res.status === 201) {
-                    alert("im here")
-                    dispatch(setBasket([...basket, res.data]))
-                    alert(` המוצר נוסף לעגלה`)
-                    console.log("res.data", res.data);
-                    console.log("useState", shoppingBags);
-                }
-                if (res.status == 200) {
-                    alert(` המוצר נוסף לעגלה`)
-                }
-                if (res.status === 409) {
-                    // updateAmount(product)
-                }
-            }
-            catch (e) {
-                console.error(e)
-            }
-        }
-        
 
+    const addtoBasket = async (product) => {
+        addToBasket(product, "Overhead")
     }
 
     const deleteOverhead = async (product) => {
@@ -149,44 +130,6 @@ const Overheads = () => {
         }
     }
 
-    // const updateStock = async (data) => {
-    //     try {
-    //         const headers = {
-    //             'Authorization': `Bearer ${token}`
-    //         }
-    //         const details = {
-    //             _id: selectedProduct._id,
-    //             stock: stockValue
-    //         }
-    //         const res = await axios.put(`http://localhost:8000/api/air-conditioner/overhead/stock`, details, { headers });
-    //         console.log(res);
-    //         if (res.status === 200) {
-    //             alert(`${selectedProduct.title} stock updated`)
-    //             const unUpdatedOverheads = overheads.filter(overhead => overhead._id != res.data._id)
-    //             dispatch(setOverheads([...unUpdatedOverheads, res.data]))
-    //             setStockVisible(false);
-    //         }
-    //     }
-    //     catch (error) {
-    //         console.error(error);
-    //         setStockVisible(false);
-    //     }
-    // }
-
-    // const getCompanies = async()=>{
-    //     try{
-    //         const res = await axios.get('http://localhost:8000/api/company')
-    //         if(res.status === 200){
-    //             console.log("company:",res.data);
-    //             dispatch(setCompanies(res.data))
-    //             // console.log(companies);
-    //         }
-    //     }
-    //     catch (e) {
-    //         console.error(e)
-    //     }
-    // }
-
     const sortData = (data) => {
         data.sort((a, b) => {
             if (a.title < b.title) return -1;  // a comes before b
@@ -194,23 +137,6 @@ const Overheads = () => {
             return 0;                           // a and b are equal
         })
     }
-
-    // const getOverheads = async () => {
-    //     try {
-    //         const headers = {
-    //             'Authorization': `Bearer ${token}`
-    //         }
-    //         console.log(headers);
-    //         const res = await axios.get('http://localhost:8000/api/air-conditioner/overhead',{headers})
-    //         if (res.status === 200) {
-    //             sortData(res.data)
-    //             setOverheads(res.data)
-    //         }
-    //     }
-    //     catch (e) {
-    //         console.error(e)
-    //     }
-    // }
 
     const getOverheadByTitle = async (c) => {
         try {
@@ -254,102 +180,25 @@ const Overheads = () => {
                 return null;
         }
     };
-    // const listItem = (product, index) => {
-    //     return (
-    //         <>
-    //             <div className="col-12" key={product._id}>
-    //                 <div className={classNames('flex flex-column xl:flex-row xl:align-items-start p-4 gap-4', { 'border-top-1 surface-border': index !== 0 })}>
-    //                     <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`/${product?.company?.imagePath}`} />
-    //                     <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`${product.imagepath}`} />
-    //                     <div className="flex flex-column sm:flex-row justify-content-between align-items-center xl:align-items-start flex-1 gap-4">
-    //                         <div className="flex flex-column align-items-center sm:align-items-start gap-3">
-    //                             {/* <Link to={{pathName:`/overheads/${product.title}` , state: {product:product} }}><div className="text-2xl font-bold text-900" style={{}} >{product.title}</div></Link> */}
-    //                             <Link to={`/overheads/overhead/${product._id}` } params={{ product: product }}><div className="text-2xl font-bold text-900" style={{}} >{product.title}</div></Link>
-    //                             <p>{product.imagepath}</p>
-    //                             <div className="flex align-items-center gap-3">
-    //                                 <Tag value={getSeverityText(product)} severity={getSeverity(product.stock)}></Tag>
-    //                             </div>
-    //                         </div>
-    //                         <div className="flex sm:flex-column align-items-center sm:align-items-end gap-3 sm:gap-2">
-    //                             <span className="text-2xl font-semibold">₪{product.price}</span>
-    //                             <Button icon="pi pi-shopping-cart" className="p-button-rounded" disabled={getSeverity(product.stock) === "danger"} onClick={()=>addToBasket(product)}></Button>
-    //                         </div>
-    //                     </div>
-    //                 </div>
-    //             </div>
-    //         </>
-    //     );
-    // };
-
-    // const gridItem = (product, index) => {
-    //     return (
-    //         <>
-    //         <div className="col-12 sm:col-6 lg:col-12 xl:col-4 p-2" key={product._id}>
-    //             <div className="p-4 border-1 surface-border surface-card border-round">
-    //                 <div className="flex flex-wrap align-items-center justify-content-between gap-2">
-    //                     {/* <img className="w-9 shadow-2 border-round" src={`${product.company.imagePath}`} /> */}
-    //                     <div className="flex align-items-center gap-2">
-    //                         <Link to={"/overheads/overhead"}><div className="text-2xl font-bold text-900" style={{}}>{product.title}</div></Link>
-    //                     </div>
-    //                 </div>
-    //                 <div className="flex flex-column align-items-center gap-3 py-5">
-    //                     <img className="w-9 shadow-2 border-round" src={`${product.imagepath}`} />
-    //                 </div>
-    //                 <Tag value={getSeverityText(product)} severity={getSeverity(product.stock)}></Tag>
-
-    //                 <div className="flex align-items-center justify-content-between">
-    //                     <span className="text-2xl font-semibold">₪{product.price}</span>
-    //                     <Button icon="pi pi-shopping-cart" className="p-button-rounded" disabled={getSeverity(product.stock) === "danger"} onClick={()=>addToBasket(product)}></Button>
-    //                 </div>
-    //             </div>
-    //         </div>
-    //         <div className="col-12 sm:col-6 lg:col-12 xl:col-4 p-2" key={product._id}>
-    //         <div className={classNames('p-4 border-1 surface-border surface-card border-roun', { 'border-top-1 surface-border': index !== 0 })}>
-    //             <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`/${product?.company?.imagePath}`} />
-    //             <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={`${product.imagepath}`} />
-    //             <div className="flex flex-column sm:flex-row justify-content-between align-items-center xl:align-items-start flex-1 gap-4">
-    //                 <div className="flex flex-column align-items-center sm:align-items-start gap-3">
-    //                     {/* <Link to={{pathName:`/overheads/${product.title}` , state: {product:product} }}><div className="text-2xl font-bold text-900" style={{}} >{product.title}</div></Link> */}
-    //                     <Link to={`/overheads/overhead/${product._id}` } params={{ product: product }}><div className="text-2xl font-bold text-900" style={{}} >{product.title}</div></Link>
-    //                     <p>{product.imagepath}</p>
-    //                     <div className="flex align-items-center gap-3">
-    //                         <Tag value={getSeverityText(product)} severity={getSeverity(product.stock)}></Tag>
-    //                     </div>
-    //                 </div>
-    //                 <div className="flex sm:flex-column align-items-center sm:align-items-end gap-3 sm:gap-2">
-    //                     <span className="text-2xl font-semibold">₪{product.price}</span>
-    //                     <Button icon="pi pi-shopping-cart" className="p-button-rounded" disabled={getSeverity(product.stock) === "danger"} onClick={()=>addToBasket(product)}></Button>
-    //                 </div>
-    //             </div>
-    //         </div>
-    //     </div>
-    //     </>
-    //     );
-    // };
 
     const UpdateOverhead = async (o) => {
         const navigationData = {
             type: o,
-            // You can add any other data you may want to send
         };
         console.log(o);
         navigate('/overheads/overhead/update', { state: navigationData })
-        // dispatch(setOverheads(res.data))
     }
 
     const gridItem = (product) => {
         return (
             <div className="col-12 sm:col-6 lg:col-3 p-3" key={product._id}>
                 <div className="border-1 surface-border border-round p-4 shadow-3 h-full flex flex-column justify-content-between gap-4">
-
-                    {/* תמונת החברה - גדולה ובולטת */}
                     <img
                         src={`/${product?.company?.imagePath}`}
                         alt="Company"
                         className="w-full h-10rem object-contain border-round"
                     />
 
-                    {/* תמונת המוצר - גדולה ורחבה */}
                     <img
                         // src={`overheads/${product.imagepath}`}
                         src={getFilePath(product.imagepath)}
@@ -378,9 +227,9 @@ const Overheads = () => {
                         icon="pi pi-shopping-cart"
                         className="w-full"
                         disabled={
-                            getSeverity(product.stock) === "danger" || registered === false
+                            getSeverity(product.stock) === "danger"
                         }
-                        onClick={() => addToBasket(product)}
+                        onClick={() => addtoBasket(product)}
                     />
                 </div>
             </div>
@@ -401,69 +250,11 @@ const Overheads = () => {
         return <div className="grid grid-nogutter">{overheads.map((product, index) => itemTemplate(product, layout, index))}</div>;
     };
 
-    // const header = () => {
-    //     return (
-    //         // <div className="flex justify-content-end">
-    //             // <DataViewLayoutOptions layout={layout} onChange={(e) => setLayout(e.value)} />
-    //         // </div>
-    //         <></>
-    //     );
-    // };
-
-    const filterOverheads = (filters) => {
-        // Filter overheads based on selected criteria
-        let filteredOverheads = overheads;
-        console.log(filteredOverheads)
-
-        // Example filter logic
-        if (filters.companies.length > 0) {
-            filteredOverheads = filteredOverheads.filter(overhead =>
-                filters.companies.includes(overhead.company.name)
-            );
-        }
-        if (filters.shabbatMode) {
-            filteredOverheads = filteredOverheads.filter(overhead => overhead.isShabbatCompatible);
-        }
-        if (filters.wifi) {
-            filteredOverheads = filteredOverheads.filter(overhead => overhead.hasWifi);
-        }
-        if (filters.priceRange) {
-            filteredOverheads = filteredOverheads.filter(overhead =>
-                overhead?.price >= filters.priceRange[0] && overhead.price <= filters.priceRange[1]
-            );
-        }
-        if (filters.btuHeating) {
-            filteredOverheads = filteredOverheads.filter(overhead =>
-                overhead?.btuHeating >= filters.btuHeating
-            );
-        }
-        if (filters.btuCooling) {
-            filteredOverheads = filteredOverheads.filter(overhead =>
-                overhead?.btuCooling >= filters.btuCooling
-            );
-        }
-        if (filters.energyRating) {
-            filteredOverheads = filteredOverheads.filter(overhead =>
-                overhead?.energyRating === filters.energyRating
-            );
-        }
-        console.log(filterOverheads)
-        dispatch(setOverheads(filteredOverheads)); // Update the state with the filtered results
-    }
-
-    useEffect(() => {
-        // getCompanies()
-
-        if (token) {
-            setRegistered(true)
-        }
-    }, [])
-
     return (
         <>
             {userDetails.role === 'admin' ? <Button onClick={() => goToAddOverhead("Overhead")}>add overhead</Button> : <></>}
-            {/* {<Button onClick={ ()=>goToAddOverhead("Overhead")}>add overhead</Button>} */}
             <div className="card">
+                <Toast ref={toast} />
                 <div className="flex justify-content-end">
                     <IconField iconPosition="left">
                         <InputIcon className="pi pi-search" />
@@ -472,8 +263,6 @@ const Overheads = () => {
                 </div>
                 <DataView value={overheads} listTemplate={listTemplate} layout={layout} />
             </div>
-            <SideFillter onFilter={filterOverheads} />
-
 
             <Dialog
                 header="עדכון מחיר"
@@ -501,33 +290,6 @@ const Overheads = () => {
                     className="p-button-success"
                 />
             </Dialog>
-
-            {/* <Dialog
-    header="עדכון מלאי"
-    visible={stockVisible}
-    style={{ width: '50vw' }}
-    onHide={() => setStockVisible(false)}
-    modal
->
-    <h6>מלאי:</h6>
-    <div className="field">
-        <span className="p-float-label">
-            <Controller
-                name="stock"
-                control={control}
-                render={({ field }) => (
-                    <InputText id={field.name} type="number" {...field} />
-                )}
-            />
-            <label htmlFor="stock">{selectedProduct?.stock}</label>
-        </span>
-    </div>
-    <Button
-        label="לעדכון"
-        onClick={handleSubmit(updateStock)}
-        className="p-button-success"
-    />
-</Dialog> */}
         </>
     )
 }

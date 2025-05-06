@@ -110,7 +110,6 @@ const updateMiniCenteral = async (req, res) => {
         miniCenteral.title = title ? title : miniCenteral.title
         miniCenteral.describe = describe ? describe : miniCenteral.describe
         miniCenteral.stock = stock ? stock : miniCenteral.stock
-        // miniCenteral.price= miniCenteral.price
         miniCenteral.BTU_output = BTU_output ? BTU_output : miniCenteral.BTU_output
         miniCenteral.efficiency_factor = efficiency_factor ? efficiency_factor : miniCenteral.efficiency_factor
         miniCenteral.energy_rating = energy_rating ? energy_rating : miniCenteral.energy_rating
@@ -185,8 +184,7 @@ const updatMiniCenteralPrice = async (req, res) => {
         return res.status(400).json({ message: "INVALID_MINICENTERAL_ID" });
     }
 
-    // Validate price
-    if (price === undefined || typeof price !== "number" || price <= 0) {
+    if (price === undefined || price <= 0) {
         return res.status(400).json({ message: "INVALID_PRICE" });
     }
     try {

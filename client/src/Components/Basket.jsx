@@ -251,9 +251,7 @@ const Basket = () => {
                                 value={productInBasket?.amount}
                                 onValueChange={(e) => {
                                     const newAmount = e.value;
-                                    // Handle invalid input cases
                                     if (newAmount < 1 || newAmount === null) {
-                                        // setErrorStates((prev) => ({ ...prev, [productDetails._id]: true }));
                                         toast.current.show({
                                             severity: 'error',
                                             summary: 'שגיאה',
@@ -261,7 +259,6 @@ const Basket = () => {
                                         });
                                     }
                                     else if (newAmount > productDetails.stock) {
-                                        // setErrorStates((prev) => ({ ...prev, [productDetails._id]: true }));
                                         toast.current.show({
                                             severity: 'error',
                                             summary: 'שגיאה',
@@ -269,14 +266,12 @@ const Basket = () => {
                                         });
                                     }
                                     else {
-                                        // Update the basket locally for immediate UI feedback
                                         const updatedBasket = basket.map((item) =>
                                             item.product._id === productDetails._id
                                                 ? { ...item, amount: newAmount }
                                                 : item
                                         );
                                         dispatch(setBasket(updatedBasket));
-                                        // Synchronize with the backend
                                         updateShoppingBagProductAmount(productDetails, newAmount);
                                         console.log("newAmount", newAmount);
                                         console.log("productDetails.stock", productDetails.stock);
@@ -287,14 +282,12 @@ const Basket = () => {
                                 inputStyle={{ padding: '0.5rem', textAlign: 'center', width: 'auto' }}
                                 decrementButtonClassName="p-button-sm p-button-primary"
                                 incrementButtonClassName="p-button-sm p-button-primary"
-                                //incrementButtonDisabled={productInBasket?.amount >= productDetails.stock}
                                 incrementButtonIcon="pi pi-plus"
                                 decrementButtonIcon="pi pi-minus"
                                 disabled={productDetails.stock === 0}
                                 min={1}
                             />
                             <Button
-                                // icon="pi pi-shopping-cart" 
                                 icon="pi pi-trash"
                                 className="p-button-rounded p-button-danger"
                                 disabled={getSeverity(productDetails.stock) === "danger"}
