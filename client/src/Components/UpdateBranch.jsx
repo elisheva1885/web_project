@@ -15,7 +15,6 @@ import React, { useRef, useState } from 'react';
      const { control, handleSubmit, formState: { errors } } = useForm();
      const [showMessage, setShowMessage] = useState(false);
      const [formData, setFormData] = useState({});
-     // const {companies} = useSelector((state) => state.companies)
      const location = useLocation();
      const { data: branch } = location.state || {};     const navigate = useNavigate();
      const toast = useRef(null);

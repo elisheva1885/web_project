@@ -5,6 +5,8 @@ import { Column } from 'primereact/column';
 import { Dialog } from 'primereact/dialog';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
+import { Toast } from 'primereact/toast';
+import { useRef } from 'react';
 
 const UpdateDeliveryStatus = () => {
     const [deliveries, setDeliveries] = useState([]);
@@ -12,8 +14,34 @@ const UpdateDeliveryStatus = () => {
     const [productsDialogVisible, setProductsDialogVisible] = useState(false);
     const [selectedDeliveryProducts, setSelectedDeliveryProducts] = useState([]);
     const { token } = useSelector((state) => state.token);
+    const toast = useRef(null);
 
-    // Fetch deliveries
+    const messages = {
+        // Error Messages
+        USER_REQUIRED: "משתמש אינו מחובר למערכת.",
+        INVALID_ADDRESS: "כתובת לא תקינה.",
+        INVALID_PURCHASE_ID: "מזהה רכישה לא תקין.",
+        INVALID_DELIVERY_ID: "מזהה משלוח לא תקין.",
+        INVALID_STATUS: "סטטוס לא תקין.",
+        DELIVERY_NOT_FOUND: "משלוח לא נמצא.",
+        NO_DELIVERIES_FOUND: "לא נמצאו משלוחים.",
+        NO_DELIVERIES_FOR_USER: "לא נמצאו משלוחים למשתמש זה.",
+        DELIVERY_CREATION_FAILED: "יצירת המשלוח נכשלה.",
+        INTERNAL_ERROR: "שגיאה פנימית בשרת. נסה שוב מאוחר יותר.",
+
+        // Success Messages
+        DELIVERY_CREATED_SUCCESSFULLY: "משלוח נוצר בהצלחה.",
+        DELIVERY_UPDATED_SUCCESSFULLY: "סטטוס המשלוח עודכן בהצלחה.",
+        DELIVERY_DELETED_SUCCESSFULLY: "משלוח נמחק בהצלחה.",
+
+        // Default
+        default: "אירעה שגיאה לא צפויה. נסה שוב."
+    };
+
+    const showToast = (toast, severity, summary, detail) => {
+        toast.current.show({ severity, summary, detail, life: 3000 });
+    };
+
     const fetchDeliveries = async () => {
         try {
             const headers = { Authorization: `Bearer ${token}` };
@@ -22,15 +50,16 @@ const UpdateDeliveryStatus = () => {
                 setDeliveries(response.data);
             }
         } catch (error) {
+            const serverMessage = error.response?.data?.message || 'default';
+            showToast(toast, 'error', 'שגיאה', messages[serverMessage]);
             console.error('Error fetching deliveries:', error);
-            alert('Failed to fetch deliveries.');
         }
     };
 
     // Update a single delivery to the next logical status
     const updateSingleDelivery = async (id, newStatus) => {
         if (!newStatus) {
-            alert('No valid next status selected.');
+            showToast(toast, 'warn', 'אזהרה', 'לא נבחר סטטוס עדכון תקין.');
             return;
         }
 
@@ -44,12 +73,13 @@ const UpdateDeliveryStatus = () => {
             );
 
             if (response.status === 200) {
-                alert('Delivery status updated successfully.');
                 setDeliveries(response.data);
+                showToast(toast, 'success', 'הצלחה', messages.DELIVERY_UPDATED_SUCCESSFULLY);
             }
         } catch (error) {
+            const serverMessage = error.response?.data?.message || 'default';
+            showToast(toast, 'error', 'שגיאה', messages[serverMessage]);
             console.error('Error updating delivery:', error);
-            alert('Failed to update delivery status.');
         } finally {
             setLoading(false);
         }
@@ -107,10 +137,10 @@ const UpdateDeliveryStatus = () => {
         "arrived": "הגיע",
         "recieved": "התקבל",
     };
+
     const currentStatusTemplate = (rowData) => {
         return <span>{statusTranslations[rowData.status] || "סטטוס לא ידוע"}</span>;
     };
-
 
     // Fetch deliveries on component mount
     useEffect(() => {
@@ -119,10 +149,11 @@ const UpdateDeliveryStatus = () => {
 
     return (
         <div style={{ maxWidth: '100%', margin: '2rem auto', overflowX: 'auto', textAlign: 'center' }}>
+            <Toast ref={toast} />
             <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1rem', color: '#2C3E50' }}>
                 עדכון סטטוס משלוחים
             </h2>
-            <DataTable value={deliveries} responsiveLayout="scroll" scrollable style={{ minWidth: '1000px',direction:'rtl' }}>
+            <DataTable value={deliveries} responsiveLayout="scroll" scrollable style={{ minWidth: '1000px', direction: 'rtl' }}>
                 <Column
                     field="_id"
                     header="מזהה משלוח"

@@ -8,9 +8,7 @@ import { Tooltip } from 'primereact/tooltip';
 const Admin = () => {
     const { userDetails } = useSelector((state) => state.userDetails);
     const { overheads } = useSelector((state) => state.overheads);
-    // const { miniCentrals } = useSelector((state) => state.miniCentrals);
-
-    // const air_conditioners = null
+    
     const navigate = useNavigate()
     const registerOfficial = async () => {
         navigate('/admin/registerOfficial')

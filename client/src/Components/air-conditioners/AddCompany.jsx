@@ -8,6 +8,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Button } from "primereact/button";
+import { Toast } from "primereact/toast";
+import { useRef } from "react";
 
 const AddCompany = () => {
     const { companies } = useSelector((state) => state.companies);
@@ -15,12 +17,31 @@ const AddCompany = () => {
 
     const { control, handleSubmit, formState: { errors } } = useForm();
     const [showMessage, setShowMessage] = useState(false);
+    const navigate = useNavigate()
+    const dispatch = useDispatch()
+    const toast = useRef(null);
+    const messages = {
+        // Error Messages
+        INVALID_NAME: "שם החברה אינו תקין. השם חייב להכיל לפחות 3 תווים.",
+        INVALID_IMAGE_PATH: "תמונת החברה אינה תקינה.",
+        NAME_ALREADY_EXISTS: "שם החברה כבר קיים במערכת.",
+        NO_COMPANIES_FOUND: "לא נמצאו חברות.",
+        INVALID_COMPANY_ID: "מזהה החברה אינו תקין.",
+        COMPANY_NOT_FOUND: "החברה לא נמצאה.",
+        INTERNAL_ERROR: "שגיאה פנימית בשרת. נסה שוב מאוחר יותר.",
 
+        // Success Messages
+        COMPANY_CREATED_SUCCESSFULLY: "החברה נוספה בהצלחה.",
+
+        // Default
+        default: "אירעה שגיאה לא צפויה. נסה שוב."
+    };
+    const showToast = (severity, summary, detail) => {
+        toast.current.show({ severity, summary, detail, life: 3000 });
+    };
     const getFormErrorMessage = (name) => {
         return errors[name] ? <small className="p-error">{errors[name].message}</small> : null;
     };
-    const navigate = useNavigate()
-    const dispatch = useDispatch()
 
     const onSubmit = async (data) => {
         const formData = new FormData();
@@ -28,7 +49,7 @@ const AddCompany = () => {
             formData.append('imagepath', data.imagepath);
         }
         else {
-            console.error("Error: imagepath is not a valid file.");
+            showToast('error', 'שגיאה', messages.INVALID_IMAGE_PATH);
             return;
         }
         formData.append('name', data.name);
@@ -36,13 +57,10 @@ const AddCompany = () => {
         try {
             const headers = {
                 'Authorization': `Bearer ${token}`, // If you have authentication
-                // 'Content-Type': 'multipart/form-data'
             };
             const res = await axios.post('http://localhost:8000/api/company', formData, { headers });
-            console.log(res);
             if (res.status === 201) {
-
-                // setFormData(data);
+                showToast('success', 'הצלחה', messages.COMPANY_CREATED_SUCCESSFULLY);
                 setShowMessage(true);
                 dispatch(setCompanies([...companies, res.data]));
                 navigate("/official");
@@ -50,20 +68,14 @@ const AddCompany = () => {
 
         }
         catch (error) {
-            if (error.response) {
-                // The request was made and the server responded with a status code
-               alert('Error:', error.response.data.message);
-            } else if (error.request) {
-                // The request was made but no response was received
-                alert('Error:', error.request.message);
-            } else {
-                // Something happened in setting up the request that triggered an Error
-            console.error(error);
+            const serverMessage = error.response?.data?.message || 'default';
+            showToast('error', 'שגיאה', messages[serverMessage]);
+            console.error("Error adding company:", error);
         }
     }
-}
     return (
         <>
+            <Toast ref={toast} />
             <form onSubmit={handleSubmit(onSubmit)} className="p-fluid">
                 <div className="field">
                     <span className="p-float-label">

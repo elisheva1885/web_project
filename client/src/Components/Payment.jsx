@@ -17,6 +17,8 @@ import { setOverheads } from '../store/air-conditioner/overHeadsSlice';
 import GooglePayButton from '@google-pay/button-react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
+import { Toast } from 'primereact/toast';
+import { useRef } from 'react';
 
 const Payment = () => {
     const { control, handleSubmit, formState: { errors } } = useForm();
@@ -42,6 +44,36 @@ const Payment = () => {
     const [showSuccessDialog, setShowSuccessDialog] = useState(false);
     const location = useLocation();
     const { products } = location.state || {};
+    const toast = useRef(null);
+
+    const messages = {
+        // Error Messages
+        INVALID_USER_ID: "מזהה המשתמש אינו תקין.",
+        INVALID_ADDRESS: "כתובת לא תקינה.",
+        REQUIRED_FIELDS_MISSING: 'שדות חובה חסרים.',
+        ADDRESS_CREATION_FAILED: 'יצירת הכתובת נכשלה.',
+        PURCHASE_CREATION_FAILED: 'יצירת הרכישה נכשלה.',
+        DELIVERY_CREATION_FAILED: 'יצירת המשלוח נכשלה.',
+        NO_ADDRESS_FOUND: "לא נמצאה כתובת.",
+        ADDRESS_ALREADY_EXISTS: "כתובת כבר קיימת במערכת.",
+
+        // Success Messages
+        ADDRESS_CREATED_SUCCESSFULLY: "הכתובת נוספה בהצלחה.",
+        PURCHASE_COMPLETED: "הרכישה הושלמה בהצלחה.",
+        DELIVERY_CREATED_SUCCESSFULLY: "משלוח נוצר בהצלחה.",
+
+        // Warnings
+        OUT_OF_STOCK: "המוצר אזל מהמלאי.",
+        NOT_ENOUGH_STOCK: "אין מספיק מלאי למוצר.",
+        PRODUCT_NOT_FOUND: "המוצר לא נמצא.",
+
+        // Informational
+        INFO_FETCHING_ADDRESS: "כתובת נטענת מהשרת.",
+        INFO_ADDRESS_USED: "כתובת קיימת נבחרה לשימוש.",
+
+        // Default
+        default: "אירעה שגיאה לא צפויה. נסה שוב."
+    };
 
     const paymentRequest = {
         apiVersion: 2,
@@ -82,15 +114,14 @@ const Payment = () => {
             const res = await axios.post("http://localhost:8000/api/user/address", address, { headers });
             if (res.status === 201) {
                 setNewAddress(res.data);
-                // alert("כתובת להזמנה נשמרה במערכת")
                 setShowNewAddressDialog(false); // Close the new address dialog
                 setShowSuccessDialog(true)
+                showToast('success', 'הצלחה', messages.ADDRESS_CREATED_SUCCESSFULLY);
             }
         } catch (error) {
-            console.log(error);
-            if (error.response?.status === 400) {
-                alert("Error");
-            }
+            const serverMessage = error.response?.data?.message || 'default';
+            showToast('error', 'שגיאה', messages[serverMessage]);
+            console.error("Error creating address:", error);
         }
     };
 
@@ -100,7 +131,6 @@ const Payment = () => {
         }
         const details = {
             address: address ? address : newAddress,
-            // purchase:  products.map(product => product.product._id)
             purchase: purchase._id
         }
 
@@ -108,28 +138,20 @@ const Payment = () => {
             const headers = {
                 'Authorization': `Bearer ${token}`
             };
-            console.log("details", details);
             const res = await axios.post("http://localhost:8000/api/delivery", details, { headers });
-            console.log("res", res);
             if (res.status === 201) {
-                alert("the deleviry created in the system")
+                showToast('success', 'הצלחה', messages.DELIVERY_CREATED_SUCCESSFULLY);
                 navigate('/')
             }
 
-        } catch (e) {
-            if (e.response) {
-                console.error("Error response from server:", e.response.data);
-                if (e.response.status === 400) {
-                    alert("Error: " + e.response.data.message);
-                }
-            } else {
-                console.error("Error making request:", e.message);
-            }
+        } catch (error) {
+            const serverMessage = error.response?.data?.message || 'default';
+        showToast('error', 'שגיאה', messages[serverMessage]);
+        console.error("Error creating delivery:", error);
         }
     }
 
     const createPurchase = async (paymentType) => {
-        // setProducts(selectedItems)
         if (products) {
             console.log("createPurchase products: ", products);
             const data = {
@@ -142,18 +164,14 @@ const Payment = () => {
                 };
                 const res = await axios.post("http://localhost:8000/api/user/purchase", data, { headers });
                 if (res.status === 201) {
-                    // console.log("to the function");
-                    // updateProductsStock(selectedItems)
                     setPurcase(res.data);
-                    console.log(res.data);
                     createDelivery(res.data)
-                    alert("ההזמנה הושלמה")
+                    showToast('success', 'הצלחה', messages.PURCHASE_COMPLETED);
                 }
             } catch (error) {
-                console.log(error);
-                if (error.response?.status === 400) {
-                    alert("Error");
-                }
+                const serverMessage = error.response?.data?.message || 'default';
+                showToast('error', 'שגיאה', messages[serverMessage]);
+                console.error("Error creating purchase:", error);
             }
         }
     }
@@ -234,21 +252,21 @@ const Payment = () => {
     };
 
     const getUserAddress = async (c) => {
-        console.log("get address from server");
         try {
             const headers = {
                 'Authorization': `Bearer ${token}`
             };
             const res = await axios.get(`http://localhost:8000/api/user/address/existAddress`, { headers })
             if (res.status === 200) {
-                console.log("address from server: ", res.data[0])
                 setAddress(res.data[0])
                 setVisible(true);
+                showToast('info', 'מידע', messages.INFO_ADDRESS_USED);
             }
         }
-        catch (e) {
-            console.error(e)
-        }
+        catch (error) {
+            const serverMessage = error.response?.data?.message || 'default';
+            showToast('error', 'שגיאה', messages[serverMessage]);
+            console.error("Error fetching user address:", error);        }
     }
 
     const renderNewAddressDialog = () => {
@@ -589,12 +607,15 @@ const Payment = () => {
         );
     };
 
+    const showToast = (severity, summary, detail) => {
+        toast.current.show({ severity, summary, detail, life: 3000 });
+    };
+
     useEffect(() => {
         getUserAddress()
     }, [])
 
     return (
-
         <div style={{
             position: 'relative',
             minHeight: '100vh', // Full-page height
@@ -604,7 +625,9 @@ const Payment = () => {
             flexDirection: 'column',
             gap: '20px', // Spacing between sections
         }}>
-            <AddressAddedSuccessfulyDialog />
+            <Toast ref={toast} />
+            {existAddress()}
+            {AddressAddedSuccessfulyDialog()}
             {renderNewAddressDialog()}
             <div style={{
                 display: 'flex',
