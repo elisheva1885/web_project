@@ -10,6 +10,8 @@ import { useSelector } from "react-redux";
 import { Button } from 'primereact/button';
 import { useNavigate } from 'react-router-dom';
 import 'primeicons/primeicons.css';
+import { Toast } from 'primereact/toast';
+import { useRef } from 'react';
 
 const Branches = () => {
     const { token } = useSelector(state => state.token);
@@ -17,6 +19,7 @@ const Branches = () => {
     const [branches, setBranches] = useState([]);
     const [filteredBranches, setFilteredBranches] = useState([]);
     const [searchValue, setSearchValue] = useState('');
+    const toast = useRef(null); // Initialize the Toast reference
     const navigate = useNavigate();
     const errorMessages = {
         INVALID_ADDRESS: "כתובת לא תקינה. ודאי שמולאו עיר, רחוב ומספר.",
@@ -51,14 +54,22 @@ const Branches = () => {
             if (res.status === 200) {
                 sortData(res.data);
                 setBranches(res.data);
-                setFilteredBranches(res.data); // Initialize filtered branches
+                setFilteredBranches(res.data); 
             }
-        } catch (error) {
+        }  catch (error) {
             if (error.response && error.response.data?.message) {
                 const message = error.response.data.message;
-                alert(errorMessages[message] || "שגיאה לא צפויה");
+                toast.current.show({
+                    severity: 'error',
+                    summary: 'שגיאה',
+                    detail: errorMessages[message] || "שגיאה לא צפויה. נסי שוב מאוחר יותר.",
+                });
             } else {
-                alert("שגיאה כללית, נסי שוב מאוחר יותר");
+                toast.current.show({
+                    severity: 'error',
+                    summary: 'שגיאה כללית',
+                    detail: "ודאי שיש חיבור לאינטרנט ונסי שוב.",
+                });
             }
         }
     };
@@ -76,17 +87,27 @@ const Branches = () => {
                 data: _id
             });
             if (res.status === 200) {
-                // const filteredBranches = branches.filter(branch => branch._id !== branchToDelete._id);
-                // setBranches(filteredBranches);
-                // setFilteredBranches(filteredBranches); // Update filtered branches after deletion
                 await getBranches()
+                toast.current.show({
+                    severity: 'success',
+                    summary: 'הצלחה',
+                    detail: "הסניף נמחק בהצלחה.",
+                });
             }
         } catch (error) {
             if (error.response && error.response.data?.message) {
                 const message = error.response.data.message;
-                alert(errorMessages[message] || "שגיאה לא צפויה");
+                toast.current.show({
+                    severity: 'error',
+                    summary: 'שגיאה',
+                    detail: errorMessages[message] || "שגיאה לא צפויה. נסי שוב מאוחר יותר.",
+                });
             } else {
-                alert("שגיאה כללית, נסי שוב מאוחר יותר");
+                toast.current.show({
+                    severity: 'error',
+                    summary: 'שגיאה כללית',
+                    detail: "ודאי שיש חיבור לאינטרנט ונסי שוב.",
+                });
             }
         }
     };
@@ -179,6 +200,7 @@ const Branches = () => {
 
     return (
         <div style={styles.branchesPage}>
+             <Toast ref={toast} /> 
             <div style={styles.pageHeader}>
                 <h2 style={styles.pageTitle}>סניפים</h2>
                 {userDetails?.role === "admin" && (

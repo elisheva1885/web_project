@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Button } from 'primereact/button';
 import { DataView, DataViewLayoutOptions } from 'primereact/dataview';
 import { Tag } from 'primereact/tag';
@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setBasket } from '../store/basketSlice';
 import { Checkbox } from 'primereact/checkbox';
 import { InputNumber } from 'primereact/inputnumber';
+import { Toast } from 'primereact/toast';
 
 const Basket = () => {
     const { basket } = useSelector((state) => state.basket);
@@ -20,24 +21,32 @@ const Basket = () => {
     const [shoppingBags, setShoppingBags] = useState([]);
     const [errorStates, setErrorStates] = useState({}); // To track errors
     const [sum, setSum] = useState(1);
-
+    const toast = useRef(null);
     const [amount, setAmount] = useState(1);
     const [quantities, setQuantities] = useState({});
 
     const dispatch = useDispatch()
     const navigate = useNavigate()
+    const errorMessages = {
+        INVALID_USER_ID: "המזהה שלך אינו תקין. נסי להתחבר מחדש.",
+        INVALID_PRODUCT_ID: "מזהה המוצר אינו תקין.",
+        INVALID_AMOUNT: "כמות המוצר חייבת להיות מספר חיובי.",
+        PRODUCT_NOT_FOUND: "לא ניתן למצוא את המוצר.",
+        OUT_OF_STOCK: "המוצר אזל מהמלאי.",
+        SHOPPING_BAG_EMPTY: "סל הקניות שלך ריק.",
+        INTERNAL_ERROR: "שגיאה פנימית. נסי שוב מאוחר יותר.",
+        NO_VALID_PRODUCTS_IN_SHOPPING_BAG: "לא נמצאו מוצרים חוקיים בסל הקניות שלך.",
+        NOT_FOUND_IN_SHOPPING_BAG: "המוצר אינו נמצא בסל הקניות שלך.",
+        PRODUCT_DELETED_FROM_SHOPPING_BAG: "המוצר הוסר בהצלחה מסל הקניות שלך.",
+        NOT_ENOUGH_STOCK: "אין מספיק מלאי למוצר זה. עדכני את הכמות.",
+        PRODUCT_NOT_FOUND_IN_SHOPPING_BAG: "המוצר לא נמצא בסל הקניות שלך.",
+        SHOPPING_BAG_ITEM_NOT_FOUND: "לא נמצא פריט בסל הקניות.",
+        Access_denied: "אינך מורשה לבצע פעולה זו.",
+        Forbidden: "אינך מורשה לבצע פעולה זו.",
+        UNAUTHORIZED: "השם המשתמש או הסיסמה אינם נכונים. אנא בדוק ונסה שוב.",
+        NOT_ENOUGH_STOCK: "אין מספיק מלאי ממוצר זה. לא ניתן להגדיל את הכמות.",
 
-    // // let sum = 0;
-    // if (basket) {
-    //     console.log(selectedItems);
-    //     selectedItems.map(item => sum += item.price)
-    // }
-
-    // console.log(basket);
-    //     const updatedItems = selectedItems.map(item => ({
-    //   ...item,
-    //   amount: 1
-    // }));
+    };
     const [totalAmount, setTotalAmount] = useState(0);
     const deleteShoppingBag = async (product) => {
         try {
@@ -52,9 +61,27 @@ const Basket = () => {
             if (res.status === 200) {
                 const updatedBasket = basket.filter(itemInBasket => itemInBasket.product._id != product._id)
                 dispatch(setBasket(updatedBasket))
+                toast.current.show({
+                    severity: 'success',
+                    summary: 'הצלחה',
+                    detail: "המוצר הוסר בהצלחה מסל הקניות."
+                });
             }
-        } catch (e) {
-            console.error(e);
+        } catch (error) {
+            if (error.response && error.response.data?.message) {
+                const message = error.response.data.message;
+                toast.current.show({
+                    severity: 'error',
+                    summary: 'שגיאה',
+                    detail: errorMessages[message] || "שגיאה לא צפויה. נסי שוב מאוחר יותר."
+                });
+            } else {
+                toast.current.show({
+                    severity: 'error',
+                    summary: 'שגיאה כללית',
+                    detail: "ודאי שיש חיבור לאינטרנט ונסי שוב."
+                });
+            }
         }
     };
 
@@ -68,11 +95,23 @@ const Basket = () => {
                 console.log("res.data ", res.data);
                 dispatch(setBasket(res.data))
                 setShoppingBags(res.data)
-                // console.log("res.data", res.data);
             }
         }
-        catch (e) {
-            console.error(e)
+        catch (error) {
+            if (error.response && error.response.data?.message) {
+                const message = error.response.data.message;
+                toast.current.show({
+                    severity: 'error',
+                    summary: 'שגיאה',
+                    detail: errorMessages[message] || "שגיאה לא צפויה. נסי שוב מאוחר יותר."
+                });
+            } else {
+                toast.current.show({
+                    severity: 'error',
+                    summary: 'שגיאה כללית',
+                    detail: "ודאי שיש חיבור לאינטרנט ונסי שוב."
+                });
+            }
         }
     }
     const updateShoppingBagProductAmount = async (productDetails, newAmount) => {
@@ -84,9 +123,7 @@ const Basket = () => {
                 product_id: productDetails._id,
                 amount: newAmount
             };
-
             const res = await axios.put('http://localhost:8000/api/user/shoppingBag', data, { headers });
-
             if (res.status === 200) {
                 const updatedBasket = basket.map(item => {
                     if (!item) return item;
@@ -95,33 +132,39 @@ const Basket = () => {
                     }
                     return item;
                 });
-
                 dispatch(setBasket(updatedBasket));
-
-                // גם לעדכן את selectedItems
                 const updatedSelectedItems = selectedItems.map(item => {
                     if (item.product._id === res.data.updatedShoppingBag.product_id) {
                         return { ...item, amount: res.data.updatedShoppingBag.amount };
                     }
                     return item;
                 });
-
                 setSelectedItems(updatedSelectedItems);
-
-                // חישוב מחדש של הסכום
                 const totalSum = updatedSelectedItems.reduce((sum, item) => sum + (item.product.price * item.amount), 0);
                 setSum(totalSum);
-
+                toast.current.show({
+                    severity: 'success',
+                    summary: 'הצלחה',
+                    detail: "כמות המוצר עודכנה בהצלחה."
+                });
             }
-            else {
-                // if (res.status === 404) {
-                //     console.log("error 404:", res)
-                //     alert("not found")
-                // }
+        } 
+            catch (error) {
+                if (error.response && error.response.data?.message) {
+                    const message = error.response.data.message;
+                    toast.current.show({
+                        severity: 'error',
+                        summary: 'שגיאה',
+                        detail: errorMessages[message] || "שגיאה לא צפויה. נסי שוב מאוחר יותר."
+                    });
+                } else {
+                    toast.current.show({
+                        severity: 'error',
+                        summary: 'שגיאה כללית',
+                        detail: "ודאי שיש חיבור לאינטרנט ונסי שוב."
+                    });
+                }
             }
-        } catch (e) {
-            console.error(e);
-        }
     };
     const goToPayment = () => {
         const navigationData = {
@@ -210,13 +253,20 @@ const Basket = () => {
                                     const newAmount = e.value;
                                     // Handle invalid input cases
                                     if (newAmount < 1 || newAmount === null) {
-                                        setErrorStates((prev) => ({ ...prev, [productDetails._id]: true }));
-                                    } 
+                                        // setErrorStates((prev) => ({ ...prev, [productDetails._id]: true }));
+                                        toast.current.show({
+                                            severity: 'error',
+                                            summary: 'שגיאה',
+                                            detail: "המספר חייב להיות חיובי.",
+                                        });
+                                    }
                                     else if (newAmount > productDetails.stock) {
-                                        setErrorStates((prev) => ({ ...prev, [productDetails._id]: true }));
-                                        //alert(`לא ניתן להזמין יותר מהמלאי הקיים. כמות נוכחית במלאי: ${productDetails.stock}`); // Show alert if exceeds stock
-                                        // productInBasket?.amount = productDetails.stock; // Set to max stock
-
+                                        // setErrorStates((prev) => ({ ...prev, [productDetails._id]: true }));
+                                        toast.current.show({
+                                            severity: 'error',
+                                            summary: 'שגיאה',
+                                            detail: "אין מספיק מלאי ממוצר זה. לא ניתן להגדיל את הכמות.",
+                                        });
                                     }
                                     else {
                                         // Update the basket locally for immediate UI feedback
@@ -293,6 +343,8 @@ const Basket = () => {
 
     return (
         <div style={{ paddingTop: '60px' }}>
+            <Toast ref={toast} /> {/* Add the Toast component here */}
+
             <h1 style={{ textAlign: 'center', marginBottom: '20px', fontSize: '2rem', color: '#333' }}>
                 סל הקניות שלי
             </h1>

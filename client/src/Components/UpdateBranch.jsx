@@ -19,7 +19,7 @@ import React, { useRef, useState } from 'react';
      const location = useLocation();
      const { data: branch } = location.state || {};     const navigate = useNavigate();
      const toast = useRef(null);
-console.log(branch);
+     const { token } = useSelector((state) => state.token)
      const errorMessages = {
         INVALID_ADDRESS: "כתובת לא תקינה. ודאי שמולאו עיר, רחוב ומספר.",
         INVALID_PHONE: "מספר הטלפון שהוזן אינו תקין.",
@@ -27,9 +27,9 @@ console.log(branch);
         INVALID_CLOSING_HOUR: "שעת סגירה אינה תקינה.",
         BRANCH_EXISTS: "סניף עם כתובת זו כבר קיים.",
         INTERNAL_ERROR: "שגיאה פנימית בשרת. נסי שוב מאוחר יותר.",
+
     };
      const onSubmit = async (data) => {
-         console.log(data);
          const updateBranch = {
              _id: branch._id,
              address: data.address,
@@ -37,17 +37,15 @@ console.log(branch);
              openingHour: data.openingHour,
              closingHour : data.closingHour
          }
-         console.log(updateBranch);
          try {
-             const response = await axios.put('http://localhost:8000/api/branches', updateBranch);
+            const headers = {
+                'Authorization': `Bearer ${token}`
+            };
+             const response = await axios.put('http://localhost:8000/api/branches', updateBranch, {headers});
              if(response.status===200)
              {
              setFormData(data);
              setShowMessage(true);
-            //  const navigationData = {
-            //      data: response.data,
-            //      // You can add any other data you may want to send
-            //  };
              navigate('/branch' )
              }
              
