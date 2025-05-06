@@ -62,6 +62,9 @@ const MultiIndoorUnit = () => {
 
       <div style={styles.imageContainer}>
         <img src={getFilePath(product.imagepath)} alt={product.title} style={styles.productImage} />
+        {product.company?.imagePath && (
+          <img src={`/${product.company.imagePath}`} alt={product.company.name} style={styles.companyImage} />
+        )}
       </div>
       <div style={styles.detailsContainer}>
         <h1 style={styles.title}>{product.title}</h1>
@@ -78,21 +81,21 @@ const MultiIndoorUnit = () => {
             <table style={{ ...styles.table, direction: 'rtl' }}>
               <tbody>
 
-                <TableRow label="תפוקת קירור (BTU)" value={`${product.BTU_output.cool} `} />
+                <TableRow label="תפוקת קירור (BTU)" value={`${product.BTU_output?.cool} `} />
 
 
-                <TableRow label="תפוקת חימום (BTU)" value={`${product.BTU_output.heat} `} />
+                <TableRow label="תפוקת חימום (BTU)" value={`${product.BTU_output?.heat} `} />
 
 
                 <TableRow label="CFM" value={product.CFM} />
 
                 <TableRow label="קוטר חיבורי צנרת" value={<span style={{ direction: 'ltr', unicodeBidi: 'embed' }}>
-                  {`${product.pipe_connection?.a} x ${product.pipe_connection?.b}`}
+                  {`${product?.pipe_connection?.a} x ${product?.pipe_connection?.b}`}
                 </span>} />
 
                 <TableRow
                   label="מידות המאייד"
-                  value={<span style={{ direction: 'ltr', unicodeBidi: 'embed' }}>{`${product.evaporator_unit_dimensions.width} x ${product.evaporator_unit_dimensions.depth} x ${product.evaporator_unit_dimensions.height}`}</span>}
+                  value={<span style={{ direction: 'ltr', unicodeBidi: 'embed' }}>{`${product?.evaporator_unit_dimensions?.width} x ${product?.evaporator_unit_dimensions?.depth} x ${product?.evaporator_unit_dimensions?.height}`}</span>}
                 />
 
               </tbody>

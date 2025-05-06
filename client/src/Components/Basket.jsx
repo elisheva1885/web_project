@@ -235,7 +235,7 @@ const Basket = () => {
                     <div className="flex flex-column sm:flex-row justify-content-between align-items-center xl:align-items-start flex-1 gap-4">
                         <div className="flex flex-column align-items-center sm:align-items-start gap-3">
                             <Link
-                                to={`/overheads/overhead/${productDetails._id}`}
+                                to={`/${productInBasket.type.toLowerCase()}s/${productInBasket.type.toLowerCase()}/${productDetails._id}`}
                                 style={{
                                     textDecoration: 'none'
                                 }}

@@ -59,6 +59,11 @@ const Overheads = () => {
         Access_denied: "אינך מורשה לבצע פעולה זו.",
         Forbidden: "אינך מורשה לבצע פעולה זו.",
         UNAUTHORIZED: "השם המשתמש או הסיסמה אינם נכונים. אנא בדוק ונסה שוב.",
+        INVALID_TITLE: "הכותרת שסיפקת אינה תקינה. נסי שנית.",
+        NO_OVERHEADS_FOUND: "לא נמצאו מזגנים תואמים.",
+        INVALID_OVERHEAD_ID: "מזהה המזגן אינו תקין.",
+        INVALID_PRICE: "המחיר חייב להיות מספר חיובי.",
+        OVERHEAD_NOT_FOUND: "המזגן לא נמצא.",
     };
 
     const goToAddOverhead = (type) => {
@@ -87,11 +92,29 @@ const Overheads = () => {
                 data: _id
             });
             if (res.status === 200) {
-                const updatedOverheads = overheads.filter(overhead => overhead._id != product._id)
+                toast.current.show({
+                    severity: "success",
+                    summary: "הצלחה",
+                    detail: "המזגן נמחק בהצלחה.",
+                });
+                const updatedOverheads = overheads.filter(overhead => overhead._id !== product._id)
                 dispatch(setOverheads(updatedOverheads))
             }
-        } catch (e) {
-            console.log(e);
+        } catch (error) {
+            if (error.response && error.response.data?.message) {
+                const message = error.response.data.message;
+                toast.current.show({
+                    severity: "error",
+                    summary: "שגיאה",
+                    detail: errorMessages[message] || "שגיאה בלתי צפויה. נסי שוב מאוחר יותר.",
+                });
+            } else {
+                toast.current.show({
+                    severity: "error",
+                    summary: "שגיאה",
+                    detail: "ודאי שיש חיבור לאינטרנט ונסי שוב.",
+                });
+            }
         }
     };
     const openPriceUpdateDialog = (product) => {
@@ -114,18 +137,33 @@ const Overheads = () => {
                 _id: selectedProduct._id,
                 price: priceValue
             }
-            console.log(details);
-            const res = await axios.put(`http://localhost:8000/api/air-conditioner/overhead/price`, details, { headers });
-            console.log(res);
+            const res = await axios.put('http://localhost:8000/api/air-conditioner/overhead/price', details, { headers });
             if (res.status === 200) {
-                alert(`${selectedProduct.title} price updated`)
-                const unUpdatedOverheads = overheads.filter(overhead => overhead._id != res.data._id)
+                toast.current.show({
+                    severity: "success",
+                    summary: "הצלחה",
+                    detail: `${selectedProduct.title} עודכן בהצלחה.`,
+                });
+                const unUpdatedOverheads = overheads.filter(overhead => overhead._id !== res.data._id)
                 dispatch(setOverheads([...unUpdatedOverheads, res.data]))
                 setPriceVisible(false);
             }
         }
         catch (error) {
-            console.error(error);
+            if (error.response && error.response.data?.message) {
+                const message = error.response.data.message;
+                toast.current.show({
+                    severity: "error",
+                    summary: "שגיאה",
+                    detail: errorMessages[message] || "שגיאה בלתי צפויה. נסי שוב מאוחר יותר.",
+                });
+            } else {
+                toast.current.show({
+                    severity: "error",
+                    summary: "שגיאה",
+                    detail: "ודאי שיש חיבור לאינטרנט ונסי שוב.",
+                });
+            }
             setPriceVisible(false);
         }
     }
@@ -147,7 +185,20 @@ const Overheads = () => {
             }
         }
         catch (e) {
-            console.error(e)
+            if (e.response && e.response.data?.message) {
+                const message = e.response.data.message;
+                toast.current.show({
+                    severity: "error",
+                    summary: "שגיאה",
+                    detail: errorMessages[message] || "שגיאה בלתי צפויה. נסי שוב מאוחר יותר.",
+                });
+            } else {
+                toast.current.show({
+                    severity: "error",
+                    summary: "שגיאה",
+                    detail: "ודאי שיש חיבור לאינטרנט ונסי שוב.",
+                });
+            }
         }
     }
 
@@ -194,13 +245,12 @@ const Overheads = () => {
             <div className="col-12 sm:col-6 lg:col-3 p-3" key={product._id}>
                 <div className="border-1 surface-border border-round p-4 shadow-3 h-full flex flex-column justify-content-between gap-4">
                     <img
-                        src={`/${product?.company?.imagePath}`}
+                        src={getFilePath(product?.company?.imagePath)}
                         alt="Company"
                         className="w-full h-10rem object-contain border-round"
                     />
 
                     <img
-                        // src={`overheads/${product.imagepath}`}
                         src={getFilePath(product.imagepath)}
                         alt={product.title}
                         className="w-full h-12rem object-contain border-round"
@@ -216,8 +266,6 @@ const Overheads = () => {
                         <span className="text-lg font-medium text-primary">₪{product.price}</span>
                         {userDetails?.role === 'official' || userDetails?.role === 'admin' ? <Button onClick={() => UpdateOverhead(product)}><i className="pi pi-pencil" style={{ fontSize: '1rem' }}></i></Button> : <></>}
                         {userDetails?.role === 'official' || userDetails?.role === 'admin' ? (<Button onClick={() => openPriceUpdateDialog(product)}><i className="pi pi-pencil" style={{ fontSize: '1rem' }}> עדכון מחיר </i> </Button>) : <></>}
-                        {/* {userDetails?.role === 'official' || userDetails?.role === 'admin' ? <Button onClick={() => openStockUpdateDialog(product)}><i className="pi pi-pencil" style={{ fontSize: '1rem' }}> עדכון מלאי </i></Button> : <></>} */}
-
                         {userDetails?.role === 'admin' && (
                             <Button icon="pi pi-trash" className="p-button-rounded p-button-danger p-button-sm" onClick={() => deleteOverhead(product)} tooltip="מחק" tooltipOptions={{ position: 'bottom' }} />
                         )}
@@ -235,7 +283,6 @@ const Overheads = () => {
             </div>
         );
     };
-
     const itemTemplate = (product, layout, index) => {
         if (!product) {
             return;
@@ -252,7 +299,7 @@ const Overheads = () => {
 
     return (
         <>
-            {userDetails.role === 'admin' ? <Button onClick={() => goToAddOverhead("Overhead")}>add overhead</Button> : <></>}
+            {userDetails.role === 'admin' || userDetails.role === 'official' ? <Button onClick={() => goToAddOverhead("Overhead")}>הוספת מזגן עילי</Button> : <></>}
             <div className="card">
                 <Toast ref={toast} />
                 <div className="flex justify-content-end">
@@ -263,7 +310,6 @@ const Overheads = () => {
                 </div>
                 <DataView value={overheads} listTemplate={listTemplate} layout={layout} />
             </div>
-
             <Dialog
                 header="עדכון מחיר"
                 visible={priceVisible}

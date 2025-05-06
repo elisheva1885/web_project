@@ -66,6 +66,9 @@ const MultiOutdoorUnit = () => {
     <div style={styles.container}>
       <div style={styles.imageContainer}>
         <img src={getFilePath(product.imagepath)} alt={product.title} style={styles.productImage} />
+        {product.company?.imagePath && (
+          <img src={`/${product.company.imagePath}`} alt={product.company.name} style={styles.companyImage} />
+        )}
       </div>
       <div style={styles.detailsContainer}>
         <h1 style={styles.title}>{product.title}</h1>

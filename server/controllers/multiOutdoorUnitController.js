@@ -99,9 +99,7 @@ const updateMultiOutdoorUnit = async (req, res) => {
         }
         multiOutdoorUnit.title = title ? title : multiOutdoorUnit.title
         multiOutdoorUnit.describe = describe ? describe : multiOutdoorUnit.describe
-        multiOutdoorUnit.imagepath = imagepath ? imagepath : multiOutdoorUnit.imagepath
         multiOutdoorUnit.stock = stock ? stock : multiOutdoorUnit.stock
-        // multiOutdoorUnit.price= multiOutdoorUnit.price
         multiOutdoorUnit.BTU_output = BTU_output ? BTU_output : multiOutdoorUnit.BTU_output
         multiOutdoorUnit.working_current = working_current ? working_current : multiOutdoorUnit.working_current
         multiOutdoorUnit.condenser_unit_dimensions = condenser_unit_dimensions ? condenser_unit_dimensions : multiOutdoorUnit.condenser_unit_dimensions
@@ -173,7 +171,7 @@ const updatMultiOutdoorUnitPrice = async (req, res) => {
         return res.status(400).json({ message: "INVALID_MULTIOUTDOORUNIT_ID" });
     }
 
-    if (price === undefined || typeof price !== "number" || price <= 0) {
+    if (price === undefined  || price <= 0) {
         return res.status(400).json({ message: "INVALID_PRICE" });
     }
 

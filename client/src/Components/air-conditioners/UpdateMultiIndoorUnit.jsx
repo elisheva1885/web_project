@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
@@ -7,6 +7,7 @@ import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { setMultiIndoorUnits } from '../../store/air-conditioner/multiIndoorUnitsSlice'; // חשוב שתעדכני גם את הסלייס
+import { Toast } from 'primereact/toast';
 
 const UpdateMultiIndoorUnit = () => {
     const location = useLocation();
@@ -15,12 +16,27 @@ const UpdateMultiIndoorUnit = () => {
     const { multiIndoorUnits } = useSelector((state) => state.multiIndoorUnits);
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const [showMessage, setShowMessage] = useState(false);
+    const toast = useRef(null);
 
+    const [showMessage, setShowMessage] = useState(false);
     const { control, handleSubmit, formState: { errors } } = useForm({
         defaultValues: m
     });
+    const messages = {
+        INVALID_UNIT_ID: "מזהה היחידה אינו תקין. ודא שהמזהה הוא מחרוזת באורך 24 תווים.",
+        UNIT_NOT_FOUND: "לא נמצאה יחידה מתאימה במערכת.",
+        INTERNAL_ERROR: "שגיאת שרת פנימית. נסה שוב מאוחר יותר.",
+    };
 
+    const showToast = (severity, summary, detail) => {
+            toast.current.show({
+                severity,
+                summary,
+                detail,
+                life: 3000,
+            });
+        
+    };
     const onSubmit = async (data) => {
         const updatedUnit = {
             _id: data._id,
@@ -50,34 +66,29 @@ const UpdateMultiIndoorUnit = () => {
             sabbath_command: data.sabbath_command
         };
 
-        console.log(updatedUnit);
         try {
             const headers = { 'Authorization': `Bearer ${token}` };
             const res = await axios.put(`http://localhost:8000/api/air-conditioner/multiIndoorUnit`, updatedUnit, { headers });
             if (res.status === 200) {
+                showToast('success', 'הצלחה', `${res.data.title} עודכן בהצלחה!`);
                 setShowMessage(true);
-                console.log(res.data);
                 const updatedUnits = multiIndoorUnits.filter(u => u._id !== res.data._id);
                 dispatch(setMultiIndoorUnits([...updatedUnits, res.data]));
                 navigate('/multiindoorunits');
             }
         } catch (error) {
-            console.error(error);
+            const serverMessage = error.response?.data?.message || 'default';
+            showToast('error', 'שגיאה', messages[serverMessage] || "שגיאה בלתי צפויה. נסה שוב מאוחר יותר.");
+            console.error("Error updating Multi Indoor Unit:", error);
         }
     };
 
     return (
         <div style={{ paddingTop: '60px' }}>
-            <Dialog visible={showMessage} onHide={() => setShowMessage(false)} position="top" footer={<Button label="Close" onClick={() => setShowMessage(false)} />} showHeader={false} breakpoints={{ '960px': '80vw' }} style={{ width: '40vw' }}>
-                <div className="flex justify-content-center flex-column pt-6 px-3">
-                    <i className="pi pi-check-circle" style={{ fontSize: '5rem', color: 'var(--green-500)' }}></i>
-                    <h5>Multi Indoor Unit Updated Successfully!</h5>
-                </div>
-            </Dialog>
-
+<Toast ref={toast} />
             <div className="flex justify-content-center">
                 <div className="card" style={{ width: '100%', maxWidth: '600px' }}>
-                    <h5 className="text-center">Update Multi Indoor Unit</h5>
+                    <h5 className="text-center">עדכון מאייד מולטי</h5>
                     <form onSubmit={handleSubmit(onSubmit)} className="p-fluid">
 
                         {/* Title */}

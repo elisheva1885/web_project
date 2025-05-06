@@ -29,128 +29,181 @@ const Overhead = lazy(() => import('./Overhead'));
 
 const MultiIndoorUnits = () => {
 
-    const { token } = useSelector((state) => state.token)
-    const { companies } = useSelector((state) => state.companies)
-    const { basket } = useSelector((state) => state.basket)
-    const { userDetails } = useSelector((state) => state.userDetails);
+ const { token } = useSelector((state) => state.token)
+ const { companies } = useSelector((state) => state.companies)
+ const { basket } = useSelector((state) => state.basket)
+ const { userDetails } = useSelector((state) => state.userDetails);
 
-    const { multiIndoorUnits } = useSelector((state) => state.multiIndoorUnits);
-    const [selectedProduct, setSelectedProduct] = useState(null);
-    const [value, setValue] = useState('')
-    const [priceVisible, setPriceVisible] = useState(false);
-    const [stockVisible, setStockVisible] = useState(false);
-    const { control, handleSubmit, formState: { errors }, watch } = useForm()
-    const [layout, setLayout] = useState('grid');
-    const navigate = useNavigate();
-    const dispatch = useDispatch();
-    const priceValue = watch('price');
-    const stockValue = watch('stock');
-    const {getFilePath} = useGetFilePath()
-    const { addToBasket, toast } = useAddToBasket();
+ const { multiIndoorUnits } = useSelector((state) => state.multiIndoorUnits);
+ const [selectedProduct, setSelectedProduct] = useState(null);
+ const [value, setValue] = useState('')
+ const [priceVisible, setPriceVisible] = useState(false);
+ const [stockVisible, setStockVisible] = useState(false);
+ const { control, handleSubmit, formState: { errors }, watch } = useForm()
+ const [layout, setLayout] = useState('grid');
+ const navigate = useNavigate();
+ const dispatch = useDispatch();
+ const priceValue = watch('price');
+ const stockValue = watch('stock');
+ const { getFilePath } = useGetFilePath()
+ const { addToBasket, toast } = useAddToBasket();
 
-    const errorMessages = {
-        INVALID_USER_ID: "המזהה שלך אינו תקין. נסי להתחבר מחדש.",
-        INVALID_PRODUCT_ID: "מזהה המוצר אינו תקין.",
-        INVALID_AMOUNT: "כמות המוצר חייבת להיות מספר חיובי.",
-        "Invalid type: MiniCenteral. Must be one of Overhead, MiniCenteral, MultiIndoorUnit, MultiOutdoorUnit":
-            "סוג המוצר אינו תקין. אנא נסי שוב.",
-        INTERNAL_ERROR: "שגיאת שרת פנימית. נסי שוב מאוחר יותר.",
-        Access_denied: "אינך מורשה לבצע פעולה זו.",
-        Forbidden: "אינך מורשה לבצע פעולה זו.",
-        UNAUTHORIZED: "השם המשתמש או הסיסמה אינם נכונים. אנא בדוק ונסה שוב.",
-    };
+ const errorMessages = {
+  INVALID_USER_ID: "המזהה שלך אינו תקין. נסי להתחבר מחדש.",
+  INVALID_PRODUCT_ID: "מזהה המוצר אינו תקין.",
+  INVALID_AMOUNT: "כמות המוצר חייבת להיות מספר חיובי.",
+  "Invalid type: MiniCenteral. Must be one of Overhead, MiniCenteral, MultiIndoorUnit, MultiOutdoorUnit":
+   "סוג המוצר אינו תקין. אנא נסי שוב.",
+  INTERNAL_ERROR: "שגיאת שרת פנימית. נסי שוב מאוחר יותר.",
+  Access_denied: "אינך מורשה לבצע פעולה זו.",
+  Forbidden: "אינך מורשה לבצע פעולה זו.",
+  UNAUTHORIZED: "השם המשתמש או הסיסמה אינם נכונים. אנא בדוק ונסה שוב.",
+  INVALID_TITLE: "הכותרת שסיפקת אינה תקינה. נסי שנית.",
+  NO_MULTI_INDOOR_UNITS_FOUND: "לא נמצאו יחידות פנימיות תואמות.",
+  INVALID_MULTI_INDOOR_UNIT_ID: "מזהה היחידה הפנימית אינו תקין.",
+  INVALID_PRICE: "המחיר חייב להיות מספר חיובי.",
+  MULTI_INDOOR_UNIT_NOT_FOUND: "היחידה הפנימית לא נמצאה.",
+ };
 
-    const goToAddMultiIndoorUnit = (type) => {
-        const navigationData = {
-            type: type,
-            // You can add any other data you may want to send
-        };
-        navigate('/air_conditioner/add', { state: navigationData });
-    };
+ const goToAddMultiIndoorUnit = (type) => {
+  const navigationData = {
+   type: type,
+   // You can add any other data you may want to send
+  };
+  navigate('/air_conditioner/add', { state: navigationData });
+ };
 
-    const addtoBasket =  async (product) => {
-        addToBasket(product, "MultiIndoorUnit")
-    }
-
-
-const deleteMultiIndoorUnit = async (product) => {
-    try {
-        const headers = {
-            'Authorization': `Bearer ${token}`
-        };
-        const _id = {
-            _id: product._id
-        };
-        const res = await axios.delete('http://localhost:8000/api/air-conditioner/multiIndoorUnit', {
-            headers: headers,
-            data: _id
-        });
-        if (res.status === 200) {
-            const updatedOverheads = multiIndoorUnits.filter(multiIndoorUnit => multiIndoorUnit._id != product._id)
-            dispatch(setMultiIndoorUnits(updatedOverheads))
-        }
-    } catch (e) {
-        console.log(e);
-    }
-};
-const openPriceUpdateDialog = (product) => {
-    setSelectedProduct(product);
-    setPriceVisible(true);
-};
-
-const openStockUpdateDialog = (product) => {
-    setSelectedProduct(product);
-    setStockVisible(true);
-};
+ const addtoBasket = async (product) => {
+  addToBasket(product, "MultiIndoorUnit")
+ }
 
 
-const updatePrice = async (data) => {
-    try {
-        const headers = {
-            'Authorization': `Bearer ${token}`
-        }
-        const details = {
-            _id: selectedProduct._id,
-            price: priceValue
-        }
-        console.log(details);
-        const res = await axios.put(`http://localhost:8000/api/air-conditioner/multiIndoorUnit/price`, details, { headers });
-        console.log(res);
-        if (res.status === 200) {
-            alert(`${selectedProduct.title} price updated`)
-            const unUpdatedOverheads = multiIndoorUnits.filter(multiIndoorUnit => multiIndoorUnit._id != res.data._id)
-            dispatch(setMultiIndoorUnits([...unUpdatedOverheads, res.data]))
-            setPriceVisible(false);
-        }
-    }
-    catch (error) {
-        console.error(error);
-        setPriceVisible(false);
-    }
-}
+ const deleteMultiIndoorUnit = async (product) => {
+  try {
+   const headers = {
+    'Authorization': `Bearer ${token}`
+   };
+   const _id = {
+    _id: product._id
+   };
+   const res = await axios.delete('http://localhost:8000/api/air-conditioner/multiIndoorUnit', {
+    headers: headers,
+    data: _id
+   });
+   if (res.status === 200) {
+    toast.current.show({
+     severity: "success",
+     summary: "הצלחה",
+     detail: "היחידה הפנימית נמחקה בהצלחה.",
+    });
+    const updatedOverheads = multiIndoorUnits.filter(multiIndoorUnit => multiIndoorUnit._id !== product._id)
+    dispatch(setMultiIndoorUnits(updatedOverheads))
+   }
+  } catch (error) {
+   if (error.response && error.response.data?.message) {
+    const message = error.response.data.message;
+    toast.current.show({
+     severity: "error",
+     summary: "שגיאה",
+     detail: errorMessages[message] || "שגיאה בלתי צפויה. נסי שוב מאוחר יותר.",
+    });
+   } else {
+    toast.current.show({
+     severity: "error",
+     summary: "שגיאה",
+     detail: "ודאי שיש חיבור לאינטרנט ונסי שוב.",
+    });
+   }
+  }
+ };
+ const openPriceUpdateDialog = (product) => {
+  setSelectedProduct(product);
+  setPriceVisible(true);
+ };
+
+ const openStockUpdateDialog = (product) => {
+  setSelectedProduct(product);
+  setStockVisible(true);
+ };
 
 
-const sortData = (data) => {
-    data.sort((a, b) => {
-        if (a.title < b.title) return -1;  // a comes before b
-        if (a.title > b.title) return 1;   // a comes after b
-        return 0;                           // a and b are equal
-    })
-}
+ const updatePrice = async (data) => {
+  try {
+   const headers = {
+    'Authorization': `Bearer ${token}`
+   }
+   const details = {
+    _id: selectedProduct._id,
+    price: priceValue
+   }
+   console.log(details);
+   const res = await axios.put(`http://localhost:8000/api/air-conditioner/multiIndoorUnit/price`, details, { headers });
+   console.log(res);
+   if (res.status === 200) {
+    toast.current.show({
+     severity: "success",
+     summary: "הצלחה",
+     detail: `${selectedProduct.title} עודכן בהצלחה.`,
+    });
+    const unUpdatedOverheads = multiIndoorUnits.filter(multiIndoorUnit => multiIndoorUnit._id !== res.data._id)
+    dispatch(setMultiIndoorUnits([...unUpdatedOverheads, res.data]))
+    setPriceVisible(false);
+   }
+  }
+  catch (error) {
+   if (error.response && error.response.data?.message) {
+    const message = error.response.data.message;
+    toast.current.show({
+     severity: "error",
+     summary: "שגיאה",
+     detail: errorMessages[message] || "שגיאה בלתי צפויה. נסי שוב מאוחר יותר.",
+    });
+   } else {
+    toast.current.show({
+     severity: "error",
+     summary: "שגיאה",
+     detail: "ודאי שיש חיבור לאינטרנט ונסי שוב.",
+    });
+   }
+   setPriceVisible(false);
+  }
+ }
 
 
-const getMultiIndoorUnitByTitle = async (c) => {
-    try {
-        setValue(c.target.value)
-        const res = await axios.get(`http://localhost:8000/api/air-conditioner/multiIndoorUnit/${c.target.value}`)
-        if (res.status === 200) {
-            dispatch(setMultiIndoorUnits(res.data))
-        }
-    }
-    catch (e) {
-        console.error(e)
-    }
-}
+ const sortData = (data) => {
+  data.sort((a, b) => {
+   if (a.title < b.title) return -1;  // a comes before b
+   if (a.title > b.title) return 1;   // a comes after b
+   return 0;                           // a and b are equal
+  })
+ }
+
+
+ const getMultiIndoorUnitByTitle = async (c) => {
+  try {
+   setValue(c.target.value)
+   const res = await axios.get(`http://localhost:8000/api/air-conditioner/multiIndoorUnit/${c.target.value}`)
+   if (res.status === 200) {
+    dispatch(setMultiIndoorUnits(res.data))
+   }
+  }
+  catch (e) {
+   if (e.response && e.response.data?.message) {
+    const message = e.response.data.message;
+    toast.current.show({
+     severity: "error",
+     summary: "שגיאה",
+     detail: errorMessages[message] || "שגיאה בלתי צפויה. נסי שוב מאוחר יותר.",
+    });
+   } else {
+    toast.current.show({
+     severity: "error",
+     summary: "שגיאה",
+     detail: "ודאי שיש חיבור לאינטרנט ונסי שוב.",
+    });
+   }
+  }
+ }
 
 const getSeverity = (s) => {
     if (s >= 50) {
@@ -256,7 +309,7 @@ const listTemplate = (products, layout) => {
 
 return (
     <>
-        {userDetails.role === 'admin' ? <Button onClick={() => goToAddMultiIndoorUnit("MultiIndoorUnit")}>add multiIndoorUnit</Button> : <></>}
+        {userDetails.role === 'admin' ? <Button onClick={() => goToAddMultiIndoorUnit("MultiIndoorUnit")}>להוספת מאייד מולטי</Button> : <></>}
             <Toast ref={toast} />
         <div className="card">
             <div className="flex justify-content-end">

@@ -48,7 +48,7 @@ const MultiOutdoorUnits = () => {
     const dispatch = useDispatch();
     const priceValue = watch('price');
     const stockValue = watch('stock');
-    const {getFilePath} = useGetFilePath()
+    const { getFilePath } = useGetFilePath()
     const { addToBasket, toast } = useAddToBasket();
     const errorMessages = {
         INVALID_USER_ID: "המזהה שלך אינו תקין. נסי להתחבר מחדש.",
@@ -60,22 +60,22 @@ const MultiOutdoorUnits = () => {
         Access_denied: "אינך מורשה לבצע פעולה זו.",
         Forbidden: "אינך מורשה לבצע פעולה זו.",
         UNAUTHORIZED: "השם המשתמש או הסיסמה אינם נכונים. אנא בדוק ונסה שוב.",
+        INVALID_TITLE: "הכותרת שסיפקת אינה תקינה. נסי שנית.",
+        NO_MULTI_OUTDOOR_UNITS_FOUND: "לא נמצאו מעבים תואמים.",
+        INVALID_MULTI_OUTDOOR_UNIT_ID: "מזהה המעבה אינו תקין.",
+        INVALID_PRICE: "המחיר חייב להיות מספר חיובי.",
+        MULTI_OUTDOOR_UNIT_NOT_FOUND: "המעבה לא נמצא.",
     };
 
-    const addtoBasket =     async (product) => {
-        addToBasket(product, "MultiOutDoorUnit")
+    const addtoBasket = async (product) => {
+        addToBasket(product, "MultiOutdoorUnit")
     }
     const goToAddMultiOutdoorUnit = (m) => {
         const navigationData = {
             type: m,
-            // You can add any other data you may want to send
         };
         navigate('/air_conditioner/add', { state: navigationData });
     };
-
-    
-    
-     
 
     const deleteMultiOutdoorUnit = async (product) => {
         try {
@@ -90,11 +90,29 @@ const MultiOutdoorUnits = () => {
                 data: _id
             });
             if (res.status === 200) {
-                const updatedOverheads = multiOutdoorUnits.filter(multiOutdoorUnit => multiOutdoorUnit._id != product._id)
+                toast.current.show({
+                    severity: "success",
+                    summary: "הצלחה",
+                    detail: "המעבה נמחק בהצלחה.",
+                });
+                const updatedOverheads = multiOutdoorUnits.filter(multiOutdoorUnit => multiOutdoorUnit._id !== product._id)
                 dispatch(setMultiOutdoorUnits(updatedOverheads))
             }
-        } catch (e) {
-            console.log(e);
+        } catch (error) {
+            if (error.response && error.response.data?.message) {
+                const message = error.response.data.message;
+                toast.current.show({
+                    severity: "error",
+                    summary: "שגיאה",
+                    detail: errorMessages[message] || "שגיאה בלתי צפויה. נסי שוב מאוחר יותר.",
+                });
+            } else {
+                toast.current.show({
+                    severity: "error",
+                    summary: "שגיאה",
+                    detail: "ודאי שיש חיבור לאינטרנט ונסי שוב.",
+                });
+            }
         }
     };
     const openPriceUpdateDialog = (product) => {
@@ -115,14 +133,31 @@ const MultiOutdoorUnits = () => {
             const res = await axios.put(`http://localhost:8000/api/air-conditioner/multiOutdoorUnit/price`, details, { headers });
             console.log(res);
             if (res.status === 200) {
-                alert(`${selectedProduct.title} price updated`)
-                const unUpdatedOverheads = multiOutdoorUnits.filter(multiOutdoorUnit => multiOutdoorUnit._id != res.data._id)
+                toast.current.show({
+                    severity: "success",
+                    summary: "הצלחה",
+                    detail: `${selectedProduct.title} עודכן בהצלחה.`,
+                });
+                const unUpdatedOverheads = multiOutdoorUnits.filter(multiOutdoorUnit => multiOutdoorUnit._id !== res.data._id)
                 dispatch(setMultiOutdoorUnits([...unUpdatedOverheads, res.data]))
                 setPriceVisible(false);
             }
         }
         catch (error) {
-            console.error(error);
+            if (error.response && error.response.data?.message) {
+                const message = error.response.data.message;
+                toast.current.show({
+                    severity: "error",
+                    summary: "שגיאה",
+                    detail: errorMessages[message] || "שגיאה בלתי צפויה. נסי שוב מאוחר יותר.",
+                });
+            } else {
+                toast.current.show({
+                    severity: "error",
+                    summary: "שגיאה",
+                    detail: "ודאי שיש חיבור לאינטרנט ונסי שוב.",
+                });
+            }
             setPriceVisible(false);
         }
     }
@@ -145,7 +180,20 @@ const MultiOutdoorUnits = () => {
             }
         }
         catch (e) {
-            console.error(e)
+            if (e.response && e.response.data?.message) {
+                const message = e.response.data.message;
+                toast.current.show({
+                    severity: "error",
+                    summary: "שגיאה",
+                    detail: errorMessages[message] || "שגיאה בלתי צפויה. נסי שוב מאוחר יותר.",
+                });
+            } else {
+                toast.current.show({
+                    severity: "error",
+                    summary: "שגיאה",
+                    detail: "ודאי שיש חיבור לאינטרנט ונסי שוב.",
+                });
+            }
         }
     }
 
@@ -178,7 +226,7 @@ const MultiOutdoorUnits = () => {
                 return null;
         }
     };
- 
+
     const UpdateMultiOutdoorUnit = async (m) => {
         const navigationData = {
             type: m,
@@ -249,12 +297,12 @@ const MultiOutdoorUnits = () => {
         return <div className="grid grid-nogutter">{multiOutdoorUnits.map((product, index) => itemTemplate(product, layout, index))}</div>;
     };
 
-   
+
 
 
     return (
         <>
-            {userDetails.role === 'admin' ? <Button onClick={() => goToAddMultiOutdoorUnit("MultiOutdoorUnit")}>add multiOutdoorUnit</Button> : <></>}
+            {userDetails.role === 'admin' ? <Button onClick={() => goToAddMultiOutdoorUnit("MultiOutdoorUnit")}>להוספת מעבה מולטי</Button> : <></>}
             <Toast ref={toast} />
             <div className="card">
                 <div className="flex justify-content-end">
@@ -268,33 +316,33 @@ const MultiOutdoorUnits = () => {
 
 
             <Dialog
-    header="עדכון מחיר"
-    visible={priceVisible}
-    style={{ width: '50vw' }}
-    onHide={() => priceVisible(false)}
-    modal
->
-    <h6>מחיר:</h6>
-    <div className="field">
-        <span className="p-float-label">
-            <Controller
-                name="price"
-                control={control}
-                render={({ field }) => (
-                    <InputText id={field.name} type="number" {...field} />
-                )}
-            />
-            <label htmlFor="price">{selectedProduct?.price}</label>
-        </span>
-    </div>
-    <Button
-        label="לעדכון"
-        onClick={handleSubmit(updatePrice)}
-        className="p-button-success"
-    />
-</Dialog>
+                header="עדכון מחיר"
+                visible={priceVisible}
+                style={{ width: '50vw' }}
+                onHide={() => priceVisible(false)}
+                modal
+            >
+                <h6>מחיר:</h6>
+                <div className="field">
+                    <span className="p-float-label">
+                        <Controller
+                            name="price"
+                            control={control}
+                            render={({ field }) => (
+                                <InputText id={field.name} type="number" {...field} />
+                            )}
+                        />
+                        <label htmlFor="price">{selectedProduct?.price}</label>
+                    </span>
+                </div>
+                <Button
+                    label="לעדכון"
+                    onClick={handleSubmit(updatePrice)}
+                    className="p-button-success"
+                />
+            </Dialog>
 
-{/* <Dialog
+            {/* <Dialog
     header="עדכון מלאי"
     visible={stockVisible}
     style={{ width: '50vw' }}
