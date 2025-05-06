@@ -18,7 +18,20 @@ const Branches = () => {
     const [filteredBranches, setFilteredBranches] = useState([]);
     const [searchValue, setSearchValue] = useState('');
     const navigate = useNavigate();
-
+    const errorMessages = {
+        INVALID_ADDRESS: "כתובת לא תקינה. ודאי שמולאו עיר, רחוב ומספר.",
+        INVALID_PHONE: "מספר הטלפון שהוזן אינו תקין.",
+        INVALID_OPENING_HOUR: "שעת פתיחה אינה תקינה.",
+        INVALID_CLOSING_HOUR: "שעת סגירה אינה תקינה.",
+        BRANCH_EXISTS: "סניף עם כתובת זו כבר קיים.",
+        INVALID_BRANCH_ID: "לא נשלח מזהה סניף.",
+        BRANCH_NOT_FOUND: "הסניף לא נמצא.",
+        NO_BRANCHES_FOUND: "לא נמצאו סניפים.",
+        NO_BRANCH_IN_CITY: "לא נמצאו סניפים בעיר המבוקשת.",
+        INTERNAL_ERROR: "שגיאה פנימית בשרת. נסי שוב מאוחר יותר.",
+        UNAUTHORIZED: "אינך מורשה לבצע פעולה זו.",
+    };
+    
     const sortData = (data) => {
         data.sort((a, b) => {
             if (a.address.city < b.address.city) return -1;

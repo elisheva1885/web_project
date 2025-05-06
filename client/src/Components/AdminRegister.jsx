@@ -54,9 +54,9 @@ const AdminRegister = () => {
                 navigate('/');
             }
         } catch (error) {
-            if (error.response && error.response.data?.code) {
-                const code = error.response.data.code;
-                alert(errorMessages[code] || "שגיאה לא צפויה");
+            if (error.response && error.response.data?.message) {
+                const message = error.response.data.message;
+                alert(errorMessages[message] || "שגיאה לא צפויה");
             } else {
                 alert("שגיאה כללית, נסי שוב מאוחר יותר");
             }

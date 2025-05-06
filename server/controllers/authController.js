@@ -6,32 +6,32 @@ const register = async (req, res) => {
     try {
         const { name, username, password, email, phone } = req.body;
         if (!name || typeof name !== 'string' || name.trim() === '') {
-            return res.status(400).json({ code: "INVALID_NAME" });
+            return res.status(400).json({ message: "INVALID_NAME" });
         }
 
         if (!username || typeof username !== 'string' || username.trim() === '') {
-            return res.status(400).json({ code: "INVALID_USERNAME" });
+            return res.status(400).json({ message: "INVALID_USERNAME" });
         }
 
         const duplicate = await User.findOne({ username }).lean();
         if (duplicate) {
-            return res.status(409).json({ code: "USERNAME_TAKEN" });
+            return res.status(409).json({ message: "USERNAME_TAKEN" });
         }
 
         if (!password || typeof password !== 'string' || password.length < 8 ||
             !/[A-Z]/.test(password) || !/[a-z]/.test(password) ||
             !/[0-9]/.test(password) || !/[!@#$%^&*]/.test(password)) {
-            return res.status(400).json({ code: "INVALID_PASSWORD" });
+            return res.status(400).json({ message: "INVALID_PASSWORD" });
         }
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (email && !emailRegex.test(email)) {
-            return res.status(400).json({ code: "INVALID_EMAIL" });
+            return res.status(400).json({ message: "INVALID_EMAIL" });
         }
 
         const phoneRegex = /^05\d{8}$/;
         if (phone && !phoneRegex.test(phone)) {
-            return res.status(400).json({ code: "INVALID_PHONE" });
+            return res.status(400).json({ message: "INVALID_PHONE" });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -41,12 +41,12 @@ const register = async (req, res) => {
         if (user) {
             return res.status(201).json(user);
         } else {
-            return res.status(400).json({ code: "INVALID_USER_DATA" });
+            return res.status(400).json({ message: "INVALID_USER_DATA" });
         }
 
     } catch (error) {
         e.error(error);
-        return res.status(500).json({ code: "INTERNAL_ERROR" });
+        return res.status(500).json({ message: "INTERNAL_ERROR" });
     }
 };
 
@@ -55,32 +55,32 @@ const registerAdmin = async (req, res) => {
         const { name, username, password, email, phone, roles } = req.body;
 
         if (!name || typeof name !== 'string' || name.trim() === '') {
-            return res.status(400).json({ code: "INVALID_NAME" });
+            return res.status(400).json({ message: "INVALID_NAME" });
         }
 
         if (!username || typeof username !== 'string' || username.trim() === '') {
-            return res.status(400).json({ code: "INVALID_USERNAME" });
+            return res.status(400).json({ message: "INVALID_USERNAME" });
         }
 
         const duplicate = await User.findOne({ username }).lean();
         if (duplicate) {
-            return res.status(409).json({ code: "USERNAME_TAKEN" });
+            return res.status(409).json({ message: "USERNAME_TAKEN" });
         }
 
         if (!password || typeof password !== 'string' || password.length < 8 ||
             !/[A-Z]/.test(password) || !/[a-z]/.test(password) ||
             !/[0-9]/.test(password) || !/[!@#$%^&*]/.test(password)) {
-            return res.status(400).json({ code: "INVALID_PASSWORD" });
+            return res.status(400).json({ message: "INVALID_PASSWORD" });
         }
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (email && !emailRegex.test(email)) {
-            return res.status(400).json({ code: "INVALID_EMAIL" });
+            return res.status(400).json({ message: "INVALID_EMAIL" });
         }
 
         const phoneRegex = /^05\d{8}$/;
         if (phone && !phoneRegex.test(phone)) {
-            return res.status(400).json({ code: "INVALID_PHONE" });
+            return res.status(400).json({ message: "INVALID_PHONE" });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -90,12 +90,12 @@ const registerAdmin = async (req, res) => {
         if (user) {
             return res.status(201).json({ message: `New user ${user.username} created successfully` });
         } else {
-            return res.status(400).json({ code: "INVALID_USER_DATA" });
+            return res.status(400).json({ message: "INVALID_USER_DATA" });
         }
 
     } catch (error) {
         e.error(error);
-        return res.status(500).json({ code: "INTERNAL_ERROR" });
+        return res.status(500).json({ message: "INTERNAL_ERROR" });
     }
 };
 
@@ -104,17 +104,17 @@ const login = async (req, res) => {
         const { username, password } = req.body;
 
         if(!username || !password){
-            return res.status(400).json({ code: "INVALID_CREDENTIALS" });
+            return res.status(400).json({ message: "INVALID_CREDENTIALS" });
         }
 
         const foundUser = await User.findOne({ username }).lean();
         if (!foundUser) {
-            return res.status(401).json({ code: "UNAUTHORIZED" });
+            return res.status(401).json({ message: "UNAUTHORIZED" });
         }
 
         const match = await bcrypt.compare(password, foundUser.password);
         if (!match) {
-            return res.status(401).json({ code: "UNAUTHORIZED" });
+            return res.status(401).json({ message: "UNAUTHORIZED" });
         }
 
         const userInfo = {
@@ -138,7 +138,7 @@ const login = async (req, res) => {
 
     } catch (error) {
         e.error(error);
-        return res.status(500).json({ code: "INTERNAL_ERROR" });
+        return res.status(500).json({ message: "INTERNAL_ERROR" });
     }
 };
 
