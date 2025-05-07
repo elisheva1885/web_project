@@ -7,6 +7,7 @@ import axios from 'axios';
 import classNames from 'classnames';
 import { useNavigate } from 'react-router-dom';
 import { Toast } from 'primereact/toast';
+import { useSelector } from 'react-redux';
 
 
 const AddBranch = () => {
@@ -15,6 +16,7 @@ const AddBranch = () => {
     const [formData, setFormData] = useState({});
     const navigate = useNavigate()
     const toast = useRef(null);
+    const { token } = useSelector((state) => state.token);
 
     const errorMessages = {
         INVALID_ADDRESS: "כתובת לא תקינה. ודאי שמולאו עיר, רחוב ומספר.",
@@ -27,10 +29,8 @@ const AddBranch = () => {
         NO_BRANCHES_FOUND: "לא נמצאו סניפים.",
         NO_BRANCH_IN_CITY: "לא נמצאו סניפים בעיר המבוקשת.",
         INTERNAL_ERROR: "שגיאה פנימית בשרת. נסי שוב מאוחר יותר.",
-        UNAUTHORIZED: "אינך רשום במערכת.",
         Access_denied: "אינך מורשה לבצע פעולה זו.",
         Forbidden: "אינך מורשה לבצע פעולה זו.",
-
     };
     const onSubmit = async (data) => {
         try {
@@ -40,7 +40,10 @@ const AddBranch = () => {
             if (data.closingHour.weekdays < 16 || data.closingHour.fridays > 13) {
                 alert("closingHour is not fitting")
             }
-            const res = await axios.post('http://localhost:8000/api/branches', data);
+            const headers = {
+                'Authorization': `Bearer ${token}`
+            }
+            const res = await axios.post('http://localhost:8000/api/branches', data, {headers});
             if (res.status === 201) {
                 setFormData(data);
                 setShowMessage(true);
