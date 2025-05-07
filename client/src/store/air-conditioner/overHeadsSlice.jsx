@@ -10,7 +10,7 @@ const overHeadsSlice = createSlice({
     reducers:{
         setOverheads:(state,action)=>{
             state.overheads=action.payload
-            console.log(state.overheads);
+            // console.log(state.overheads);
         },
         clearOverheads(state) {
             state.overheads = null;

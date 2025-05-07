@@ -112,12 +112,24 @@ const Payment = () => {
         }
     };
 
-    const createAddress = async (address) => {
+    const createAddress = async (newaddress) => {
         try {
             const headers = {
                 'Authorization': `Bearer ${token}`
             };
-            const res = await axios.post("http://localhost:8000/api/user/address", address, { headers });
+            console.log("address: ", address);
+            const data = address._id
+            const deleteRes = await axios.delete("http://localhost:8000/api/user/address",  {
+                headers: headers,
+                data: address._id
+            });
+            console.log("deleteRes: ", deleteRes);
+            if (deleteRes.status !== 200 && deleteRes.status !== 204) {
+                console.error("Failed to delete the existing address:", deleteRes.data);
+                showToast('error', 'שגיאה', "Failed to delete the existing address.");
+                return;
+            }
+            const res = await axios.post("http://localhost:8000/api/user/address", newaddress, { headers });
             if (res.status === 201) {
                 setNewAddress(res.data);
                 setShowNewAddressDialog(false); // Close the new address dialog
@@ -183,6 +195,7 @@ const Payment = () => {
     }
 
     const onSubmit = (data) => {
+        setFromDisabled(true)
         createAddress(data)
     };
 
@@ -202,9 +215,7 @@ const Payment = () => {
             };
             const res = await axios.get(`http://localhost:8000/api/user/address/existAddress`, { headers })
             if (res.status === 200) {
-                console.log("getUserAddress res.data.address", res.data.address[0]);
                 setAddress(res.data.address[0])
-                // console.log("getUserAddress address", address);
                 showToast('info', 'מידע', messages.INFO_ADDRESS_USED);
                 setVisible(true);// Show the dialog if an address exists
             }
@@ -441,7 +452,6 @@ const Payment = () => {
     };
 
     const OrderProductsDisplay = ({ products }) => {
-        console.log("products in order display", products);
         return (
             <div
                 style={{
@@ -577,20 +587,17 @@ const Payment = () => {
 
     const handleCreateNewAddress = () => {
         setVisible(false);
-        renderNewAddressDialog()
+        setShowNewAddressDialog(true);
         showToast('info', 'מידע', 'פתיחת טופס לכתובת חדשה.');
     };
 
     useEffect(() => {
-        if (address) {
-            console.log("Updated address:", address); // Log when address is updated
-        }
     }, [address]);
     useEffect(() => {
         getUserAddress()
     }, [])
 
-    
+
     return (
         <div style={{
             position: 'relative',
@@ -602,13 +609,14 @@ const Payment = () => {
             gap: '20px', // Spacing between sections
         }}>
             <Toast ref={toast} />
-            {(visible && address&& Object.keys(address).length > 0)?<ExistAddress
+            {(visible && address && Object.keys(address).length > 0) ? <ExistAddress
                 visible={visible}
                 address={address}
                 onUseAddress={handleUseAddress}
                 onCreateNewAddress={handleCreateNewAddress}
                 onClose={() => setVisible(false)}
-            />:<></>}
+            /> : <></>}
+            {renderNewAddressDialog()}
             <div style={{
                 display: 'flex',
                 justifyContent: 'space-between', // Align Total Sum and Payment Buttons

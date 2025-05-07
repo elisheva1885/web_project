@@ -10,7 +10,7 @@ const multiIndoorUnitsSlice = createSlice({
     reducers:{
         setMultiIndoorUnits:(state,action)=>{
             state.multiIndoorUnits=action.payload
-            console.log(state.multiIndoorUnits);
+            // console.log(state.multiIndoorUnits);
 
         },
         clearMultiIndoorUnits(state) {

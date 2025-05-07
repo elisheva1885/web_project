@@ -36,7 +36,7 @@ function App() {
           const res = await axios.get('http://localhost:8000/api/air-conditioner/overhead')
           if (res.status === 200) {
               dispatch(setOverheads(res.data));
-              console.log(overheads);
+            //   console.log(overheads);
           }
       }
       catch (e) {
@@ -79,7 +79,7 @@ function App() {
           const res = await axios.get('http://localhost:8000/api/air-conditioner/miniCenteral')
           if (res.status === 200) {
               dispatch(setMiniCenterals(res.data));
-              console.log(miniCenterals);
+            //   console.log(miniCenterals);
           }
       }
       catch (e) {
@@ -92,7 +92,7 @@ function App() {
       try{
           const res = await axios.get('http://localhost:8000/api/company')
           if(res.status === 200){
-              console.log("in getCompanies");
+            //   console.log("in getCompanies");
               dispatch(setCompanies(res.data))
           }
       }
