@@ -202,7 +202,9 @@ const Payment = () => {
             };
             const res = await axios.get(`http://localhost:8000/api/user/address/existAddress`, { headers })
             if (res.status === 200) {
-                setAddress(res.data[0])
+                console.log("getUserAddress res.data.address", res.data.address[0]);
+                setAddress(res.data.address[0])
+                // console.log("getUserAddress address", address);
                 showToast('info', 'מידע', messages.INFO_ADDRESS_USED);
                 setVisible(true);// Show the dialog if an address exists
             }
@@ -580,9 +582,15 @@ const Payment = () => {
     };
 
     useEffect(() => {
+        if (address) {
+            console.log("Updated address:", address); // Log when address is updated
+        }
+    }, [address]);
+    useEffect(() => {
         getUserAddress()
     }, [])
 
+    
     return (
         <div style={{
             position: 'relative',
@@ -594,7 +602,7 @@ const Payment = () => {
             gap: '20px', // Spacing between sections
         }}>
             <Toast ref={toast} />
-            {visible?<ExistAddress
+            {(visible && address&& Object.keys(address).length > 0)?<ExistAddress
                 visible={visible}
                 address={address}
                 onUseAddress={handleUseAddress}

@@ -38,7 +38,7 @@ const ExistAddress = ({ visible, address, onUseAddress, onCreateNewAddress, onCl
                     </div>
                 }
                 <div style={{ display: 'flex', gap: '10px', marginTop: '20px', justifyContent: 'flex-end' }}>
-                    <Button
+                {address ?<Button
                         label="לשימוש בכתובת"
                         onClick={onUseAddress}
                         className="p-button-success"
@@ -48,7 +48,7 @@ const ExistAddress = ({ visible, address, onUseAddress, onCreateNewAddress, onCl
                             border: 'none', // Remove border
                             padding: '10px 20px', // Adjust padding
                         }}
-                    />
+                    />:<></>}
                     <Button
                         label="ליצירת כתובת חדשה"
                         onClick={onCreateNewAddress}

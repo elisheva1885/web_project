@@ -66,7 +66,7 @@ const MyOrders = () => {
         try {
             const res = await axios.get(`http://localhost:8000/api/delivery/byid`, { headers })
             if (res.status === 200) {
-                console.log("res.status === 200. UserDeliveries from server:", res.data)
+                // console.log("res.status === 200. UserDeliveries from server:", res.data)
                 dispatch(setUserDeliveries(res.data))
                 console.log("userDeliveries", userDeliveries)
             }
@@ -168,8 +168,6 @@ const MyOrders = () => {
             </Card>
         );
     };
-
-
 
     useEffect(() => {
         if (userDeliveries && userDeliveries.length > 0) {
