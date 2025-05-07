@@ -77,7 +77,7 @@ const MyOrders = () => {
             showToast('error', 'שגיאה', translatedMessage); // Show toast with translated message
             console.error("Error fetching user deliveries:", error);
         }
-       
+
     }
 
 
@@ -145,7 +145,7 @@ const MyOrders = () => {
                                 }}
                             >
                                 <Image
-                                    src={ getFilePath(product.imagepath) || 'air-conditioner.jpg'} // Use a placeholder image if undefined
+                                    src={getFilePath(product.imagepath) || 'air-conditioner.jpg'} // Use a placeholder image if undefined
                                     alt={product.title || 'No Title'}
                                     width="100"
                                     preview
@@ -167,19 +167,15 @@ const MyOrders = () => {
         );
     };
 
-    // useEffect(() => {
-    //     if (userDeliveries && userDeliveries.length > 0) {
-    //         const filteredOrders = filterData(userDeliveries);
-    //         const sortedOrders = sortData(filteredOrders);
-    //         setOrders(sortedOrders);
-    //     }
-    // }, [userDeliveries]); // Dependency on userDeliveries
-
-    // Fetch deliveries when the component is mounted
     useEffect(() => {
         getUserDeliveries();
-    }, []); // Empty dependency array means this runs only once
-
+    }, []);
+    useEffect(() => {
+        const filteredOrders = filterData(userDeliveries);
+        const sortedOrders = sortData(filteredOrders);
+        setOrders(sortedOrders);
+    }, [userDeliveries]);
+    
     return (
         <div className="my-orders">
             <Toast ref={toast} />

@@ -207,11 +207,18 @@ const Payment = () => {
                 showToast('info', 'מידע', messages.INFO_ADDRESS_USED);
                 setVisible(true);// Show the dialog if an address exists
             }
+
         }
         catch (error) {
-            const serverMessage = error.response?.data?.message || 'default';
-            showToast('error', 'שגיאה', messages[serverMessage]);
-            console.error("Error fetching user address:", error);
+            if (error.response?.data?.message === "NO_ADDRESS_FOUND") {
+                setShowNewAddressDialog(true)
+            }
+            else {
+                const serverMessage = error.response?.data?.message || 'default';
+                showToast('error', 'שגיאה', messages[serverMessage]);
+                console.error("Error fetching user address:", error);
+            }
+
         }
     }
 
@@ -548,7 +555,7 @@ const Payment = () => {
                 <Button
                     label="Pay with Google Pay"
                     icon="pi pi-google"
-                    className="p-button-warning"
+                    className="p-button-info"
                     style={{
                         width: '250px',
                         background: 'linear-gradient(135deg, #fbc2eb, #a18cd1)', // Matching theme
@@ -557,6 +564,8 @@ const Payment = () => {
                         height: '60px', // Increase button height
                         fontSize: '1.2rem', // Increase font size
                         borderRadius: '8px', // Rounded corners
+                        zIndex: 10, /* Ensure the button is on top */
+                        pointerEvents: 'auto', /* Ensure the button can be clicked */
                     }}
                     onClick={() => createPurchase("google")}
                 />
@@ -579,7 +588,7 @@ const Payment = () => {
         showToast('info', 'מידע', 'פתיחת טופס לכתובת חדשה.');
     };
     useEffect(() => {
-        if (address) {        }
+        if (address) { }
     }, [address]);
     useEffect(() => {
     }, [address]);
