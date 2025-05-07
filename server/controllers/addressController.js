@@ -136,8 +136,10 @@ const updateAddress = async (req, res) => {
 }
 
 const deleteAddress = async (req, res) => {
+    console.log("deleteAddress called")
     try {
         const { _id } = req.body
+        console.log("deleteAddress _id:", _id)
         if (!_id || typeof _id !== "string" || _id.length !== 24) {
             return res.status(400).json({ message: "INVALID_ADDRESS_ID" });
         }

@@ -10,7 +10,7 @@ const multiOutdoorUnitsSlice = createSlice({
     reducers:{
         setMultiOutdoorUnits:(state,action)=>{
             state.multiOutdoorUnits=action.payload
-            console.log(state.multiOutdoorUnits);
+            // console.log(state.multiOutdoorUnits);
 
         },
         clearMultiOutdoorUnits(state) {

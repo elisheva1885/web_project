@@ -4,10 +4,6 @@ import { Suspense, lazy } from 'react'
 import { Route, Routes, Link, Router, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { MegaMenu } from 'primereact/megamenu';
-import AdminRegister from './AdminRegister';
-import Payment from './Payment';
-import MiniCenteral from './air-conditioners/MiniCenteral';
-import UpdateUserDetails from './UpdateUserDetails';
 
 
 const About = lazy(() => import('./About'));
@@ -35,14 +31,18 @@ const UpdateMultiIndoorUnit = lazy(() => import('./air-conditioners/UpdateMultiI
 const UpdateMultiOutdoorUnit = lazy(() => import('./air-conditioners/UpdateMultiOutdoorUnit'));
 const AddCompany = lazy(() => import('./air-conditioners/AddCompany'));
 const UpdateDeliveryStatus = lazy(() => import('./UpdateDeliveryStatus'));
+const Payment = lazy(() => import('./Payment'));
+const AdminRegister = lazy(() => import('./AdminRegister'));
+const UpdateUserDetails = lazy(() => import('./UpdateUserDetails'));
+const MiniCenteral = lazy(() => import('./air-conditioners/MiniCenteral'));
 
 const Navbar = () => {
 
     const { token } = useSelector((state) => state.token)
 
     const {userDetails} = useSelector((state) => state.userDetails);
-    console.log("userDetails Navbar",userDetails)
-    console.log("token Navbar",token)
+    // console.log("userDetails Navbar",userDetails)
+    // console.log("token Navbar",token)
     const navigate = useNavigate();
 
     const acItems = [

@@ -10,7 +10,7 @@ const miniCenteralsSlice = createSlice({
     reducers:{
         setMiniCenterals:(state,action)=>{
             state.miniCenterals=action.payload
-            console.log(state.miniCenterals);
+            // console.log(state.miniCenterals);
 
         },
         clearMiniCenterals(state) {
