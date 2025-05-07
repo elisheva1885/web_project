@@ -176,6 +176,14 @@ const UpdateDeliveryStatus = () => {
                 <Column
                     field="createdAt"
                     header="תאריך הזמנה"
+                    body={(rowData) => {
+                        const formattedDate = new Date(rowData.createdAt).toLocaleDateString('he-IL', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric',
+                        });
+                        return formattedDate;
+                    }}
                     bodyStyle={{ textAlign: 'right' }}
                     headerStyle={{ textAlign: 'right' }}
                     style={{ width: '150px' }}
