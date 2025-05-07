@@ -31,7 +31,7 @@ const MultiIndoorUnitSchema = new mongoose.Schema({
         heat: { type: Number }
     },
     CFM:{
-        type:Number
+        type:String
     },
     pipe_connection: {
         a:{ type:String},

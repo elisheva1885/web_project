@@ -100,7 +100,7 @@ const AddMultiIndoorUnit = () => {
             </Dialog>
             <div className="flex justify-content-center">
                 <div className="card" style={{ width: '100%', maxWidth: '600px' }}>
-                    <h5 className="text-center">Add Multi Indoor Unit</h5>
+                    <h5 className="text-center">הוספת מאייד מולטי</h5>
                     <form onSubmit={handleSubmit(onSubmit)} className="p-fluid">
                         <div className="field">
                             <span className="p-float-label">
@@ -195,7 +195,7 @@ const AddMultiIndoorUnit = () => {
                         <div className="field">
                             <span className="p-float-label">
                                 <Controller name="CFM" control={control} render={({ field }) => (
-                                    <InputText id="CFM" type="number" {...field} />
+                                    <InputText id="CFM"  {...field} />
                                 )} />
                                 <label htmlFor="CFM">CFM</label>
                             </span>
@@ -253,7 +253,7 @@ const AddMultiIndoorUnit = () => {
                             </div>
                         </div>
 
-                        <Button type="submit" label="Add Indoor Unit" className="mt-2" />
+                        <Button type="submit" label="להוספה" className="mt-2" />
                     </form>
                 </div>
             </div>

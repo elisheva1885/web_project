@@ -107,11 +107,11 @@ const AddCompany = () => {
                     </span>
                     {getFormErrorMessage('imagepath')}
                 </div>
-                <Button type="submit" label="Add Company" className="mt-2" />
+                <Button type="submit" label="להוספה" className="mt-2" />
             </form>
             {showMessage && (
                 <div className="p-message p-message-success">
-                    <span>Company added successfully!</span>
+                    <span>נוסף בהצלחה!</span>
                 </div>
             )}
         </>

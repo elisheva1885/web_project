@@ -66,9 +66,10 @@ const MyOrders = () => {
         try {
             const res = await axios.get(`http://localhost:8000/api/delivery/byid`, { headers })
             if (res.status === 200) {
-                // console.log("res.status === 200. UserDeliveries from server:", res.data)
                 dispatch(setUserDeliveries(res.data))
-                console.log("userDeliveries", userDeliveries)
+                const filteredOrders = filterData(userDeliveries)
+                const sortedOrders = sortData(filteredOrders)
+                setOrders(sortedOrders)
             }
         } catch (error) {
             const serverMessage = error.response?.data?.message; // Get server error message
@@ -76,10 +77,7 @@ const MyOrders = () => {
             showToast('error', 'שגיאה', translatedMessage); // Show toast with translated message
             console.error("Error fetching user deliveries:", error);
         }
-        const filteredOrders = filterData(userDeliveries)
-        const sortedOrders = sortData(filteredOrders)
-        setOrders(sortedOrders)
-        console.log("sortedOrders", orders)
+       
     }
 
 
@@ -134,7 +132,7 @@ const MyOrders = () => {
                         overflow: "auto"
                     }}
                 >
-                    {delivery.purchase.products.map((shoppingBagItem) => {
+                    {delivery.purchase?.products.map((shoppingBagItem) => {
                         const product = shoppingBagItem.product_id || {}; // product_id now dynamically resolves to the correct product type
                         return (
                             <div
@@ -169,13 +167,13 @@ const MyOrders = () => {
         );
     };
 
-    useEffect(() => {
-        if (userDeliveries && userDeliveries.length > 0) {
-            const filteredOrders = filterData(userDeliveries);
-            const sortedOrders = sortData(filteredOrders);
-            setOrders(sortedOrders);
-        }
-    }, [userDeliveries]); // Dependency on userDeliveries
+    // useEffect(() => {
+    //     if (userDeliveries && userDeliveries.length > 0) {
+    //         const filteredOrders = filterData(userDeliveries);
+    //         const sortedOrders = sortData(filteredOrders);
+    //         setOrders(sortedOrders);
+    //     }
+    // }, [userDeliveries]); // Dependency on userDeliveries
 
     // Fetch deliveries when the component is mounted
     useEffect(() => {
@@ -196,7 +194,8 @@ const MyOrders = () => {
             }}>
                 ההזמנות שלי
             </h2>
-            {orders.map((delivery) => renderDelivery(delivery))}
+
+            {orders?.map((delivery) => renderDelivery(delivery))}
         </div>
     )
 }

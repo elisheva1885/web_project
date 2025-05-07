@@ -391,7 +391,7 @@ const AddOverhead = () => {
                             )} />
                         </div>
 
-                        <Button type="submit" label="Add Air Conditioner" className="mt-2" />
+                        <Button type="submit" label="להוספה" className="mt-2" />
                     </form>
                 </div>
             </div>
