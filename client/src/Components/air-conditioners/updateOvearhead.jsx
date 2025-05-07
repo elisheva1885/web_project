@@ -125,7 +125,7 @@ const UpdateOverheadAC = () => {
 
             <div className="flex justify-content-center">
                 <div className="card" style={{ width: '100%', maxWidth: '600px' }}>
-                    <h5 className="text-center">Update Overhead AC</h5>
+                    <h5 className="text-center">עדכן מזגן עילי</h5>
                     <form onSubmit={handleSubmit(onSubmit)} className="p-fluid">
                         <div className="field">
                             <span className="p-float-label">
@@ -386,7 +386,7 @@ const UpdateOverheadAC = () => {
                             )} />
                         </div>
 
-                        <Button type="submit" label="Update Overhead AC" className="mt-2" />
+                        <Button type="submit" label="עדכן" className="mt-2" />
                     </form>
                 </div>
             </div>

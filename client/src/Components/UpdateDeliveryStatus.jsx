@@ -19,7 +19,6 @@ const UpdateDeliveryStatus = () => {
     const { getFilePath } = useGetFilePath()
 
     const messages = {
-        // Error Messages
         USER_REQUIRED: "משתמש אינו מחובר למערכת.",
         INVALID_ADDRESS: "כתובת לא תקינה.",
         INVALID_PURCHASE_ID: "מזהה רכישה לא תקין.",
@@ -30,23 +29,18 @@ const UpdateDeliveryStatus = () => {
         NO_DELIVERIES_FOR_USER: "לא נמצאו משלוחים למשתמש זה.",
         DELIVERY_CREATION_FAILED: "יצירת המשלוח נכשלה.",
         INTERNAL_ERROR: "שגיאה פנימית בשרת. נסה שוב מאוחר יותר.",
-
-        // Success Messages
         DELIVERY_CREATED_SUCCESSFULLY: "משלוח נוצר בהצלחה.",
         DELIVERY_UPDATED_SUCCESSFULLY: "סטטוס המשלוח עודכן בהצלחה.",
         DELIVERY_DELETED_SUCCESSFULLY: "משלוח נמחק בהצלחה.",
         UNAUTHORIZED: "השם המשתמש או הסיסמה אינם נכונים. אנא בדוק ונסה שוב.",
         Access_denied: "אינך מורשה לבצע פעולה זו.",
         Forbidden: "אינך מורשה לבצע פעולה זו.",
-
-        // Default
         default: "אירעה שגיאה לא צפויה. נסה שוב."
     };
 
     const showToast = (toast, severity, summary, detail) => {
         toast.current.show({ severity, summary, detail, life: 3000 });
     };
-
     const fetchDeliveries = async () => {
         try {
             const headers = { Authorization: `Bearer ${token}` };
@@ -61,7 +55,6 @@ const UpdateDeliveryStatus = () => {
         }
     };
 
-    // Update a single delivery to the next logical status
     const updateSingleDelivery = async (id, newStatus) => {
         if (!newStatus) {
             showToast(toast, 'warn', 'אזהרה', 'לא נבחר סטטוס עדכון תקין.');
@@ -90,13 +83,11 @@ const UpdateDeliveryStatus = () => {
         }
     };
 
-    // Show products for a specific delivery
     const showProducts = (rowData) => {
         setSelectedDeliveryProducts(rowData.purchase.products || []);
         setProductsDialogVisible(true);
     };
 
-    // Define the status flow
     const statusFlow = ['waiting to be delivered', 'on the way', 'arrived', 'recieved'];
     const statusFlowHebrew = ['ממתין למשלוח', 'בדרך', 'הגיע', 'התקבל'];
 
@@ -147,7 +138,6 @@ const UpdateDeliveryStatus = () => {
         return <span>{statusTranslations[rowData.status] || "סטטוס לא ידוע"}</span>;
     };
 
-    // Fetch deliveries on component mount
     useEffect(() => {
         fetchDeliveries();
     }, []);

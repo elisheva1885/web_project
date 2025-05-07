@@ -64,7 +64,7 @@ const Payment = () => {
         ADDRESS_CREATED_SUCCESSFULLY: "הכתובת נוספה בהצלחה.",
         PURCHASE_COMPLETED: "הרכישה הושלמה בהצלחה.",
         DELIVERY_CREATED_SUCCESSFULLY: "משלוח נוצר בהצלחה.",
-
+        PRODUCT_OUT_OF_STOCK:"המוצר אזל מהמלאי.",
         // Warnings
         OUT_OF_STOCK: "המוצר אזל מהמלאי.",
         NOT_ENOUGH_STOCK: "אין מספיק מלאי למוצר.",
@@ -175,7 +175,7 @@ const Payment = () => {
                     showToast('success', 'הצלחה', messages.PURCHASE_COMPLETED);
                 }
             } catch (error) {
-                const serverMessage = error.response?.data?.message || 'default';
+                const serverMessage = error.response?.data?.message || 'default';                
                 showToast('error', 'שגיאה', messages[serverMessage]);
                 console.error("Error creating purchase:", error);
             }
@@ -525,18 +525,6 @@ const Payment = () => {
                 gap: '10px',           // Add spacing between buttons
             }}>
                 <DefineAddressButton />
-                {/* {address ? existAddress() : <></>} */}
-                {/* <GooglePayButton
-                    environment="TEST"
-                    buttonColor={buttonColor}
-                    buttonType={buttonType}
-                    buttonSizeMode={buttonSizeMode}
-                    paymentRequest={paymentRequest}
-                    onLoadPaymentData={paymentRequest => {
-                        console.log("load payment data", paymentRequest);
-                    }}
-                    style={{ width: buttonWidth, height: buttonHeight }}
-                /> */}
                 <Button
                     label="Pay with PayPal"
                     icon="pi pi-paypal"

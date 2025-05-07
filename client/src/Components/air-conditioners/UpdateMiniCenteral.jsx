@@ -359,7 +359,7 @@ const UpdateMiniCenteral = () => {
 
                         {/* Repeat similar structure for remaining fields */}
 
-                        <Button type="submit" label="Update MiniCenteral" className="mt-2" />
+                        <Button type="submit" label="עדכן" className="mt-2" />
                     </form>
                 </div>
             </div>
