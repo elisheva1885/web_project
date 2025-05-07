@@ -266,7 +266,7 @@ const Basket = () => {
                                     }
                                     else {
                                         const updatedBasket = basket.map((item) =>
-                                            item.product._id === productDetails._id
+                                            item?.product._id === productDetails._id
                                                 ? { ...item, amount: newAmount }
                                                 : item
                                         );

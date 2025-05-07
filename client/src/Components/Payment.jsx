@@ -578,7 +578,11 @@ const Payment = () => {
         renderNewAddressDialog()
         showToast('info', 'מידע', 'פתיחת טופס לכתובת חדשה.');
     };
-
+    useEffect(() => {
+        if (address) {
+            console.log("Updated address:", address); // Log when address is updated
+        }
+    }, [address]);
     useEffect(() => {
         getUserAddress()
     }, [])
