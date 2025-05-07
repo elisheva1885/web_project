@@ -91,7 +91,6 @@ const sendDeliveryCreatedEmail = async (deliveryId) => {
 
     catch (error) {
         console.error("אירעה שגיאה בשליחת האימייל:", error);
-
     }
 }
 

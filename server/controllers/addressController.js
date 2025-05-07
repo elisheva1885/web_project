@@ -63,7 +63,6 @@ const createAddress = async (req, res) => {
 const readAddressesByUserId = async (req, res) => {
     try {
         const _id = req.user?._id
-        console.log("readAddressesByUserId",_id)
         if (!_id || typeof _id !== "string" || _id.length !== 24) {
             return res.status(400).json({ message: "INVALID_USER_ID" });
         }

@@ -40,7 +40,6 @@ const createShoppingBag = async (req, res) => {
         return res.status(400).json({ message: "INTERNAL_ERROR" });
     }
     catch (err) {
-        console.error("createShoppingBag",err); 
         return res.status(500).json({ message: "INTERNAL_ERROR" })
     }
 }

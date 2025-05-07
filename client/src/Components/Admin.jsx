@@ -20,9 +20,9 @@ const Admin = () => {
     return (
         <>
             <div style={{ paddingTop: '60px' }}>
-                <Button type="button" label="הוספת מזכירה" className="mt-2" onClick={()=>registerOfficial} />
+                <Button type="button" label="הוספת מזכירה" className="mt-2" onClick={registerOfficial} />
             </div>
-            <Button type="button" label="לצפייה בכל ההזמנות" className="mt-2" onClick={()=>toOrders} />
+            <Button type="button" label="לצפייה בכל ההזמנות" className="mt-2" onClick={toOrders} />
         </>
     )
 }

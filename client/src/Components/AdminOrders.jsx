@@ -53,9 +53,10 @@ const AdminOrders = () => {
         }
         try {
             const res = await axios.get(`http://localhost:8000/api/delivery/`, { headers })
+            console.log(res);
             if (res.status === 200) {
                 console.log("res.status === 200. Deliveries from server:", res.data)
-                setDeliveries(res.data)
+                // setDeliveries(res.data)
                 const sortedOrders = sortData(res.data)
                 setOrders(sortedOrders)
                 renderDelivery(sortedOrders)
@@ -75,7 +76,7 @@ const AdminOrders = () => {
         toast.current.show({ severity, summary, detail, life: 3000 });
     };
     const renderDelivery = (delivery) => {
-        // console.log("renderDelivery", delivery);
+        console.log("renderDelivery", delivery);
         const orderDate = new Date(delivery.createdAt).toLocaleDateString();
         const statusColors = {
             "waiting to be delivered": "warning",
@@ -126,7 +127,7 @@ const AdminOrders = () => {
                         overflow: "auto"
                     }}
                 >
-                    {delivery.purchase.products.map((shoppingBagItem) => {
+                    {delivery.purchase?.products.map((shoppingBagItem) => {
                         const product = shoppingBagItem.product_id || {}; // product_id now dynamically resolves to the correct product type
                         return (
                             <div
