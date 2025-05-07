@@ -75,12 +75,6 @@ const UpdateUserDetails = () => {
     return (
         <div style={{ paddingTop: "60px" }}>
             <Toast ref={toast} />
-            <Dialog visible={showMessage} onHide={() => setShowMessage(false)} position="top" footer={<Button label="Close" onClick={() => setShowMessage(false)} />} showHeader={false} breakpoints={{ '960px': '80vw' }} style={{ width: '40vw' }}>
-                <div className="flex justify-content-center flex-column pt-6 px-3">
-                    <i className="pi pi-check-circle" style={{ fontSize: '5rem', color: 'var(--green-500)' }}></i>
-                    <h5>  {userDetails.name} עודכן בהצלחה! </h5>
-                </div>
-            </Dialog>
             <div className="form-demo">
                 <div className="flex justify-content-center">
                     <div className="card">

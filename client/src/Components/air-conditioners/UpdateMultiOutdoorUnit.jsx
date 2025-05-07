@@ -245,7 +245,7 @@ const UpdateMultiOutdoorUnit = () => {
                             )} />
                         </div>
 
-                        <Button type="submit" label="Update" className="mt-2" />
+                        <Button type="submit" label="עדכן" className="mt-2" />
                     </form>
                 </div>
             </div>

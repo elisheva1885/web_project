@@ -79,11 +79,6 @@ const Navbar = () => {
         }
         ,
         {
-            label: 'צור קשר',
-            icon: 'pi pi-phone',
-            url: '/overheads'
-        },
-        {
             label: 'סניפים',
             icon: 'pi pi-shop',
             url: '/branch'

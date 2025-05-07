@@ -8,12 +8,15 @@ import { Tag } from "primereact/tag"
 import { Card } from "primereact/card"
 import { Toast } from "primereact/toast";
 import { useRef } from "react";
+import useGetFilePath from "../hooks/useGetFilePath"
 
 const AdminOrders = () => {
     const { token } = useSelector((state) => state.token)
     const [deliveries, setDeliveries] = useState([])
     const [orders, setOrders] = useState([]);
     const toast = useRef(null); // Add this line to create a ref for the Toast component
+    const { getFilePath } = useGetFilePath()
+
     const errorMessages = {
         USER_REQUIRED: "משתמש נדרש.",
         INVALID_ADDRESS: "כתובת לא חוקית.",
@@ -142,7 +145,7 @@ const AdminOrders = () => {
                                 {console.log(product.imagepath)
                                 }
                                 <Image
-                                    src={"/" + product.imagepath || 'air-conditioner.jpg'} // Use a placeholder image if undefined
+                                    src={getFilePath(product.imagepath)  || 'air-conditioner.jpg'} 
                                     alt={product.title || 'No Title'}
                                     width="100"
                                     preview

@@ -46,7 +46,6 @@ const UpdateMultiIndoorUnit = () => {
             _id: data._id,
             title: data.title,
             describe: data.describe,
-            imagepath: data.imagepath,
             stock: data.stock,
             BTU_output: {
                 cool: data.BTU_output?.cool,
@@ -112,16 +111,6 @@ const UpdateMultiIndoorUnit = () => {
                                     <InputText id="describe" {...field} />
                                 )} />
                                 <label htmlFor="describe">Description</label>
-                            </span>
-                        </div>
-
-                        {/* Image Path */}
-                        <div className="field">
-                            <span className="p-float-label">
-                                <Controller name="imagepath" control={control} render={({ field }) => (
-                                    <InputText id="imagepath" {...field} />
-                                )} />
-                                <label htmlFor="imagepath">Image Path</label>
                             </span>
                         </div>
 
@@ -266,7 +255,7 @@ const UpdateMultiIndoorUnit = () => {
                             )} />
                         </div>
 
-                        <Button type="submit" label="Update" className="mt-2" />
+                        <Button type="submit" label="עדכן" className="mt-2" />
                     </form>
                 </div>
             </div>
