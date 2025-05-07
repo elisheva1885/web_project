@@ -38,7 +38,6 @@ const AddOverhead = () => {
 
     const onSubmit = async (data) => {
         const formData = new FormData(); // Create an empty FormData object      
-        // Append the file to the FormData object
         if (data.imagepath instanceof File) {
             formData.append('imagepath', data.imagepath);
         } else {
