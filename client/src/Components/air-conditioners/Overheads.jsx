@@ -67,7 +67,6 @@ const Overheads = () => {
         UNAUTHORIZED: "השם המשתמש או הסיסמה אינם נכונים. אנא בדוק ונסה שוב.",
         Access_denied: "אינך מורשה לבצע פעולה זו.",
         Forbidden: "אינך מורשה לבצע פעולה זו."
-
     };
 
     const goToAddOverhead = (type) => {

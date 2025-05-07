@@ -13,8 +13,7 @@ const createOverhead = async (req, res) => {
         return res.status(400).json({ message: "INVALID_OTHER_DATA_FORMAT" });
     }
     const { company, title, describe, stock, price, BTU_output, energy_rating, working_current, CFM, recommended_model_C, pipe_connection, in_size, out_size, air_flow, quiet, wifi, speeds, air4d, night_mode, timer, sabbath_command, onof_auto } = otherData
-
-    if (!company || !title || !describe || !price || price <= 0) {
+    if (!company || !title || !describe || !price || price <= 0 || !stock || stock < 0) {
         return res.status(400).json({ message: "REQUIRED_FIELDS_MISSING" });
     }
     const imagepath = uploadedFile?.filename;

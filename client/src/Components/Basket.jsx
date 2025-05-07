@@ -174,9 +174,7 @@ const Basket = () => {
         };
         navigate('/basket/payment', { state: navigationData })
     }
-    useEffect(() => {
-        getShoppingBag()
-    }, [])
+  
     const getSeverity = (stock) => {
         if (stock >= 50) return 'success';
         else if (stock > 0) return 'warning';
@@ -315,25 +313,10 @@ const Basket = () => {
         )
     };
 
-    // const header = () => {
-    //     return (
-    //         <div className="flex justify-content-end">
-    //             <DataViewLayoutOptions layout={layout} onChange={(e) => setLayout(e.value)} />
-    //         </div>
-    //     );
-    // };
     useEffect(() => {
-        // if (token) {
-        //     // קריאה ל-API רק אם יש טוקן
-        //     getShoppingBag();
+        getShoppingBag()
         setSum(0)
-        // }
-        // else {
-        //     alert("to save thing in your basket you need to register")
-        //     navigate("/register")
-        // }
-
-    }, []);
+    }, [])
 
     return (
         <div style={{ paddingTop: '60px' }}>

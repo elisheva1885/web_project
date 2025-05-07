@@ -44,25 +44,6 @@ function App() {
       }
   }
 
-
-  const getShoppingBag = async () => {
-      try {
-          const headers = {
-              'Authorization': `Bearer ${token}`
-          }
-          const res = await axios.get('http://localhost:8000/api/user/shoppingBag', { headers })
-          if (res.status === 200) {
-              console.log("res.data ",res.data);
-              dispatch(setBasket(res.data))
-              // setShoppingBags(res.data)
-              // console.log("res.data", res.data);
-          }
-      }
-      catch (e) {
-          console.error(e)
-      }
-  }
-
   const getMultiIndoorUnit = async () => {
       try {
           const res = await axios.get('http://localhost:8000/api/air-conditioner/multiIndoorUnit')
@@ -125,7 +106,6 @@ function App() {
       getCompanies()
       getMiniCenterals()
       getMultiIndoorUnit()
-      getShoppingBag()
       getMultiOutdoorUnit()
   }, [])
 

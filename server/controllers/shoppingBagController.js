@@ -28,13 +28,11 @@ const createShoppingBag = async (req, res) => {
             user_id: user_id,
             product_id: product_id,
         }).exec()
-
         if (duplicate) {
             duplicate.amount++
             const updatedShoppingBag = await duplicate.save()
             return res.status(200).json({ message: "UPDATE_AMOUNT" })
         }
-
         const shoppingBag = await ShoppingBag.create({ user_id, product_id, type, amount })
         if (shoppingBag) {
             return res.status(201).json(shoppingBag)
@@ -42,6 +40,7 @@ const createShoppingBag = async (req, res) => {
         return res.status(400).json({ message: "INTERNAL_ERROR" });
     }
     catch (err) {
+        console.error("createShoppingBag",err); 
         return res.status(500).json({ message: "INTERNAL_ERROR" })
     }
 }
@@ -65,6 +64,8 @@ const readShoppingBagByUserId = async (req, res) => {
 
                 const Model = mongoose.model(shoppingBag.type); // Dynamically get the model based on type
                 const airConditioner = await Model.findOne({ _id: shoppingBag.product_id }).populate("company").lean()
+                if(airConditioner){
+                
                 if (airConditioner.stock < 0) {
                     throw new Error(`OUT_OF_STOCK: ${shoppingBag.product_id}`);
                 }
@@ -75,8 +76,9 @@ const readShoppingBagByUserId = async (req, res) => {
                     shoppingBagId: shoppingBag._id,
                 };
             }
+        }
             catch (err) {
-                console.error(err.message);
+                console.error("readShoppingBagByUserId",err.message);
                 return null; // Catch individual errors but allow other promises to resolve
             }
         }
@@ -118,23 +120,11 @@ const updateShoppingBagAmount = async (req, res) => {
         const updatedShoppingBag = await shoppingBag.save();
         return res.status(200).json({ updatedShoppingBag });
     } catch (err) {
-        console.error(err);
+        console.error("updateShoppingBagAmount",err);
         return res.status(500).json({ message: "INTERNAL_ERROR" });
     }
 
 }
-
-// const checkProductStock = async (product , amount)=>{
-//     const res =  await getProductByIdAndType(product._id, product.type)
-//     // console.log("the res in check", res);
-//     // return res.then((result) => {
-//     //     console.log(result); // Logs the resolved value (e.g., {message: "Ok"} or {message: "not enough..."})
-//     // })
-//     // .catch((error) => {
-//     //     console.error("Error:", error);
-//     // });
-
-// }
 
 const checkProductStockByIdAndType = async (_id, type, amount) => {
     try {
@@ -178,7 +168,7 @@ const deleteShoppingBag = async (req, res) => {
         return res.status(200).json({ message: "PRODUCT_DELETED_FROM_SHOPPING_BAG" });
     }
     catch (err) {
-        console.error(err);
+        console.error("deleteShoppingBag",err);
         return res.status(500).json({ message: "INTERNAL_ERROR" });
     }
 }
