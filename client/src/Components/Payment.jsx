@@ -20,6 +20,7 @@ import { Column } from 'primereact/column';
 import { Toast } from 'primereact/toast';
 import { useRef } from 'react';
 import ExistAddress from './ExistAddress';
+import useGetFilePath from '../hooks/useGetFilePath';
 
 const Payment = () => {
     const { control, handleSubmit, formState: { errors } } = useForm();
@@ -46,6 +47,7 @@ const Payment = () => {
     const location = useLocation();
     const { products } = location.state || {};
     const toast = useRef(null);
+    const { getFilePath } = useGetFilePath()
 
     const messages = {
         // Error Messages
@@ -71,6 +73,9 @@ const Payment = () => {
         // Informational
         INFO_FETCHING_ADDRESS: "כתובת נטענת מהשרת.",
         INFO_ADDRESS_USED: "כתובת קיימת נבחרה לשימוש.",
+        UNAUTHORIZED: "השם המשתמש או הסיסמה אינם נכונים. אנא בדוק ונסה שוב.",
+        Access_denied: "אינך מורשה לבצע פעולה זו.",
+        Forbidden: "אינך מורשה לבצע פעולה זו.",
 
         // Default
         default: "אירעה שגיאה לא צפויה. נסה שוב."
@@ -477,7 +482,7 @@ const Payment = () => {
                         body={(rowData) => (
                             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                                 <img
-                                    src={'/' + rowData.product.imagepath}
+                                    src={getFilePath(rowData.product.imagepath)}
                                     alt={rowData.product.title}
                                     style={{
                                         width: '80px',

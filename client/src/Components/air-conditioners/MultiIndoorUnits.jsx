@@ -63,6 +63,9 @@ const MultiIndoorUnits = () => {
   INVALID_MULTI_INDOOR_UNIT_ID: "מזהה היחידה הפנימית אינו תקין.",
   INVALID_PRICE: "המחיר חייב להיות מספר חיובי.",
   MULTI_INDOOR_UNIT_NOT_FOUND: "היחידה הפנימית לא נמצאה.",
+  UNAUTHORIZED: "השם המשתמש או הסיסמה אינם נכונים. אנא בדוק ונסה שוב.",
+        Access_denied: "אינך מורשה לבצע פעולה זו.",
+        Forbidden: "אינך מורשה לבצע פעולה זו.",
  };
 
  const goToAddMultiIndoorUnit = (type) => {
@@ -251,7 +254,7 @@ const gridItem = (product) => {
 
                 {/* תמונת החברה - גדולה ובולטת */}
                 <img
-                    src={`/${product?.company?.imagePath}`}
+                    src={getFilePath(product?.company?.imagePath)}
                     alt="Company"
                     className="w-full h-10rem object-contain border-round"
                 />
@@ -272,8 +275,7 @@ const gridItem = (product) => {
                     <Tag value={getSeverityText(product)} severity={getSeverity(product.stock)} />
                     <span className="text-lg font-medium text-primary">₪{product.price}</span>
                     {userDetails?.role === 'official' || userDetails?.role === 'admin' ? <Button onClick={() => UpdateMultiIndoorUnit(product)}><i className="pi pi-pencil" style={{ fontSize: '1rem' }}></i></Button> : <></>}
-                    {userDetails?.role === 'official' || userDetails?.role === 'admin' ? (<Button onClick={() => openPriceUpdateDialog(product)}><i className="pi pi-pencil" style={{ fontSize: '1rem' }}> עדכון מחיר </i> </Button>) : <></>}
-                    {/* {userDetails?.role === 'official' || userDetails?.role === 'admin' ? <Button onClick={() => openStockUpdateDialog(product)}><i className="pi pi-pencil" style={{ fontSize: '1rem' }}> עדכון מלאי </i></Button> : <></>} */}
+                    {userDetails?.role === 'admin' ? (<Button onClick={() => openPriceUpdateDialog(product)}><i className="pi pi-pencil" style={{ fontSize: '1rem' }}> עדכון מחיר </i> </Button>) : <></>}
 
                     {userDetails?.role === 'admin' && (
                         <Button icon="pi pi-trash" className="p-button-rounded p-button-danger p-button-sm" onClick={() => deleteMultiIndoorUnit(product)} tooltip="מחק" tooltipOptions={{ position: 'bottom' }} />

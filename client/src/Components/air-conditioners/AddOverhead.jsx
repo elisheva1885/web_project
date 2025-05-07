@@ -34,6 +34,9 @@ const AddOverhead = () => {
         NO_OVERHEADS_FOUND: "לא נמצאו מזגנים",
         INVALID_TITLE: "כותרת לא תקינה",
         INVALID_OTHER_DATA_FORMAT: "פורמט מידע לא תקין",
+        UNAUTHORIZED: "השם המשתמש או הסיסמה אינם נכונים. אנא בדוק ונסה שוב.",
+        Access_denied: "אינך מורשה לבצע פעולה זו.",
+        Forbidden: "אינך מורשה לבצע פעולה זו.",
     }
 
     const onSubmit = async (data) => {

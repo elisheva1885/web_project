@@ -4,10 +4,12 @@ import { Tag } from "primereact/tag";
 import { Divider } from "primereact/divider";
 import { Image } from "primereact/image";
 import { useSelector } from 'react-redux';
+import useGetFilePath from '../hooks/useGetFilePath';
 
 const OrderHistory = () => {
     const { userDeliveries } = useSelector((state) => state.userDeliveries);
     const [historyOrders, setHistoryOrders] = useState([]);
+    const { getFilePath } = useGetFilePath()
 
     // Filters and sorts the order history based on "recieved" status
     const filterAndSortHistory = (data) => {
@@ -78,7 +80,7 @@ const OrderHistory = () => {
                                 }}
                             >
                                 <Image
-                                    src={product.imagepath || 'air-conditioner.jpg'} // Use a placeholder image if undefined
+                                    src={getFilePath(product.imagepath) || 'air-conditioner.jpg'} // Use a placeholder image if undefined
                                     alt={product.title || 'No Title'}
                                     width="100"
                                     preview

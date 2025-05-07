@@ -29,7 +29,8 @@ const AddBranch = () => {
         INTERNAL_ERROR: "שגיאה פנימית בשרת. נסי שוב מאוחר יותר.",
         UNAUTHORIZED: "אינך רשום במערכת.",
         Access_denied: "אינך מורשה לבצע פעולה זו.",
-        Forbidden: "אינך מורשה לבצע פעולה זו."
+        Forbidden: "אינך מורשה לבצע פעולה זו.",
+
     };
     const onSubmit = async (data) => {
         try {

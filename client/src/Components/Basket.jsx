@@ -12,6 +12,7 @@ import { setBasket } from '../store/basketSlice';
 import { Checkbox } from 'primereact/checkbox';
 import { InputNumber } from 'primereact/inputnumber';
 import { Toast } from 'primereact/toast';
+import useGetFilePath from '../hooks/useGetFilePath';
 
 const Basket = () => {
     const { basket } = useSelector((state) => state.basket);
@@ -24,7 +25,7 @@ const Basket = () => {
     const toast = useRef(null);
     const [amount, setAmount] = useState(1);
     const [quantities, setQuantities] = useState({});
-
+    const { getFilePath } = useGetFilePath()
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const errorMessages = {
@@ -229,7 +230,7 @@ const Basket = () => {
 
                     <img
                         className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round"
-                        src={`${productDetails.imagepath}`}
+                        src={getFilePath(productDetails.imagepath)}
                         alt={productDetails.title}
                     />
                     <div className="flex flex-column sm:flex-row justify-content-between align-items-center xl:align-items-start flex-1 gap-4">

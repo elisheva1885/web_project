@@ -21,7 +21,6 @@ const AddCompany = () => {
     const dispatch = useDispatch()
     const toast = useRef(null);
     const messages = {
-        // Error Messages
         INVALID_NAME: "שם החברה אינו תקין. השם חייב להכיל לפחות 3 תווים.",
         INVALID_IMAGE_PATH: "תמונת החברה אינה תקינה.",
         NAME_ALREADY_EXISTS: "שם החברה כבר קיים במערכת.",
@@ -29,11 +28,10 @@ const AddCompany = () => {
         INVALID_COMPANY_ID: "מזהה החברה אינו תקין.",
         COMPANY_NOT_FOUND: "החברה לא נמצאה.",
         INTERNAL_ERROR: "שגיאה פנימית בשרת. נסה שוב מאוחר יותר.",
-
-        // Success Messages
+        UNAUTHORIZED: "השם המשתמש או הסיסמה אינם נכונים. אנא בדוק ונסה שוב.",
+        Access_denied: "אינך מורשה לבצע פעולה זו.",
+        Forbidden: "אינך מורשה לבצע פעולה זו.",
         COMPANY_CREATED_SUCCESSFULLY: "החברה נוספה בהצלחה.",
-
-        // Default
         default: "אירעה שגיאה לא צפויה. נסה שוב."
     };
     const showToast = (severity, summary, detail) => {

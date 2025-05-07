@@ -26,6 +26,10 @@ const UpdateMultiIndoorUnit = () => {
         INVALID_UNIT_ID: "מזהה היחידה אינו תקין. ודא שהמזהה הוא מחרוזת באורך 24 תווים.",
         UNIT_NOT_FOUND: "לא נמצאה יחידה מתאימה במערכת.",
         INTERNAL_ERROR: "שגיאת שרת פנימית. נסה שוב מאוחר יותר.",
+        UNAUTHORIZED: "השם המשתמש או הסיסמה אינם נכונים. אנא בדוק ונסה שוב.",
+        Access_denied: "אינך מורשה לבצע פעולה זו.",
+        Forbidden: "אינך מורשה לבצע פעולה זו."
+
     };
 
     const showToast = (severity, summary, detail) => {

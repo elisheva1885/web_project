@@ -39,7 +39,9 @@ const AddMultiOutdoorUnits = () => {
         INSUFFICIENT_STOCK: "אין מספיק מלאי.",
         INVALID_PRICE: "מחיר אינו תקין.",
         INTERNAL_ERROR: "שגיאה פנימית בשרת. נסה שוב מאוחר יותר.",
-
+        UNAUTHORIZED: "השם המשתמש או הסיסמה אינם נכונים. אנא בדוק ונסה שוב.",
+        Access_denied: "אינך מורשה לבצע פעולה זו.",
+        Forbidden: "אינך מורשה לבצע פעולה זו.",
         // Success Messages
         MULTIOUTDOORUNIT_CREATED_SUCCESSFULLY: "היחידה החיצונית נוספה בהצלחה.",
         MULTIOUTDOORUNIT_DELETED_SUCCESSFULLY: "היחידה החיצונית נמחקה בהצלחה.",
