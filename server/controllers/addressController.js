@@ -62,16 +62,17 @@ const createAddress = async (req, res) => {
 
 const readAddressesByUserId = async (req, res) => {
     try {
-        const user_id = req.user?._id
+        const _id = req.user?._id
+        console.log("readAddressesByUserId",_id)
         if (!_id || typeof _id !== "string" || _id.length !== 24) {
             return res.status(400).json({ message: "INVALID_USER_ID" });
         }
-        const user = await User.findById(user_id);
+        const user = await User.findById(_id);
         if (!user) {
             return res.status(404).json({ message: "USER_NOT_FOUND" });
         }
 
-        const address = await Address.find({ user_id }).lean()
+        const address = await Address.find({user_id: _id }).lean()
 
         if (!address || address.length === 0) {
             return res.status(404).json({ message: "NO_ADDRESS_FOUND" });
@@ -79,7 +80,7 @@ const readAddressesByUserId = async (req, res) => {
         return res.status(200).json({ address });
     }
     catch (error) {
-        console.error(error);
+        console.error("Error reading addresses by user ID:",error);
         return res.status(500).json({ message: "INTERNAL_SERVER_ERROR" });
     }
 }
