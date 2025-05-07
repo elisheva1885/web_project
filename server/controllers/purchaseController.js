@@ -32,7 +32,6 @@ const createPurchase = async (req, res) => {
     }
 }
 
-
 const checkProductsStock = async (products) => {
     try {
         const results = await Promise.all(
@@ -70,6 +69,9 @@ const changeProductStockByIdAndType = async (_id, type, amount) => {
         if (!airConditioner) {
             return { status: 404, message: `PRODUCT_NOT_FOUND` };
         }
+        if (!airConditioner.stock) {
+            return { status: 404, message: `PRODUCT_STOCK_NOT_FOUND` };
+        }
         if (airConditioner.stock < amount) {
             return { status: 400, message: `OUT_OF_STOCK` };
         }
@@ -101,7 +103,7 @@ const readPurchasesByUserId = async (req, res) => {
     }
 
     try {
-        const purchases = await Purchase.findById(user_id).lean()
+        const purchases = await Purchase.find({user_id}).lean()
         if (!purchases?.length) {
             return res.status(404).json({ message: "NO_PURCHASES_FOR_USER" });
         }

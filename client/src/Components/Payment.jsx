@@ -19,6 +19,7 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Toast } from 'primereact/toast';
 import { useRef } from 'react';
+import ExistAddress from './ExistAddress';
 import useGetFilePath from '../hooks/useGetFilePath';
 
 const Payment = () => {
@@ -151,8 +152,8 @@ const Payment = () => {
 
         } catch (error) {
             const serverMessage = error.response?.data?.message || 'default';
-        showToast('error', 'שגיאה', messages[serverMessage]);
-        console.error("Error creating delivery:", error);
+            showToast('error', 'שגיאה', messages[serverMessage]);
+            console.error("Error creating delivery:", error);
         }
     }
 
@@ -194,68 +195,6 @@ const Payment = () => {
         setFromDisabled(true)
     }
 
-    const existAddress = () => {
-        return (
-            <div>
-                <Dialog
-                    header="כתובת משלוח"
-                    visible={visible}
-                    style={{
-                        width: '35vw', // Make the dialog narrower
-                        textAlign: 'right', // Align content to the right
-                        borderRadius: '12px', // Add rounded corners
-                        direction: 'rtl', // Right-to-left direction
-                        boxShadow: '0 8px 16px rgba(0, 0, 0, 0.2)', // Add a drop shadow
-                        background: 'linear-gradient(135deg, #f6d365, #fda085)', // Add a colorful gradient background
-                    }}
-                    onHide={() => setVisible(false)}
-                    modal
-                >
-                    <div style={{ color: '#333', lineHeight: '1.6' }}>
-                        <h3 style={{ marginBottom: '8px' }}>כתובת שמורה:</h3>
-                        <h5 style={{ marginBottom: '8px' }}>עיר: {address.city}</h5>
-                        <h5 style={{ marginBottom: '8px' }}>
-                            רחוב: {address.street} {address.building_num}
-                        </h5>
-                        <h5 style={{ marginBottom: '8px' }}>
-                            דירה: {address.apartment_num}, קומה: {address.floor}
-                        </h5>
-                        <h5 style={{ marginBottom: '8px' }}>מיקוד: {address.zip_code}</h5>
-                    </div>
-                    <div style={{ display: 'flex', gap: '10px', marginTop: '20px', justifyContent: 'flex-end' }}>
-                        <Button
-                            label="לשימוש בכתובת"
-                            onClick={() => {
-                                usingAddress();
-                                setVisible(false);
-                            }}
-                            className="p-button-success"
-                            style={{
-                                backgroundColor: '#4caf50', // Green button background
-                                color: '#fff', // White text
-                                border: 'none', // Remove border
-                                padding: '10px 20px', // Adjust padding
-                            }}
-                        />
-                        <Button
-                            label="ליצירת כתובת חדשה"
-                            onClick={() => {
-                                setShowNewAddressDialog(true); // Show new address dialog
-                                setVisible(false); // Hide existing address dialog
-                            }} className="p-button-secondary"
-                            style={{
-                                backgroundColor: '#ff9800', // Orange button background
-                                color: '#fff', // White text
-                                border: 'none', // Remove border
-                                padding: '10px 20px', // Adjust padding
-                            }}
-                        />
-                    </div>
-                </Dialog>
-            </div>
-        );
-    };
-
     const getUserAddress = async (c) => {
         try {
             const headers = {
@@ -264,14 +203,15 @@ const Payment = () => {
             const res = await axios.get(`http://localhost:8000/api/user/address/existAddress`, { headers })
             if (res.status === 200) {
                 setAddress(res.data[0])
-                setVisible(true);
                 showToast('info', 'מידע', messages.INFO_ADDRESS_USED);
+                setVisible(true);// Show the dialog if an address exists
             }
         }
         catch (error) {
             const serverMessage = error.response?.data?.message || 'default';
             showToast('error', 'שגיאה', messages[serverMessage]);
-            console.error("Error fetching user address:", error);        }
+            console.error("Error fetching user address:", error);
+        }
     }
 
     const renderNewAddressDialog = () => {
@@ -440,9 +380,9 @@ const Payment = () => {
                 }}
                 onClick={() => {
                     setVisible(true);
-                    if (address) { // Check if address exists
-                        existAddress();
-                    }
+                    // if (address) { // Check if address exists
+                    //     existAddress();
+                    // }
                 }}
             />
         );
@@ -450,7 +390,19 @@ const Payment = () => {
 
     const AddressAddedSuccessfulyDialog = () => {
         return (
-            <Dialog visible={showSuccessDialog} style={{ width: '30vw' }} onClick={() => setShowSuccessDialog(false)} onHide={() => setShowSuccessDialog(false)} position="top" footer={<Button label="Close" onClick={() => (false)} />} showHeader={false} breakpoints={{ '960px': '80vw' }} disabled={formDisabled} modal>
+            <Dialog
+                visible={showSuccessDialog}
+                style={{ width: '30vw' }}
+                onClick={() => setShowSuccessDialog(false)}
+                onHide={() => setShowSuccessDialog(false)}
+                position="top"
+                footer={<Button
+                    label="Close"
+                    onClick={() => (false)} />}
+                showHeader={false}
+                breakpoints={{ '960px': '80vw' }}
+                disabled={formDisabled}
+                modal>
                 <div className="flex justify-content-center flex-column pt-6 px-3">
                     <i className="pi pi-check-circle" style={{ fontSize: '5rem', color: 'var(--green-500)' }}></i>
                     <h5>!הכתובת נוספה בהצלחה</h5>
@@ -566,7 +518,7 @@ const Payment = () => {
                 gap: '10px',           // Add spacing between buttons
             }}>
                 <DefineAddressButton />
-                {address ? existAddress() : <></>}
+                {/* {address ? existAddress() : <></>} */}
                 {/* <GooglePayButton
                     environment="TEST"
                     buttonColor={buttonColor}
@@ -616,6 +568,17 @@ const Payment = () => {
         toast.current.show({ severity, summary, detail, life: 3000 });
     };
 
+    const handleUseAddress = () => {
+        setVisible(false);
+        showToast('success', 'הצלחה', 'כתובת קיימת נבחרה לשימוש.');
+    };
+
+    const handleCreateNewAddress = () => {
+        setVisible(false);
+        renderNewAddressDialog()
+        showToast('info', 'מידע', 'פתיחת טופס לכתובת חדשה.');
+    };
+
     useEffect(() => {
         getUserAddress()
     }, [])
@@ -631,9 +594,13 @@ const Payment = () => {
             gap: '20px', // Spacing between sections
         }}>
             <Toast ref={toast} />
-            {existAddress()}
-            {AddressAddedSuccessfulyDialog()}
-            {renderNewAddressDialog()}
+            {visible?<ExistAddress
+                visible={visible}
+                address={address}
+                onUseAddress={handleUseAddress}
+                onCreateNewAddress={handleCreateNewAddress}
+                onClose={() => setVisible(false)}
+            />:<></>}
             <div style={{
                 display: 'flex',
                 justifyContent: 'space-between', // Align Total Sum and Payment Buttons
