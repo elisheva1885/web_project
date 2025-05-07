@@ -19,12 +19,8 @@ const MultiOutdoorUnit = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const stepperRef = useRef(null);
-  const dispatch = useDispatch();
   const { getFilePath } = useGetFilePath();
   const { addToBasket, toast } = useAddToBasket();
-  const { basket } = useSelector((state) => state.basket);
-  const { token } = useSelector((state) => state.token);
-
  
   const addtoBasket = async () => {
     addToBasket(product, "MultiOutdoorUnit");
@@ -67,7 +63,7 @@ const MultiOutdoorUnit = () => {
       <div style={styles.imageContainer}>
         <img src={getFilePath(product.imagepath)} alt={product.title} style={styles.productImage} />
         {product.company?.imagePath && (
-          <img src={`/${product.company.imagePath}`} alt={product.company.name} style={styles.companyImage} />
+          <img src={getFilePath(product.company.imagePath)} alt={product.company.name} style={styles.companyImage} />
         )}
       </div>
       <div style={styles.detailsContainer}>

@@ -69,7 +69,7 @@ const MiniCenteral = () => {
             <div style={styles.imageContainer}>
                 <img src={getFilePath(product.imagepath)} alt={product.title} style={styles.productImage} />
                 {product.company?.imagePath && (
-                    <img src={`/${product.company.imagePath}`} alt={product.company.name} style={styles.companyImage} />
+                    <img src={getFilePath(product.company.imagePath)} alt={product.company.name} style={styles.companyImage} />
                 )}
             </div>
 
@@ -91,6 +91,8 @@ const MiniCenteral = () => {
                             <span style={styles.featureUnit}>BTU</span>
                         </div>
                     )}
+                              <div style={styles.emptyLine}></div>
+
                     {product.energy_rating && (
                         <div style={styles.featureItem}>
                             <span style={styles.energyRating}>{product.energy_rating}</span>
@@ -169,6 +171,10 @@ const FeatureRow = ({ label, value, isBoolean = true }) => (
 );
 
 const styles = {
+    emptyLine: {
+        width: '100%',
+        height: '1px', // Adjust the height as needed for spacing
+      },
     container: {
         display: 'flex',
         flexDirection: 'column',

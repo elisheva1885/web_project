@@ -13,7 +13,7 @@ const createMultiOutdoorUnit = async (req, res) => {
         return res.status(400).json({ message: "INVALID_OTHER_DATA_FORMAT" });
     }
     const { company, title, describe, stock, price, BTU_output, working_current, condenser_unit_dimensions, quiet, wifi, timer, sabbath_command, onof_auto } = otherData
-    if (!company || !title || !describe || !price || typeof price !== "number" || price <= 0) {
+    if (!company || !title || !describe || !price || price <= 0) {
         return res.status(400).json({ message: "REQUIRED_FIELDS_MISSING" });
     }
     const imagepath = req.file?.filename;

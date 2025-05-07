@@ -46,17 +46,6 @@ const MultiOutdoorUnitSchema = new mongoose.Schema({
         type: Boolean,
         default:false
     },
-    // speeds: {
-    //     type: Number
-    // },
-    // air4d:{
-    //     type: Boolean,
-    //     default:false
-    // },
-    // night_mode: {
-    //     type: Boolean,
-    //     default:false
-    // },
     timer: {
         type: Boolean,
         default:false

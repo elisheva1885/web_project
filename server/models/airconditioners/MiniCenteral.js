@@ -42,7 +42,7 @@ const minicenteralSchema = new mongoose.Schema({
         heat: { type: String }
     },
     CFM:{
-        type:Number
+        type:String
     },
     Pa:{//לחץ סטטי
         type:Number

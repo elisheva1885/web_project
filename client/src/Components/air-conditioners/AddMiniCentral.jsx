@@ -236,7 +236,7 @@ const AddMiniCentral = () => {
                                 <div style={{ flex: '1', marginRight: '10px' }}>
                                     <span className="p-float-label">
                                         <Controller name="working_current.cool" control={control} render={({ field }) => (
-                                            <InputText id="working_current.cool" {...field} />
+                                            <InputText type="number"  id="working_current.cool" {...field} />
                                         )} />
                                         <label htmlFor="working_current.cool">Working Current Cool</label>
                                     </span>
@@ -244,7 +244,7 @@ const AddMiniCentral = () => {
                                 <div style={{ flex: '1', marginLeft: '10px' }}>
                                     <span className="p-float-label">
                                         <Controller name="working_current.heat" control={control} render={({ field }) => (
-                                            <InputText id="working_current.heat" {...field} />
+                                            <InputText type="number" id="working_current.heat" {...field} />
                                         )} />
                                         <label htmlFor="working_current.heat">Working Current Heat</label>
                                     </span>
@@ -255,7 +255,7 @@ const AddMiniCentral = () => {
                         <div className="field">
                             <span className="p-float-label">
                                 <Controller name="CFM" control={control} render={({ field }) => (
-                                    <InputText id="CFM" type="number" {...field} />
+                                    <InputText id="CFM" {...field} />
                                 )} />
                                 <label htmlFor="CFM">CFM</label>
                             </span>

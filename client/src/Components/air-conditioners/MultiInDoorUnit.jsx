@@ -63,7 +63,7 @@ const MultiIndoorUnit = () => {
       <div style={styles.imageContainer}>
         <img src={getFilePath(product.imagepath)} alt={product.title} style={styles.productImage} />
         {product.company?.imagePath && (
-          <img src={`/${product.company.imagePath}`} alt={product.company.name} style={styles.companyImage} />
+          <img src={getFilePath(product.company.imagePath)} alt={product.company.name} style={styles.companyImage} />
         )}
       </div>
       <div style={styles.detailsContainer}>

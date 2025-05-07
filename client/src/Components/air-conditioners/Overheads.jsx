@@ -245,7 +245,7 @@ const Overheads = () => {
             <div className="col-12 sm:col-6 lg:col-3 p-3" key={product._id}>
                 <div className="border-1 surface-border border-round p-4 shadow-3 h-full flex flex-column justify-content-between gap-4">
                     <img
-                        src={getFilePath(product?.company?.imagePath)}
+                        src={getFilePath(product.company.imagePath)}
                         alt="Company"
                         className="w-full h-10rem object-contain border-round"
                     />

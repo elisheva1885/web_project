@@ -243,7 +243,7 @@ const MultiOutdoorUnits = () => {
 
                     {/* תמונת החברה - גדולה ובולטת */}
                     <img
-                        src={`/${product?.company?.imagePath}`}
+                        src={getFilePath(product?.company?.imagePath)}
                         alt="Company"
                         className="w-full h-10rem object-contain border-round"
                     />
