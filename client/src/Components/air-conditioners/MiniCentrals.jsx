@@ -291,6 +291,8 @@ const MiniCenterals = () => {
             setRegistered(true)
         }
     }, [])
+    useEffect(() => {
+    }, [miniCenterals]);
 
     return (
         <>

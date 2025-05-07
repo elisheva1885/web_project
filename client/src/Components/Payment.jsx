@@ -117,21 +117,9 @@ const Payment = () => {
             const headers = {
                 'Authorization': `Bearer ${token}`
             };
-            console.log("address: ", address);
-            const data = address._id
-            const deleteRes = await axios.delete("http://localhost:8000/api/user/address",  {
-                headers: headers,
-                data: address._id
-            });
-            console.log("deleteRes: ", deleteRes);
-            if (deleteRes.status !== 200 && deleteRes.status !== 204) {
-                console.error("Failed to delete the existing address:", deleteRes.data);
-                showToast('error', 'שגיאה', "Failed to delete the existing address.");
-                return;
-            }
             const res = await axios.post("http://localhost:8000/api/user/address", newaddress, { headers });
             if (res.status === 201) {
-                setNewAddress(res.data);
+                setAddress(res.data);
                 setShowNewAddressDialog(false); // Close the new address dialog
                 setShowSuccessDialog(true)
                 showToast('success', 'הצלחה', messages.ADDRESS_CREATED_SUCCESSFULLY);
@@ -591,9 +579,7 @@ const Payment = () => {
         showToast('info', 'מידע', 'פתיחת טופס לכתובת חדשה.');
     };
     useEffect(() => {
-        if (address) {
-            console.log("Updated address:", address); // Log when address is updated
-        }
+        if (address) {        }
     }, [address]);
     useEffect(() => {
     }, [address]);

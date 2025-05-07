@@ -10,7 +10,6 @@ const companySlice = createSlice({
     reducers:{
         setCompanies:(state,action)=>{
             state.companies=action.payload
-            console.log("companies:",state.companies);
         },
         clearCompanies(state) {
             state.companies = null;

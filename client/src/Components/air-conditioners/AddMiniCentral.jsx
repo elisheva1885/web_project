@@ -77,6 +77,7 @@ const AddMiniCentral = () => {
                 setFormData(data);
                 setShowMessage(true);
                 dispatch(setMiniCenterals([...miniCenterals, res.data]));
+                // console.log("Mini Central added successfully:", res.data);
                 showToast('success', 'הצלחה', messages.MINICENTERAL_CREATED_SUCCESSFULLY);
                 navigate('/miniCenterals');
             }

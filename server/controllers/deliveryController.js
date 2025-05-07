@@ -14,16 +14,9 @@ const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
         user: "eli7saf@gmail.com",
-        pass: 'dlos zelp opcn icli',
+        pass: process.env.EMAIL_PASSWORD,
     }
 })
-
-const mailOptions = {
-    from: 'eli7saf@gmail.com',
-    to: 'elisheva1885@gmail.com',
-    subject: 'נושא ההודעה',
-    text: 'תוכן ההודעה',
-};
 
 const createDelivery = async (req, res) => {
     const user_id = req.user?._id
@@ -31,7 +24,7 @@ const createDelivery = async (req, res) => {
     if (!user_id) {
         return res.status(400).json({ message: "USER_REQUIRED" });
     }
-    if (!address || typeof address !== "object" || !address.city || !address.street || !address.zipCode) {
+    if (!address || typeof address !== "object" ) {
         return res.status(400).json({ message: "INVALID_ADDRESS" });
     }
     if (!purchase || typeof purchase !== "string" || purchase.length !== 24) {
@@ -81,7 +74,7 @@ const sendDeliveryCreatedEmail = async (deliveryId) => {
             from: 'eli7saf@gmail.com',
             to: user.email,
             subject: 'ההזמנה שלך נכנסה למערכת ותשלח אליך בקרוב',
-            text: `שלום ${user.name},\n\nההזמנה שלך נכנסה למערכת ותשלח אליך בקרוב.\n\nפרטי ההזמנה:\nכתובת: ${address.street}, ${address.city}, ${address.zipCode}\nסטטוס: ${delivery.status}\n\nפרטי רכישה:\nמוצרים: ${delivery.purchase.products.map(p => `• ${p.productName} - כמות: ${p.quantity}`).join('\n')}\nסכום כולל: ${""} ש"ח\n\nתודה על רכישתך!\nצוות השירות שלנו`
+            text: `שלום ${user.name},\n\nההזמנה שלך נכנסה למערכת ותשלח אליך בקרוב.\nתודה על רכישתך!\nצוות השירות שלנו`
         };
 
         // שלח את המייל
@@ -121,7 +114,7 @@ const sendDeliveryUpdatedEmail = async (deliveryId) => {
             from: 'eli7saf@gmail.com',
             to: user.email,
             subject: 'ההזמנה שלך מתקרבת אליך :)',
-            text: `שלום ${user.name},\nסטטוס ההזמנה שלך השתנה. .\n\nפרטי ההזמנה:\nכתובת: ${address.street}, ${address.city}, ${address.zipCode}\nסטטוס: ${delivery.status}\n\nפרטי רכישה:\nמוצרים: ${delivery.purchase.products.map(p => `• ${p.productName} - כמות: ${p.quantity}`).join('\n')}\nסכום כולל: ${""} ש"ח\n\nתודה על רכישתך!\nצוות השירות שלנו`
+            text: `שלום ${user.name},\nסטטוס ההזמנה שלך השתנה. \nתודה על רכישתך!\nצוות השירות שלנו`
         };
 
         // שלח את המייל

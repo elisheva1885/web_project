@@ -5,6 +5,7 @@ const User = require('../models/User')
 const createAddress = async (req, res) => {
     try {
         const user_id = req.user?._id
+        console.log("createAddress ", req.body)
         const { country, city, street, building_num, apartment_num, floor, zip_code } = req.body
         if (!user_id) {
             return res.status(400).json({ message: "INVALID_USER_ID" });
@@ -24,15 +25,15 @@ const createAddress = async (req, res) => {
         if (typeof street !== 'string' || street.trim() === '') {
             return res.status(400).json({ message: "INVALID_STREET" });
         }
-        if (typeof building_num !== 'number' || building_num <= 0) {
-            return res.status(400).json({ message: "INVALID_BUILDING_NUMBER" });
-        }
-        if (typeof apartment_num !== 'number' || apartment_num <= 0) {
-            return res.status(400).json({ message: "INVALID_APARTMENT_NUMBER" });
-        }
-        if (typeof floor !== 'number') {
-            return res.status(400).json({ message: "INVALID_FLOOR" });
-        }
+        // if (typeof building_num !== 'number' || building_num <= 0) {
+        //     return res.status(400).json({ message: "INVALID_BUILDING_NUMBER" });
+        // }
+        // if (typeof apartment_num !== 'number' || apartment_num <= 0) {
+        //     return res.status(400).json({ message: "INVALID_APARTMENT_NUMBER" });
+        // }
+        // if (typeof floor !== 'number') {
+        //     return res.status(400).json({ message: "INVALID_FLOOR" });
+        // }
         if (typeof zip_code !== 'string' || zip_code.trim() === '') {
             return res.status(400).json({ message: "INVALID_ZIP_CODE" });
         }
@@ -43,7 +44,8 @@ const createAddress = async (req, res) => {
         }
         const existingAddress = await Address.findOne({ user_id });
         if (existingAddress) {
-            return res.status(409).json({ message: "ADDRESS_ALREADY_EXISTS" });
+            // return res.status(409).json({ message: "ADDRESS_ALREADY_EXISTS" });
+            await existingAddress.deleteOne()
         }
         const address = await Address.create({ user_id, country, city, street, building_num, apartment_num, floor, zip_code })
         if (address) {
@@ -58,7 +60,6 @@ const createAddress = async (req, res) => {
         return res.status(500).json({ message: "INTERNAL_SERVER_ERROR" });
     }
 }
-
 
 const readAddressesByUserId = async (req, res) => {
     try {

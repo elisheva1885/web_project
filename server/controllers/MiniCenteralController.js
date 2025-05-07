@@ -37,7 +37,11 @@ const createMiniCenteral = async (req, res) => {
         }
         const miniCenteral = await MiniCenteral.create({ company, title, describe, imagepath, stock, price, BTU_output, efficiency_factor, energy_rating, working_current, CFM, Pa, pipe_connection, in_size, out_size, quiet, wifi, speeds, air4d, sabbath_command, onof_auto })
         if (miniCenteral) {
-            return res.status(201).json(miniCenteral);
+            const populatedMiniCenteral = await MiniCenteral.findById(miniCenteral._id).populate("company").lean()
+            if (!populatedMiniCenteral) {
+                return res.status(404).json({ message: "MINICENTERAL_NOT_FOUND" })
+            }
+            return res.status(201).json(populatedMiniCenteral);
         } else {
             return res.status(400).json({ message: "MINICENTERAL_CREATION_FAILED" });
         }
