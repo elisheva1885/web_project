@@ -6,9 +6,8 @@ const officialVerify = require("../middleware/officialVerify")
 const veriftyJWT = require("../middleware/verifyJWT")
 
 router.post("/",veriftyJWT, deliveryController.createDelivery)
-router.get("/",veriftyJWT, deliveryController.readDeliveries)
+router.get("/",officialVerify, deliveryController.readDeliveries)
 router.get("/:id",veriftyJWT, deliveryController.readDeliveriesByUserId)
-router.put("/",veriftyJWT, deliveryController.updateDelivery)
-router.delete("/",veriftyJWT, deliveryController.deleteDelivery)
+router.put("/",officialVerify, deliveryController.updateDelivery)
 
 module.exports = router

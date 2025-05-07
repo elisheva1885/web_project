@@ -38,7 +38,9 @@ const AddMiniCentral = () => {
         INSUFFICIENT_STOCK: "אין מלאי מספיק.",
         INVALID_PRICE: "מחיר אינו תקין.",
         INTERNAL_ERROR: "שגיאה פנימית בשרת. נסה שוב מאוחר יותר.",
-
+        UNAUTHORIZED: "השם המשתמש או הסיסמה אינם נכונים. אנא בדוק ונסה שוב.",
+        Access_denied: "אינך מורשה לבצע פעולה זו.",
+        Forbidden: "אינך מורשה לבצע פעולה זו.",
         // Success Messages
         MINICENTERAL_CREATED_SUCCESSFULLY: "המיני מרכזי נוסף בהצלחה.",
         MINICENTERAL_DELETED_SUCCESSFULLY: "המיני מרכזי נמחק בהצלחה.",

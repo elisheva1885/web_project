@@ -36,7 +36,9 @@ const AddMultiIndoorUnit = () => {
         INSUFFICIENT_STOCK: "אין מלאי מספיק.",
         INVALID_PRICE: "מחיר אינו תקין.",
         INTERNAL_ERROR: "שגיאה פנימית בשרת. נסה שוב מאוחר יותר.",
-    
+        UNAUTHORIZED: "השם המשתמש או הסיסמה אינם נכונים. אנא בדוק ונסה שוב.",
+        Access_denied: "אינך מורשה לבצע פעולה זו.",
+        Forbidden: "אינך מורשה לבצע פעולה זו.",
         // Success Messages
         MULTIINDOORUNIT_CREATED_SUCCESSFULLY: "היחידה הפנימית נוספה בהצלחה.",
         MULTIINDOORUNIT_DELETED_SUCCESSFULLY: "היחידה הפנימית נמחקה בהצלחה.",

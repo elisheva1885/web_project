@@ -26,6 +26,10 @@ import React, { useRef, useState } from 'react';
         INVALID_CLOSING_HOUR: "שעת סגירה אינה תקינה.",
         BRANCH_EXISTS: "סניף עם כתובת זו כבר קיים.",
         INTERNAL_ERROR: "שגיאה פנימית בשרת. נסי שוב מאוחר יותר.",
+        UNAUTHORIZED: "השם המשתמש או הסיסמה אינם נכונים. אנא בדוק ונסה שוב.",
+        Access_denied: "אינך מורשה לבצע פעולה זו.",
+        Forbidden: "אינך מורשה לבצע פעולה זו."
+
 
     };
      const onSubmit = async (data) => {

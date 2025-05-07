@@ -100,7 +100,6 @@ const updateOverhead = async (req, res) => {
         overhead.describe = describe ? describe : overhead.describe
         overhead.imagepath = imagepath ? imagepath : overhead.imagepath
         overhead.stock = stock ? stock : overhead.stock
-        // overhead.price= overhead.price
         overhead.BTU_output = BTU_output ? BTU_output : overhead.BTU_output
         overhead.energy_rating = energy_rating ? energy_rating : overhead.energy_rating
         overhead.working_current = working_current ? working_current : overhead.working_current

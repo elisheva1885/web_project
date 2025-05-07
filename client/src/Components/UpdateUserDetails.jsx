@@ -24,6 +24,9 @@ const UpdateUserDetails = () => {
         NO_FIELDS_TO_UPDATE: "אין שדות לעדכן.",
         USER_NOT_FOUND: "המשתמש לא נמצא.",
         INTERNAL_ERROR: "שגיאה פנימית בשרת. נסה שוב מאוחר יותר.",
+        UNAUTHORIZED: "השם המשתמש או הסיסמה אינם נכונים. אנא בדוק ונסה שוב.",
+        Access_denied: "אינך מורשה לבצע פעולה זו.",
+        Forbidden: "אינך מורשה לבצע פעולה זו.",
 
         // Success Messages
         USER_UPDATED_SUCCESSFULLY: "הפרטים עודכנו בהצלחה.",

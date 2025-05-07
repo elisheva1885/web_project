@@ -13,7 +13,7 @@ const createMultiIndoorUnit = async (req, res) => {
         return res.status(400).json({ message: "INVALID_OTHER_DATA_FORMAT" });
     }
     const { company, title, describe, stock, price, BTU_output, CFM, pipe_connection, evaporator_unit_dimensions } = otherData
-    if (!company || !title || !describe || !price || typeof company !== "string" || typeof title !== "string" || typeof describe !== "string" || typeof price !== "number" || price <= 0) {
+    if (!company || !title || !describe || !price  || price <= 0) {
         return res.status(400).json({ message: "REQUIRED_FIELDS_MISSING" });
     }
     const imagepath = req.file?.filename;

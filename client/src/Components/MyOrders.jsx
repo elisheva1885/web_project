@@ -14,6 +14,7 @@ import { Image } from "primereact/image";
 import { Divider } from "primereact/divider";
 import { Toast } from 'primereact/toast';
 import { useRef } from 'react';
+import useGetFilePath from '../hooks/useGetFilePath';
 
 const MyOrders = () => {
     const dispatch = useDispatch();
@@ -21,6 +22,8 @@ const MyOrders = () => {
     const { token } = useSelector((state) => state.token);
     const [orders, setOrders] = useState([]);
     const toast = useRef(null);
+    const { getFilePath } = useGetFilePath()
+
     const errorMessages = {
         USER_REQUIRED: "משתמש נדרש.",
         INVALID_ADDRESS: "כתובת לא חוקית.",
@@ -31,7 +34,10 @@ const MyOrders = () => {
         DELIVERY_NOT_FOUND: "המשלוח לא נמצא.",
         INTERNAL_ERROR: "שגיאה פנימית בשרת. אנא נסה שוב מאוחר יותר.",
         UNAUTHORIZED: "אין לך הרשאות לצפות בהזמנות.",
-        default: "שגיאה כללית. אנא נסה שוב מאוחר יותר."
+        default: "שגיאה כללית. אנא נסה שוב מאוחר יותר.",
+        Access_denied: "אינך מורשה לבצע פעולה זו.",
+        Forbidden: "אינך מורשה לבצע פעולה זו."
+
     };
 
     const showToast = (severity, summary, detail) => {
@@ -141,7 +147,7 @@ const MyOrders = () => {
                                 }}
                             >
                                 <Image
-                                    src={product.imagepath || 'air-conditioner.jpg'} // Use a placeholder image if undefined
+                                    src={ getFilePath(product.imagepath) || 'air-conditioner.jpg'} // Use a placeholder image if undefined
                                     alt={product.title || 'No Title'}
                                     width="100"
                                     preview

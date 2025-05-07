@@ -34,7 +34,10 @@ const Branches = () => {
         INVALID_CITY: "שם העיר אינו תקין.",
         INTERNAL_ERROR: "שגיאה פנימית בשרת. נסי שוב מאוחר יותר.",
         Access_denied: "אינך מורשה לבצע פעולה זו.",
-        Forbidden: "אינך מורשה לבצע פעולה זו."
+        Forbidden: "אינך מורשה לבצע פעולה זו.",
+        UNAUTHORIZED: "השם המשתמש או הסיסמה אינם נכונים. אנא בדוק ונסה שוב.",
+        default: "שגיאה כללית. אנא נסי שוב מאוחר יותר.",
+
     };
     const sortData = (data) => {
         data.sort((a, b) => {

@@ -7,6 +7,7 @@ import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { Toast } from 'primereact/toast';
 import { useRef } from 'react';
+import useGetFilePath from '../hooks/useGetFilePath';
 
 const UpdateDeliveryStatus = () => {
     const [deliveries, setDeliveries] = useState([]);
@@ -15,6 +16,7 @@ const UpdateDeliveryStatus = () => {
     const [selectedDeliveryProducts, setSelectedDeliveryProducts] = useState([]);
     const { token } = useSelector((state) => state.token);
     const toast = useRef(null);
+    const { getFilePath } = useGetFilePath()
 
     const messages = {
         // Error Messages
@@ -33,6 +35,9 @@ const UpdateDeliveryStatus = () => {
         DELIVERY_CREATED_SUCCESSFULLY: "משלוח נוצר בהצלחה.",
         DELIVERY_UPDATED_SUCCESSFULLY: "סטטוס המשלוח עודכן בהצלחה.",
         DELIVERY_DELETED_SUCCESSFULLY: "משלוח נמחק בהצלחה.",
+        UNAUTHORIZED: "השם המשתמש או הסיסמה אינם נכונים. אנא בדוק ונסה שוב.",
+        Access_denied: "אינך מורשה לבצע פעולה זו.",
+        Forbidden: "אינך מורשה לבצע פעולה זו.",
 
         // Default
         default: "אירעה שגיאה לא צפויה. נסה שוב."
@@ -209,8 +214,8 @@ const UpdateDeliveryStatus = () => {
                         {selectedDeliveryProducts.map((product, index) => (
                             <li key={index} style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
                                 <img
-                                    src={product.product_id.imagepath}
-                                    alt={product.product_id.title}
+                                    src={getFilePath(product.product_id?.imagepath) }
+                                    alt={product.product_id?.title}
                                     style={{
                                         width: '50px',
                                         height: '50px',
@@ -221,7 +226,7 @@ const UpdateDeliveryStatus = () => {
                                     }}
                                 />
                                 <div>
-                                    <p style={{ margin: 0, fontWeight: 'bold' }}>{product.product_id.title}</p>
+                                    <p style={{ margin: 0, fontWeight: 'bold' }}>{product.product_id?.title}</p>
                                     <p style={{ margin: 0 }}>כמות: {product.amount}</p>
                                 </div>
                             </li>

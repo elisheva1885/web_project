@@ -54,6 +54,9 @@ const MiniCenterals = () => {
         INVALID_MINICENTERAL_ID: "מזהה המזגן אינו תקין.",
         INVALID_PRICE: "המחיר חייב להיות מספר חיובי.",
         MINICENTERAL_NOT_FOUND: "המזגן לא נמצא.",
+        UNAUTHORIZED: "השם המשתמש או הסיסמה אינם נכונים. אנא בדוק ונסה שוב.",
+        Access_denied: "אינך מורשה לבצע פעולה זו.",
+        Forbidden: "אינך מורשה לבצע פעולה זו.",
     };
 
     const goToAddMiniCenteral = (type) => {
@@ -250,7 +253,7 @@ const MiniCenterals = () => {
                         <Tag value={getSeverityText(product)} severity={getSeverity(product.stock)} />
                         <span className="text-lg font-medium text-primary">₪{product.price}</span>
                         {userDetails?.role === 'official' || userDetails?.role === 'admin' ? <Button onClick={() => UpdateMiniCenteral(product)}><i className="pi pi-pencil" style={{ fontSize: '1rem' }}></i></Button> : <></>}
-                        {userDetails?.role === 'official' || userDetails?.role === 'admin' ? (<Button onClick={() => openPriceUpdateDialog(product)}><i className="pi pi-pencil" style={{ fontSize: '1rem' }}> עדכון מחיר </i> </Button>) : <></>}
+                        { userDetails?.role === 'admin' ? (<Button onClick={() => openPriceUpdateDialog(product)}><i className="pi pi-pencil" style={{ fontSize: '1rem' }}> עדכון מחיר </i> </Button>) : <></>}
                         {userDetails?.role === 'admin' && (
                             <Button icon="pi pi-trash" className="p-button-rounded p-button-danger p-button-sm" onClick={() => deleteMiniCentral(product)} tooltip="מחק" tooltipOptions={{ position: 'bottom' }} />
                         )}

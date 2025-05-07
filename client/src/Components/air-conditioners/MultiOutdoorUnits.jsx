@@ -65,6 +65,10 @@ const MultiOutdoorUnits = () => {
         INVALID_MULTI_OUTDOOR_UNIT_ID: "מזהה המעבה אינו תקין.",
         INVALID_PRICE: "המחיר חייב להיות מספר חיובי.",
         MULTI_OUTDOOR_UNIT_NOT_FOUND: "המעבה לא נמצא.",
+        UNAUTHORIZED: "השם המשתמש או הסיסמה אינם נכונים. אנא בדוק ונסה שוב.",
+        Access_denied: "אינך מורשה לבצע פעולה זו.",
+        Forbidden: "אינך מורשה לבצע פעולה זו."
+
     };
 
     const addtoBasket = async (product) => {
@@ -264,7 +268,7 @@ const MultiOutdoorUnits = () => {
                         <Tag value={getSeverityText(product)} severity={getSeverity(product.stock)} />
                         <span className="text-lg font-medium text-primary">₪{product.price}</span>
                         {userDetails?.role === 'official' || userDetails?.role === 'admin' ? <Button onClick={() => UpdateMultiOutdoorUnit(product)}><i className="pi pi-pencil" style={{ fontSize: '1rem' }}></i></Button> : <></>}
-                        {userDetails?.role === 'official' || userDetails?.role === 'admin' ? (<Button onClick={() => openPriceUpdateDialog(product)}><i className="pi pi-pencil" style={{ fontSize: '1rem' }}> עדכון מחיר </i> </Button>) : <></>}
+                        { userDetails?.role === 'admin' ? (<Button onClick={() => openPriceUpdateDialog(product)}><i className="pi pi-pencil" style={{ fontSize: '1rem' }}> עדכון מחיר </i> </Button>) : <></>}
                         {userDetails?.role === 'admin' && (
                             <Button icon="pi pi-trash" className="p-button-rounded p-button-danger p-button-sm" onClick={() => deleteMultiOutdoorUnit(product)} tooltip="מחק" tooltipOptions={{ position: 'bottom' }} />
                         )}

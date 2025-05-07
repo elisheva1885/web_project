@@ -24,7 +24,9 @@ const AdminRegister = () => {
         INVALID_PHONE: "מספר הטלפון לא תקין",
         INTERNAL_ERROR: "שגיאה בשרת, נסי שוב מאוחר יותר",
         Access_denied: "אינך מורשה לבצע פעולה זו.",
-        Forbidden: "אינך מורשה לבצע פעולה זו."
+        Forbidden: "אינך מורשה לבצע פעולה זו.",
+        UNAUTHORIZED: "השם המשתמש או הסיסמה אינם נכונים. אנא בדוק ונסה שוב.",
+
     };
     const defaultValues = {
         name: '',

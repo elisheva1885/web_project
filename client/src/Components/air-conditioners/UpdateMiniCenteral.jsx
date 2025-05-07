@@ -20,6 +20,10 @@ const UpdateMiniCenteral = () => {
         INVALID_MINICENTERAL_ID: "מזהה המזגן אינו תקין. ודא שהמזהה הוא מחרוזת באורך 24 תווים.",
         MINICENTERAL_NOT_FOUND: "המזגן לא נמצא במערכת. ודא שהמזהה נכון.",
         INTERNAL_ERROR: "שגיאת שרת פנימית. נסי שוב מאוחר יותר.",
+        UNAUTHORIZED: "השם המשתמש או הסיסמה אינם נכונים. אנא בדוק ונסה שוב.",
+        Access_denied: "אינך מורשה לבצע פעולה זו.",
+        Forbidden: "אינך מורשה לבצע פעולה זו."
+
     };
     const showToast = (severity, summary, detail) => {
         toast.current.show({

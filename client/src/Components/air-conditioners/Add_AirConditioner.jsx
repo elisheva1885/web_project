@@ -22,7 +22,6 @@ const Add_AirConditioner = () => {
         default:
             break;
     }
-   
 
     return (
         <>
