@@ -20,12 +20,12 @@ const OrderHistory = () => {
         return filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     };
 
-    useEffect(() => {
-        if (userDeliveries && userDeliveries.length > 0) {
-            const sortedHistory = filterAndSortHistory(userDeliveries);
-            setHistoryOrders(sortedHistory);
-        }
-    }, [userDeliveries]); // Dependency on userDeliveries
+    // useEffect(() => {
+    //     if (userDeliveries && userDeliveries.length > 0) {
+    //         const sortedHistory = filterAndSortHistory(userDeliveries);
+    //         setHistoryOrders(sortedHistory);
+    //     }
+    // }, [userDeliveries]); // Dependency on userDeliveries
 
     const renderDelivery = (delivery) => {
         const orderDate = new Date(delivery.createdAt).toLocaleDateString();
@@ -67,7 +67,7 @@ const OrderHistory = () => {
                         overflow: "auto"
                     }}
                 >
-                    {delivery.purchase.products.map((shoppingBagItem) => {
+                    {delivery.purchase?.products.map((shoppingBagItem) => {
                         const product = shoppingBagItem.product_id || {}; // product_id now dynamically resolves to the correct product type
                         return (
                             <div

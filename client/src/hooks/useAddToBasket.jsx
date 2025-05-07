@@ -37,7 +37,7 @@ const useAddToBasket = () => { // Renamed to a valid custom hook
                     'Authorization': `Bearer ${token}`
                 };
                 const res = await axios.post('http://localhost:8000/api/user/shoppingBag', shoppingBagDetails, { headers });
-                if (res.status === 201) {
+                if (res.status === 201) {                 
                     dispatch(setBasket([...basket, res.data]));
                     toast.current.show({
                         severity: 'success',

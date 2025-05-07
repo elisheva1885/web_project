@@ -139,7 +139,6 @@ const MultiIndoorUnits = () => {
     _id: selectedProduct._id,
     price: priceValue
    }
-   console.log(details);
    const res = await axios.put(`http://localhost:8000/api/air-conditioner/multiIndoorUnit/price`, details, { headers });
    console.log(res);
    if (res.status === 200) {
@@ -227,7 +226,7 @@ const getSeverityText = (product) => {
         case 'success':
             return "במלאי";
 
-        case 'warning': //check what problematic
+        case 'warning': 
             return "פריטים אחרונים";
 
         case 'danger':
@@ -241,32 +240,27 @@ const getSeverityText = (product) => {
 const UpdateMultiIndoorUnit = async (m) => {
     const navigationData = {
         type: m,
-        // You can add any other data you may want to send
     };
     navigate('/multiIndoorUnits/multiIndoorUnit/update', { state: navigationData })
-    // dispatch(setOverheads(res.data))
 }
 
 const gridItem = (product) => {
+    {console.log(product.company.imagePath)}
+
     return (
         <div className="col-12 sm:col-6 lg:col-3 p-3" key={product._id}>
             <div className="border-1 surface-border border-round p-4 shadow-3 h-full flex flex-column justify-content-between gap-4">
-
-                {/* תמונת החברה - גדולה ובולטת */}
                 <img
-                    src={getFilePath(product?.company?.imagePath)}
+                    src={getFilePath(product.company.imagePath)}
                     alt="Company"
                     className="w-full h-10rem object-contain border-round"
                 />
-
-                {/* תמונת המוצר - גדולה ורחבה */}
                 <img
                     src={getFilePath(product.imagepath)}
                     alt={product.title}
                     className="w-full h-12rem object-contain border-round"
                 />
 
-                {/* פרטי המוצר */}
                 <div className="flex flex-column align-items-center text-center gap-2">
                     <Link to={`/multiIndoorUnits/multiIndoorUnit/${product._id}`}>
                         <div className="text-xl font-bold text-900">{product.title}</div>

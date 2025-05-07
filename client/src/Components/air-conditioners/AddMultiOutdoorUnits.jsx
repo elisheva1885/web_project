@@ -90,19 +90,9 @@ const AddMultiOutdoorUnits = () => {
     return (
         <div className="form-demo">
             <Toast ref={toast} />
-            <Dialog visible={showMessage} onHide={() => setShowMessage(false)} position="top" footer={<Button label="Close" onClick={() => setShowMessage(false)} />} showHeader={false} breakpoints={{ '960px': '80vw' }} style={{ width: '40vw' }}>
-                <div className="flex justify-content-center flex-column pt-6 px-3">
-                    <i className="pi pi-check-circle" style={{ fontSize: '5rem', color: 'var(--green-500)' }}></i>
-                    <h5>Multi Outdoor Unit Added Successfully!</h5>
-                    <p style={{ lineHeight: 1.5, textIndent: '1rem' }}>
-                        Multi Outdoor Unit <b>{formData.title}</b> has been successfully added.
-                    </p>
-                </div>
-            </Dialog>
-
             <div className="flex justify-content-center">
                 <div className="card" style={{ width: '100%', maxWidth: '600px' }}>
-                    <h5 className="text-center">Add Multi Outdoor Unit</h5>
+                    <h5 className="text-center">הוספת מעבה מולטי</h5>
                     <form onSubmit={handleSubmit(onSubmit)} className="p-fluid">
 
                         {/* Company */}
@@ -289,7 +279,7 @@ const AddMultiOutdoorUnits = () => {
                             <label htmlFor="onof_auto">Auto ON/OFF</label>
                         </div>
 
-                        <Button type="submit" label="Add Outdoor Unit" className="mt-2" />
+                        <Button type="submit" label="להוספה" className="mt-2" />
                     </form>
                 </div>
             </div>
